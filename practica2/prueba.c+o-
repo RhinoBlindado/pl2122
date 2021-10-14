@@ -1,0 +1,12 @@
+inicio {
+	inivar
+		entero edad;
+	finvar
+
+	edad = -1;
+
+	escanear(entero edad);
+
+	anunciar("tienes ", edad, " años");
+	\
+}
