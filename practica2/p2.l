@@ -16,7 +16,7 @@ INIVAR   inivar
 FINVAR   finvar
 CERLLA   \}
 ABRLLA   \{
-DEFLISTA "lista de"
+DEFLISTA "lista"\ +"de"
 TIPODATO entero|real|caracter|booleano
 ASIG     =
 IF       si
@@ -31,7 +31,6 @@ COMA     ,
 PRINT    anunciar
 PYC      ;
 MAS      \+
-MENOS    -
 OPBIN    \/|\^|<|<=|>|>=|y|o|oex
 OPUNARIO no|#|\?
 CONCAT   \*\*
@@ -49,42 +48,57 @@ LITERAL  [0-9]*\.[0-9]*|[0-9]+|'.'|Verdadero|Falso
 %%
 
  /* Reconoce el token y lo muestra por la salida */
-{INIPROG}  { printf("INIPROG "); }
-{ABRPAR}   { printf("ABRPAR "); }
-{CERPAR}   { printf("CERPAR "); }
-{INIVAR}   { printf("INIVAR "); }
-{FINVAR}   { printf("FINVAR "); }
-{CERLLA}   { printf("CERLLA "); }
-{ABRLLA}   { printf("ABRLLA "); }
-{DEFLISTA} { printf("DEFLISTA "); }
-{TIPODATO} { printf("TIPODATO "); }
-{ASIG}     { printf("ASIG "); }
-{IF}       { printf("IF "); }
-{ELSE}     { printf("ELSE "); }
-{WHILE}    { printf("WHILE "); }
-{SCAN}     { printf("SCAN "); }
-{RETURN}   { printf("RETURN "); }
-{FOR}      { printf("FOR "); }
-{TO}       { printf("TO "); }
-{SENTIDO}  { printf("SENTIDO "); }
-{COMA}     { printf("COMA "); }
-{PRINT}    { printf("PRINT "); }
-{PYC}      { printf("PYC "); }
-{MAS}      { printf("MAS "); }
-{MENOS}    { printf("MENOS "); }
-{OPBIN}    { printf("OPBIN "); }
-{OPUNARIO} { printf("OPUNARIO "); }
-{CONCAT}   { printf("CONCAT "); }
-{BORRAR}   { printf("BORRAR "); }
-{ARROBA}   { printf("ARROBA "); }
-{POR}      { printf("POR "); }
-{INITER}   { printf("INITER "); }
-{ITER}     { printf("ITER "); }
-{ABRCOR}   { printf("ABRCOR "); }
-{CERCOR}   { printf("CERCOR "); }
-{CADENA}   { printf("CADENA "); }
-{IDENTIF}  { printf("IDENTIF "); }
-{LITERAL}  { printf("LITERAL "); }
+{INIPROG}  { printf("INIPROG - %s\n", yytext); }
+{ABRPAR}   { printf("ABRPAR - %s\n", yytext); }
+{CERPAR}   { printf("CERPAR - %s\n", yytext); }
+{INIVAR}   { printf("INIVAR - %s\n", yytext); }
+{FINVAR}   { printf("FINVAR - %s\n", yytext); }
+{CERLLA}   { printf("CERLLA - %s\n", yytext); }
+{ABRLLA}   { printf("ABRLLA - %s\n", yytext); }
+{DEFLISTA} { printf("DEFLISTA - %s\n", yytext); }
+"entero"   { printf("TIPODATO - %s 0\n", yytext); }
+"real"     { printf("TIPODATO - %s 1\n", yytext); }
+"caracter" { printf("TIPODATO - %s 2\n", yytext); }
+"booleano" { printf("TIPODATO - %s 3\n", yytext); }
+{ASIG}     { printf("ASIG - %s\n", yytext); }
+{IF}       { printf("IF - %s\n", yytext); }
+{ELSE}     { printf("ELSE - %s\n", yytext); }
+{WHILE}    { printf("WHILE - %s\n", yytext); }
+{SCAN}     { printf("SCAN - %s\n", yytext); }
+{RETURN}   { printf("RETURN - %s\n", yytext); }
+{FOR}      { printf("FOR - %s\n", yytext); }
+{TO}       { printf("TO - %s\n", yytext); }
+"aumentando" { printf("SENTIDO - %s 0\n", yytext); }
+"decrementando" { printf("SENTIDO - %s 1\n", yytext); }
+{COMA}     { printf("COMA - %s\n", yytext); }
+{PRINT}    { printf("PRINT - %s\n", yytext); }
+{PYC}      { printf("PYC - %s\n", yytext); }
+{MAS}      { printf("MAS - %s\n", yytext); }
+"/"        { printf("OPBIN - %s 0\n", yytext); }
+"^"        { printf("OPBIN - %s 1\n", yytext); }
+"<"        { printf("OPBIN - %s 2\n", yytext); }
+"<="       { printf("OPBIN - %s 3\n", yytext); }
+">"        { printf("OPBIN - %s 4\n", yytext); }
+">="       { printf("OPBIN - %s 5\n", yytext); }
+"y"        { printf("OPBIN - %s 6\n", yytext); }
+"o"        { printf("OPBIN - %s 7\n", yytext); }
+"oex"      { printf("OPBIN - %s 8\n", yytext); }
+"no"       { printf("OPUNARIO - %s 0\n", yytext); }
+"#"        { printf("OPUNARIO - %s 1\n", yytext); }
+"?"        { printf("OPUNARIO - %s 2\n", yytext); }
+{CONCAT}   { printf("CONCAT - %s\n", yytext); }
+"%"        { printf("BORRAR - %s 0\n", yytext); }
+"-"        { printf("BORRAR - %s 1\n", yytext); }
+{ARROBA}   { printf("ARROBA - %s\n", yytext); }
+{POR}      { printf("POR - %s\n", yytext); }
+{INITER}   { printf("INITER - %s\n", yytext); }
+"<<"       { printf("ITER - %s 0\n", yytext); }
+">>"       { printf("ITER - %s 1\n", yytext); }
+{ABRCOR}   { printf("ABRCOR - %s\n", yytext); }
+{CERCOR}   { printf("CERCOR - %s\n", yytext); }
+{CADENA}   { printf("CADENA - %s\n", yytext); }
+{IDENTIF}  { printf("IDENTIF - %s\n", yytext); }
+{LITERAL}  { printf("LITERAL - %s\n", yytext); }
 
  /*
  	Ignora el espacio en blanco (espacio, tabuladores y saltos de línea)

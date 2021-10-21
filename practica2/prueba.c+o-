@@ -1,12 +1,16 @@
 inicio {
 	inivar
-		entero edad;
+		real edad;
 	finvar
+
+	lista de
 
 	edad = -1;
 
 	escanear(entero edad);
 
-	anunciar("tienes ", edad, " años");
+	anunciar("tienes ", edad + 1 oex 80, " años");
+	53d
 	\
+#?no
 }
