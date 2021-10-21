@@ -10,7 +10,5 @@ inicio {
 	escanear(entero edad);
 
 	anunciar("tienes ", edad + 1 oex 80, " años");
-	53d
 	\
-#?no
 }
