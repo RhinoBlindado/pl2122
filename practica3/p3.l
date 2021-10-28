@@ -14,35 +14,35 @@
 %}
 
 /* TOKENS */
-INIPROG  inicio
-ABRPAR   \(
-CERPAR   \)
-INIVAR   inivar
-FINVAR   finvar
-CERLLA   \}
-ABRLLA   \{
-DEFLISTA "lista"\ +"de"
-ASIG     =
-IF       si
-ELSE     sino
-WHILE    mientras
-SCAN     escanear
-RETURN   repatriar
-FOR      para
-TO       hasta
-COMA     ,
-PRINT    anunciar
-PYC      ;
-MAS      \+
-CONCAT   \*\*
-ARROBA   @
-POR      \*
-INITER   \$
-ABRCOR   \[
-CERCOR   \]
-CADENA   \"[^"]*\"
-IDENTIF  [A-Za-z][A-Za-z0-9]*
-LITERAL  [0-9]*\.[0-9]*|[0-9]+|'.'|Verdadero|Falso
+// INIPROG  inicio
+// ABRPAR   \(
+// CERPAR   \)
+// INIVAR   inivar
+// FINVAR   finvar
+// CERLLA   \}
+// ABRLLA   \{
+// DEFLISTA "lista"\ +"de"
+// ASIG     =
+// IF       si
+// ELSE     sino
+// WHILE    mientras
+// SCAN     escanear
+// RETURN   repatriar
+// FOR      para
+// TO       hasta
+// COMA     ,
+// PRINT    anunciar
+// PYC      ;
+// MAS      \+
+// CONCAT   \*\*
+// ARROBA   @
+// POR      \*
+// INITER   \$
+// ABRCOR   \[
+// CERCOR   \]
+// CADENA   \"[^"]*\"
+// IDENTIF  [A-Za-z][A-Za-z0-9]*
+// LITERAL  [0-9]*\.[0-9]*|[0-9]+|'.'|Verdadero|Falso
 
 %%
 
