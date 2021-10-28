@@ -1,9 +1,9 @@
 inicio {
 	inivar
 		real edad;
-	finvar
+	finvar;
 
-	lista de
+	lista de entero
 
 	edad = -1;
 

@@ -48,7 +48,6 @@ LITERAL  [0-9]*\.[0-9]*|[0-9]+|'.'|Verdadero|Falso
 
  /* Reconoce el token y lo muestra por la salida */
 {INIPROG}       { printf("INIPROG - %s\n", yytext); return(INIPROG); }
-{INIPROG}       { printf("INIPROG - %s\n", yytext); return(INIPROG); }
 {ABRPAR}        { printf("ABRPAR - %s\n", yytext); return(ABRPAR); }
 {CERPAR}        { printf("CERPAR - %s\n", yytext); return(CERPAR); }
 {INIVAR}        { printf("INIVAR - %s\n", yytext); return(INIVAR); }
@@ -74,6 +73,7 @@ LITERAL  [0-9]*\.[0-9]*|[0-9]+|'.'|Verdadero|Falso
 {PRINT}         { printf("PRINT - %s\n", yytext); return(PRINT); }
 {PYC}           { printf("PYC - %s\n", yytext); return(PYC); }
 {MAS}           { printf("MAS - %s\n", yytext); return(MAS); }
+	/* TODO: Separar OPBIN en tokens individuales para la prioridad */
 "/"             { printf("OPBIN - %s 0\n", yytext); return(OPBIN); }
 "^"             { printf("OPBIN - %s 1\n", yytext); return(OPBIN); }
 "<"             { printf("OPBIN - %s 2\n", yytext); return(OPBIN); }
@@ -115,6 +115,6 @@ LITERAL  [0-9]*\.[0-9]*|[0-9]+|'.'|Verdadero|Falso
 %%
 
 // TODO: borrar esto y pasarlo a un main nuevo
-int main() {
-	yylex();
-}
+// int main() {
+// 	yylex();
+// }

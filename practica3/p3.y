@@ -5,7 +5,7 @@
 
 void yyerror ( char * msg ) ;
 
-int n_lineas = 1;
+// int n_lineas = 1;
 %}
 
 /* Muestra los errores con más alegría */
