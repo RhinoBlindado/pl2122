@@ -8,8 +8,6 @@ void yyerror ( char * msg ) ;
 // int n_lineas = 1;
 %}
 
-/* Muestra los errores con más alegría */
-// %error-verbose
 %define parse.error verbose
 
 %start programa
@@ -18,10 +16,13 @@ void yyerror ( char * msg ) ;
 %token INIPROG
 %token ABRPAR
 %token CERPAR
-%token INIVAR
-%token FINVAR
 %token CERLLA
 %token ABRLLA
+%token ABRCOR
+%token CERCOR
+%token INIVAR
+%token FINVAR
+%token COMA
 %token DEFLISTA
 %token TIPODATO
 %token ASIG
@@ -33,24 +34,55 @@ void yyerror ( char * msg ) ;
 %token FOR
 %token TO
 %token SENTIDO
-%token COMA
 %token PRINT
 %token PYC
-%token MAS
-%token OPBIN
-%token OPUNARIO
+%token PLUS
+%token MINUS
+%token SLASH
+%token HAT
+%token ASTERISC
+%token LT
+%token LE
+%token GT
+%token GE
+%token AND
+%token OR
+%token XOR
+%token PLUSPLUS
+%token MINMIN
+%token PERCENT
 %token CONCAT
-%token BORRAR
-%token ARROBA
-%token POR
-%token INITER
+%token NOT
+%token HASH
+%token INTERR
+%token AT
 %token ITER
-%token ABRCOR
-%token CERCOR
+%token INITER
 %token CADENA
 %token IDENTIF
 %token LITERAL
 
+%left OR                        // OR lógico
+%left AND // AND lógico
+                                // OR bits
+%left XOR                       // Exclusive OR
+// AND bits
+                                // Operadores de igualdad
+%left LT LE GT GE               // Operadores de relación
+%left PLUS MINUS                // Operadores aditivos
+%left ASTERISC SLASH PERCENT HAT// Operadores multiplicativos
+
+%right NOT                      // Operadores unarios (TODO: falta +- unario)
+%right PLUSPLUS MINMIN
+// Añadir Decrementos e Incrementos pos y prefijos.
+%left ABRPAR                    // índices
+
+// Listas
+%left AT
+%left ITER
+%left INITER
+%left HASH INTERR
+%left CONCAT
 
 %%
 
@@ -59,22 +91,21 @@ programa                      : cabeceraPrograma bloque;
 cabeceraPrograma              : INIPROG;
 
 bloque                        : inicioBloque declararVariablesLocalesMulti
-										  declararFuncionMulti sentencias finBloque;
+                                declararFuncionMulti sentencias finBloque;
 
-declararFuncionMulti          : declararFuncionMulti
-										| declararFuncion
-										| /* cadena vacía */
-										;
+declararFuncionMulti          : declararFuncionMulti declararFuncion
+                              | /* cadena vacía */
+                              ;
 
 declararFuncion               : cabeceraFuncion bloque;
 
 declararVariablesLocalesMulti : marcaInicioVariable variablesLocalesMulti
-										  marcaFinVar
-										| /* cadena vacía*/
-										;
+                                marcaFinVar
+                              | /* cadena vacía*/
+                              ;
 
 cabeceraFuncion               : tipoDato identificador inicioParametros
-										  parametros finParametros;
+                                parametros finParametros;
 
 inicioParametros              : ABRPAR;
 
@@ -89,47 +120,47 @@ inicioBloque                  : ABRLLA;
 finBloque                     : CERLLA;
 
 variablesLocalesMulti         : variablesLocalesMulti variableLocal
-										| /* cadena vacía */
-										;
+                              | /* cadena vacía */
+                              ;
 
 variableLocal                 : tipoDato variableSolitaria identificador
-										  finSentencia;
+                                finSentencia;
 
 variableSolitaria             : variableSolitaria identificador COMA
-										| /* cadena vacía */
-										;
+                              | /* cadena vacía */
+                              ;
 
 tipoDato                      : tipoElemental
-										| DEFLISTA tipoElemental
-										;
+                              | DEFLISTA tipoElemental
+                              ;
 
 tipoElemental                 : TIPODATO;
 
 sentencias                    : sentencias sentencia
-										| sentencia
-										;
+                              | sentencia
+                              ;
 
 sentencia                     : bloque
-										| sentenciaAsignacion
-										| sentenciaIf
-										| sentenciaWhile
-										| sentenciaEntrada
-										| sentenciaSalida
-										| sentenciaReturn
-										| sentenciaFor
-										| sentenciaLista
-										;
+                              | sentenciaAsignacion
+                              | sentenciaIf
+                              | sentenciaWhile
+                              | sentenciaEntrada
+                              | sentenciaSalida
+                              | sentenciaReturn
+                              | sentenciaFor
+                              | sentenciaLista
+                              ;
 
 sentenciaAsignacion           : identificador ASIG expresion finSentencia;
 
 sentenciaIf                   : IF inicioParametros expresion finParametros
-										  sentencia
-										| IF inicioParametros expresion finParametros
-										  sentencia ELSE sentencia
-										;
+                                sentencia
+                              | IF inicioParametros expresion finParametros
+                                sentencia ELSE sentencia
+                              ;
 
 sentenciaWhile                : WHILE inicioParametros expresion finParametros
-										  sentencia;
+                                sentencia;
 
 sentenciaEntrada              : nombreEntrada listaVariables finSentencia;
 
@@ -140,67 +171,88 @@ listaVariables                : inicioParametros parametros finParametros;
 sentenciaReturn               : RETURN expresion finSentencia;
 
 sentenciaFor                  : FOR sentenciaAsignacion TO expresion sentido
-										  sentencia
-										| FOR expresion TO expresion sentido sentencia
-										;
+                                sentencia
+                              | FOR expresion TO expresion sentido sentencia
+                              ;
 
 sentido                       : SENTIDO;
 
 sentenciaSalida               : nombreSalida inicioParametros
-										  listaExpresionesCadena finParametros
-										  finSentencia;
+                                listaExpresionesCadena finParametros
+                                finSentencia;
 
 listaExpresionesCadena        : expresion
-										| cadena
-										| listaExpresionesCadena COMA expresion
-										;
+                              | cadena
+                              | listaExpresionesCadena COMA expresion
+                              ;
 
 nombreSalida                  : PRINT;
 
 parametros                    : tipoDato identificador
                               | parametros COMA tipoDato identificador
-										| /* cadena vacía */
-										;
+                              | /* cadena vacía */
+                              ;
 
 expresion                     : ABRPAR expresion CERPAR
-										| opUnario expresion
-										| expresion opBinario expresion
-										| identificador
-										| literal
-										| funcion
-										| expresionLista
-										;
+                              | PLUS expresion
+                              | MINUS expresion
+                              | NOT expresion
+                              | expresion PLUS expresion
+                              | expresion MINUS expresion
+                              | expresion SLASH expresion
+                              | expresion HAT expresion
+                              | expresion ASTERISC expresion
+                              | expresion LT expresion
+                              | expresion LE expresion
+                              | expresion GT expresion
+                              | expresion GE expresion
+                              | expresion AND expresion
+                              | expresion OR expresion
+                              | expresion XOR expresion
+                              | identificador
+                              | literal
+                              | funcion
+                              | expresionLista
+                              ;
 
 funcion                       : identificador ABRPAR argumentos CERPAR;
 
 argumentos                    : expresion
-										| argumentos COMA expresion
-										;
+                              | argumentos COMA expresion
+                              ;
 
 identificador                 : IDENTIF;
-
-opBinario                     : OPBIN;
-
-opUnario                      : OPUNARIO;
 
 finSentencia                  : PYC;
 
 lista                         : ABRCOR contenidoLista CERCOR;
 
-contenidoLista : expresion
-               | contenidoLista COMA expresion;
+contenidoLista                : expresion
+                              | contenidoLista COMA expresion
+                              ;
 
-sentenciaLista : identificador ITER finSentencia
-               | INITER identificador finSentencia;
+sentenciaLista                : identificador ITER finSentencia
+                              | INITER identificador finSentencia
+                              ;
 
-expresionLista : OPUNARIO expresion
-               | expresion OPBIN expresion ARROBA expresion
-               | expresion OPBIN expresion;
+expresionLista                : HASH expresion
+                              | INTERR expresion
+//                              | expresion AT expresion
+                              | expresion PLUSPLUS expresion AT expresion
+                              | expresion MINMIN expresion
+                              | expresion PERCENT expresion
+                              | expresion CONCAT expresion
+//                              | expresion PLUS expresion
+//                              | expresion MINUS expresion
+//                              | expresion ASTERISC expresion
+//                              | expresion SLASH expresion
+                              ;
 
-/* Literales */
-literal : LITERAL | lista;
+literal                       : LITERAL | lista
+                              ;
 
-cadena : CADENA;
+cadena                        : CADENA
+                              ;
 
 %%
 
@@ -210,5 +262,5 @@ cadena : CADENA;
 /* Se implementa la función yyerror */
 void yyerror( char *msg )
 {
-	fprintf(stderr, "[Linea %d]: %s\n", n_lineas, msg);
+   fprintf(stderr, "[Linea %d]: %s\n", n_lineas, msg);
 }
