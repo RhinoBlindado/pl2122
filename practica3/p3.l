@@ -48,6 +48,8 @@ lista[ \t\n]+de         return(DEFLISTA);
 "/"                     return(SLASH);
 "^"                     return(HAT);
 "*"                     return(ASTERISC);
+"=="                    return(EQ);
+"!="                    return(NEQ);
 "<"                     return(LT);
 "<="                    return(LE);
 ">"                     return(GT);

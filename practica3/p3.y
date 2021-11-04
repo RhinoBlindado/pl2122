@@ -41,6 +41,8 @@ void yyerror ( char * msg ) ;
 %token SLASH
 %token HAT
 %token ASTERISC
+%token EQ
+%token NEQ
 %token LT
 %token LE
 %token GT
@@ -67,7 +69,7 @@ void yyerror ( char * msg ) ;
                                 // OR bits
 %left XOR                       // Exclusive OR
 // AND bits
-                                // Operadores de igualdad
+%left EQ NEQ                    // Operadores de igualdad
 %left LT LE GT GE               // Operadores de relación
 %left PLUS MINUS                // Operadores aditivos
 %left ASTERISC SLASH PERCENT HAT// Operadores multiplicativos
@@ -88,7 +90,7 @@ void yyerror ( char * msg ) ;
 
 programa                      : cabeceraPrograma bloque;
 
-cabeceraPrograma              : INIPROG;
+cabeceraPrograma              : error INIPROG {yyerrok;};
 
 bloque                        : inicioBloque declararVariablesLocalesMulti
                                 declararFuncionMulti sentencias finBloque;
@@ -107,11 +109,11 @@ declararVariablesLocalesMulti : marcaInicioVariable variablesLocalesMulti
 cabeceraFuncion               : tipoDato identificador inicioParametros
                                 parametros finParametros;
 
-inicioParametros              : ABRPAR;
+inicioParametros              : error ABRPAR {yyerrok;};
 
-finParametros                 : CERPAR;
+finParametros                 : error CERPAR {yyerrok;};
 
-marcaInicioVariable           : INIVAR;
+marcaInicioVariable           : error INIVAR {yyerrok;};
 
 marcaFinVar                   : FINVAR finSentencia;
 
