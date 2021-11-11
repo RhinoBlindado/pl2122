@@ -3,11 +3,10 @@ inicio {
 		real edad;
 	finvar;
 
-	lista de entero
-
 	edad = -1;
 
-	escanear(entero edad);
+	escanear 7(entero edad);
 
-	anunciar("tienes ", edad + 1 oex 80, " años");
+	anunciar ("hola");
+
 }

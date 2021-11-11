@@ -83,20 +83,20 @@ int yylex(void);
 // %left LT LE GT GE               // Operadores de relación
 // %left PLUS MINUS                // Operadores aditivos
 %left MASMENOS
-%left OPMULT
+%right OPMULT
 // %left ASTERISC SLASH PERCENT HAT// Operadores multiplicativos
 
-%right NOT                      // Operadores unarios (TODO: falta +- unario)
+%right NOT                      // Operadores unarios
 %right PLUSPLUS MINMIN
 // Añadir Decrementos e Incrementos pos y prefijos.
 %left ABRPAR                    // índices
 
 // Listas
-%left AT
+%right AT
 %left ITER
 %left INITER
 %left HASH INTERR
-%left CONCAT
+%right CONCAT
 
 
 
@@ -146,9 +146,9 @@ variableSolitaria             : variableSolitaria identificador coma
                               | /* cadena vacía*/
                               ;
 
-coma : COMA
-     | error
-     ;
+coma                          : COMA
+                              | error
+                              ;
 
 tipoDato                      : tipoElemental
                               | DEFLISTA tipoElemental
@@ -277,10 +277,3 @@ void yyerror( const char *msg )
 {
    fprintf(stderr, "[Linea %d]: %s\n", n_lineas, msg);
 }
-
-/*
-   TODO: Unir expresion y expresionLista,
-      añadir error en asignación,
-      unir comparaciones,
-      unir +-
-*/
