@@ -3,7 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 
-void yyerror ( char * msg ) ;
+void yyerror ( const char * msg ) ;
+int yylex(void);
 
 // int n_lineas = 1;
 %}
@@ -90,7 +91,7 @@ void yyerror ( char * msg ) ;
 
 programa                      : cabeceraPrograma bloque;
 
-cabeceraPrograma              : error INIPROG {yyerrok;};
+cabeceraPrograma              : INIPROG;
 
 bloque                        : inicioBloque declararVariablesLocalesMulti
                                 declararFuncionMulti sentencias finBloque;
@@ -109,11 +110,11 @@ declararVariablesLocalesMulti : marcaInicioVariable variablesLocalesMulti
 cabeceraFuncion               : tipoDato identificador inicioParametros
                                 parametros finParametros;
 
-inicioParametros              : error ABRPAR {yyerrok;};
+inicioParametros              : ABRPAR;
 
-finParametros                 : error CERPAR {yyerrok;};
+finParametros                 : CERPAR;
 
-marcaInicioVariable           : error INIVAR {yyerrok;};
+marcaInicioVariable           : INIVAR;
 
 marcaFinVar                   : FINVAR finSentencia;
 
@@ -128,9 +129,13 @@ variablesLocalesMulti         : variablesLocalesMulti variableLocal
 variableLocal                 : tipoDato variableSolitaria identificador
                                 finSentencia;
 
-variableSolitaria             : variableSolitaria identificador COMA
+variableSolitaria             : variableSolitaria identificador coma
                               | /* cadena vacía */
                               ;
+
+coma : COMA
+	  | error
+	  ;
 
 tipoDato                      : tipoElemental
                               | DEFLISTA tipoElemental
@@ -184,7 +189,7 @@ sentenciaSalida               : nombreSalida inicioParametros
                                 finSentencia;
 
 listaExpresionesCadena        : expresion
-                              | cadena
+//                              | cadena
                               | listaExpresionesCadena COMA expresion
                               ;
 
@@ -192,6 +197,7 @@ nombreSalida                  : PRINT;
 
 parametros                    : tipoDato identificador
                               | parametros COMA tipoDato identificador
+										| error
                               | /* cadena vacía */
                               ;
 
@@ -204,6 +210,8 @@ expresion                     : ABRPAR expresion CERPAR
                               | expresion SLASH expresion
                               | expresion HAT expresion
                               | expresion ASTERISC expresion
+										| expresion EQ expresion
+										| expresion NEQ expresion
                               | expresion LT expresion
                               | expresion LE expresion
                               | expresion GT expresion
@@ -215,6 +223,9 @@ expresion                     : ABRPAR expresion CERPAR
                               | literal
                               | funcion
                               | expresionLista
+//										| literal literal error
+//										| identificador identificador error
+										| error
                               ;
 
 funcion                       : identificador ABRPAR argumentos CERPAR;
@@ -225,7 +236,9 @@ argumentos                    : expresion
 
 identificador                 : IDENTIF;
 
-finSentencia                  : PYC;
+finSentencia                  : PYC
+										| error
+										;
 
 lista                         : ABRCOR contenidoLista CERCOR;
 
@@ -250,7 +263,7 @@ expresionLista                : HASH expresion
 //                              | expresion SLASH expresion
                               ;
 
-literal                       : LITERAL | lista
+literal                       : LITERAL | lista | cadena
                               ;
 
 cadena                        : CADENA
@@ -262,7 +275,7 @@ cadena                        : CADENA
 #include "lex.yy.c"
 
 /* Se implementa la función yyerror */
-void yyerror( char *msg )
+void yyerror( const char *msg )
 {
    fprintf(stderr, "[Linea %d]: %s\n", n_lineas, msg);
 }

@@ -3,7 +3,8 @@ inicio
     inivar
         entero ve;
         real vf;
-        caracter vc, v2, v4;
+        caracter vc v2, v4
+        caracter vc, v2 v4;
         booleano vl;
         lista de entero le, le2;
         lista de real lf, lf2;
@@ -11,13 +12,13 @@ inicio
         lista de booleano lb;
     finvar;
 
-    entero funcionA(entero a1, real a2, caracter a3)
+    entero funcionA(enteros a1, real a2, caracter a3)
     {
         inivar
             entero x1, x2;
         finvar;
 
-        caracter funcionB(caracter b1, booleano b2)
+        caracter funcionB(caracteres b1, booleano b2)
         {
             inivar
                 real xf, x2;
@@ -68,7 +69,7 @@ inicio
                 si(e1 == "a")
                 {
                     repatriar e1;
-                } 
+                }
                 sino
                 {
                     si(e1 == "b")
@@ -91,8 +92,8 @@ inicio
                     entero dato;
                 finvar;
 
-                dato = 2;
-                dato = valor * 20 / dato;
+                dato = 2 + hola hola + prueba;
+                dato = valor * 20 / dato o;
             }
             sino
             {
@@ -100,12 +101,12 @@ inicio
                 d1 = d1 / 1000.0;
             }
 
-            retornar d1;
+            repatriar d1;
         }
-    }
-
-    pe ++ 10;
-    pf ++ -10.0;
-    pc ++ "#";
-
-} 
+		  repatriar a;
+	 }
+    pe = pe ++ 10 @ 1;
+    pf = pf ++ -10.0 @ 0;
+    pc = pc ++ "#" @ 0;
+	 ·
+}
