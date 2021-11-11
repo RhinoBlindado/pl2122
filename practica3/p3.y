@@ -37,23 +37,30 @@ int yylex(void);
 %token SENTIDO
 %token PRINT
 %token PYC
-%token PLUS
-%token MINUS
-%token SLASH
-%token HAT
-%token ASTERISC
-%token EQ
-%token NEQ
-%token LT
-%token LE
-%token GT
-%token GE
+%token MASMENOS
+//%token PLUS
+//%token MINUS
+
+%token OPMULT
+// %token SLASH
+// %token HAT
+// %token ASTERISC
+// %token PERCENT
+
+%token IGUALDAD
+// %token EQ
+// %token NEQ
+
+%token DESIGUALDAD
+// %token LT
+// %token LE
+// %token GT
+// %token GE
 %token AND
 %token OR
 %token XOR
 %token PLUSPLUS
 %token MINMIN
-%token PERCENT
 %token CONCAT
 %token NOT
 %token HASH
@@ -70,10 +77,14 @@ int yylex(void);
                                 // OR bits
 %left XOR                       // Exclusive OR
 // AND bits
-%left EQ NEQ                    // Operadores de igualdad
-%left LT LE GT GE               // Operadores de relación
-%left PLUS MINUS                // Operadores aditivos
-%left ASTERISC SLASH PERCENT HAT// Operadores multiplicativos
+// %left EQ NEQ                    // Operadores de igualdad
+%left IGUALDAD
+%left DESIGUALDAD
+// %left LT LE GT GE               // Operadores de relación
+// %left PLUS MINUS                // Operadores aditivos
+%left MASMENOS
+%left OPMULT
+// %left ASTERISC SLASH PERCENT HAT// Operadores multiplicativos
 
 %right NOT                      // Operadores unarios (TODO: falta +- unario)
 %right PLUSPLUS MINMIN
@@ -86,6 +97,8 @@ int yylex(void);
 %left INITER
 %left HASH INTERR
 %left CONCAT
+
+
 
 %%
 
@@ -130,12 +143,12 @@ variableLocal                 : tipoDato variableSolitaria identificador
                                 finSentencia;
 
 variableSolitaria             : variableSolitaria identificador coma
-                              | /* cadena vacía */
+                              | /* cadena vacía*/
                               ;
 
 coma : COMA
-	  | error
-	  ;
+     | error
+     ;
 
 tipoDato                      : tipoElemental
                               | DEFLISTA tipoElemental
@@ -158,7 +171,9 @@ sentencia                     : bloque
                               | sentenciaLista
                               ;
 
-sentenciaAsignacion           : identificador ASIG expresion finSentencia;
+sentenciaAsignacion           : identificador ASIG expresion finSentencia
+                              | error
+                              ;
 
 sentenciaIf                   : IF inicioParametros expresion finParametros
                                 sentencia
@@ -189,7 +204,6 @@ sentenciaSalida               : nombreSalida inicioParametros
                                 finSentencia;
 
 listaExpresionesCadena        : expresion
-//                              | cadena
                               | listaExpresionesCadena COMA expresion
                               ;
 
@@ -197,35 +211,32 @@ nombreSalida                  : PRINT;
 
 parametros                    : tipoDato identificador
                               | parametros COMA tipoDato identificador
-										| error
+                              | error
                               | /* cadena vacía */
                               ;
 
 expresion                     : ABRPAR expresion CERPAR
-                              | PLUS expresion
-                              | MINUS expresion
-                              | NOT expresion
-                              | expresion PLUS expresion
-                              | expresion MINUS expresion
-                              | expresion SLASH expresion
-                              | expresion HAT expresion
-                              | expresion ASTERISC expresion
-										| expresion EQ expresion
-										| expresion NEQ expresion
-                              | expresion LT expresion
-                              | expresion LE expresion
-                              | expresion GT expresion
-                              | expresion GE expresion
+                              | MASMENOS expresion %prec HASH
+                              | NOT expresion %prec HASH
+                              | expresion MASMENOS expresion
+                              | expresion OPMULT expresion
+                              // | expresion SLASH expresion
+                              // | expresion HAT expresion
+                              // | expresion ASTERISC expresion
+                              // | expresion PERCENT expresion
+                              | expresion IGUALDAD expresion
+                              | expresion DESIGUALDAD expresion
                               | expresion AND expresion
                               | expresion OR expresion
                               | expresion XOR expresion
                               | identificador
                               | literal
                               | funcion
-                              | expresionLista
-//										| literal literal error
-//										| identificador identificador error
-										| error
+                              | HASH expresion %prec HASH
+                              | INTERR expresion %prec HASH
+                              | expresion PLUSPLUS expresion AT expresion
+                              | expresion MINMIN expresion
+                              | expresion CONCAT expresion
                               ;
 
 funcion                       : identificador ABRPAR argumentos CERPAR;
@@ -237,8 +248,8 @@ argumentos                    : expresion
 identificador                 : IDENTIF;
 
 finSentencia                  : PYC
-										| error
-										;
+                              | error
+                              ;
 
 lista                         : ABRCOR contenidoLista CERCOR;
 
@@ -248,19 +259,6 @@ contenidoLista                : expresion
 
 sentenciaLista                : identificador ITER finSentencia
                               | INITER identificador finSentencia
-                              ;
-
-expresionLista                : HASH expresion
-                              | INTERR expresion
-//                              | expresion AT expresion
-                              | expresion PLUSPLUS expresion AT expresion
-                              | expresion MINMIN expresion
-                              | expresion PERCENT expresion
-                              | expresion CONCAT expresion
-//                              | expresion PLUS expresion
-//                              | expresion MINUS expresion
-//                              | expresion ASTERISC expresion
-//                              | expresion SLASH expresion
                               ;
 
 literal                       : LITERAL | lista | cadena
@@ -279,3 +277,10 @@ void yyerror( const char *msg )
 {
    fprintf(stderr, "[Linea %d]: %s\n", n_lineas, msg);
 }
+
+/*
+   TODO: Unir expresion y expresionLista,
+      añadir error en asignación,
+      unir comparaciones,
+      unir +-
+*/

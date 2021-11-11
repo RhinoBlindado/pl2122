@@ -83,10 +83,23 @@ inicio
                 }
             }
 
+            sino {
+               dato = 1;
+            } si (a) {
+               dato = 3;
+               si (b) {
+                  dato = 1;
+               } sino {
+                  dato = 2;
+               } sino {
+                  dato = 3;
+               }
+            }
+
             anunciar ("Introduce un valor entero :");
             escanear (entero valor);
 
-            si(d1 > 0.0)
+            si(d1 > 0.0 < pog)
             {
                 inivar
                     entero dato;
@@ -97,16 +110,16 @@ inicio
             }
             sino
             {
-                valor = valor * 100;
+                valor = valor * * * 100;
                 d1 = d1 / 1000.0;
             }
 
             repatriar d1;
         }
-		  repatriar a;
-	 }
+        repatriar a;
+    }
     pe = pe ++ 10 @ 1;
     pf = pf ++ -10.0 @ 0;
     pc = pc ++ "#" @ 0;
-	 ·
+    ·
 }
