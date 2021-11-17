@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
+//int yydebug=1; 
 void yyerror ( const char * msg ) ;
 int yylex(void);
 
@@ -141,6 +142,7 @@ variablesLocalesMulti         : variablesLocalesMulti variableLocal
 
 variableLocal                 : tipoDato variableSolitaria identificador
                                 finSentencia;
+                              | error;
 
 variableSolitaria             : variableSolitaria identificador coma
                               | /* cadena vacía*/
