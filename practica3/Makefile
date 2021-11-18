@@ -10,7 +10,7 @@ lex.yy.c: p3.l
 	flex p3.l
 
 y.tab.c: p3.y lex.yy.c
-	yacc -d p3.y
+	yacc -d -v -t p3.y
 
 y.tab.o: y.tab.c
 	gcc -c y.tab.c

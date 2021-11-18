@@ -141,7 +141,7 @@ variablesLocalesMulti         : variablesLocalesMulti variableLocal
                               ;
 
 variableLocal                 : tipoDato variableSolitaria identificador
-                                finSentencia;
+                                finSentencia
                               | error;
 
 variableSolitaria             : variableSolitaria identificador coma

@@ -1,18 +1,18 @@
 inicio
 {
     inivar
-        entero ve;
-        real vf;
+        entero ve a,b,c
+        real vf, h j;
         caracter vc, v2, v4;
         caracter vc, v2, v4;
-        booleano vl;
+        bo··oleano vl;
         lista de entero le, le2;
         lista de real lf, lf2;
         lista de caracter lc, lc2;
         lista de booleano lb;
     finvar;
 
-    entero funcionA(entero a1, real a2, caracter a3)
+    entero funcionA(entero a1, real a2 caracter a3)
     {
         inivar
             entero x1, x2;
@@ -32,9 +32,9 @@ inicio
 
                 x1 = 1.3;
 
-                si (c2 > 10)
+                si ((c2 > 10)*)
                 {
-                    c2 = c2 - 1;
+                    c2 = c2 - 1 *;
                 }
                 sino
                 {
@@ -114,7 +114,7 @@ inicio
         }
         repatriar a;
     }
-    pe = pe ++ 10 @ 1;
+    pe = pe ++ 10 @ 1 + 2 * (3 + 2);
     pf = pf ++ -10.0 @ 0;
     pc = pc ++ "#" @ 0;
 }

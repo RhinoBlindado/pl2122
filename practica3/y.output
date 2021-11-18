@@ -1,0 +1,2780 @@
+State 148 conflicts: 1 shift/reduce
+
+
+Grammar
+
+    0 $accept: programa $end
+
+    1 programa: cabeceraPrograma bloque
+
+    2 cabeceraPrograma: INIPROG
+
+    3 bloque: inicioBloque declararVariablesLocalesMulti declararFuncionMulti sentencias finBloque
+
+    4 declararFuncionMulti: declararFuncionMulti declararFuncion
+    5                     | %empty
+
+    6 declararFuncion: cabeceraFuncion bloque
+
+    7 declararVariablesLocalesMulti: marcaInicioVariable variablesLocalesMulti marcaFinVar
+    8                              | %empty
+
+    9 cabeceraFuncion: tipoDato identificador inicioParametros parametros finParametros
+
+   10 inicioParametros: ABRPAR
+
+   11 finParametros: CERPAR
+
+   12 marcaInicioVariable: INIVAR
+
+   13 marcaFinVar: FINVAR finSentencia
+
+   14 inicioBloque: ABRLLA
+
+   15 finBloque: CERLLA
+
+   16 variablesLocalesMulti: variablesLocalesMulti variableLocal
+   17                      | %empty
+
+   18 variableLocal: tipoDato variableSolitaria identificador finSentencia
+   19              | error
+
+   20 variableSolitaria: variableSolitaria identificador coma
+   21                  | %empty
+
+   22 coma: COMA
+   23     | error
+
+   24 tipoDato: tipoElemental
+   25         | DEFLISTA tipoElemental
+
+   26 tipoElemental: TIPODATO
+
+   27 sentencias: sentencias sentencia
+   28           | sentencia
+
+   29 sentencia: bloque
+   30          | sentenciaAsignacion
+   31          | sentenciaIf
+   32          | sentenciaWhile
+   33          | sentenciaEntrada
+   34          | sentenciaSalida
+   35          | sentenciaReturn
+   36          | sentenciaFor
+   37          | sentenciaLista
+
+   38 sentenciaAsignacion: identificador ASIG expresion finSentencia
+   39                    | error
+
+   40 sentenciaIf: IF inicioParametros expresion finParametros sentencia
+   41            | IF inicioParametros expresion finParametros sentencia ELSE sentencia
+
+   42 sentenciaWhile: WHILE inicioParametros expresion finParametros sentencia
+
+   43 sentenciaEntrada: nombreEntrada listaVariables finSentencia
+
+   44 nombreEntrada: SCAN
+
+   45 listaVariables: inicioParametros parametros finParametros
+
+   46 sentenciaReturn: RETURN expresion finSentencia
+
+   47 sentenciaFor: FOR sentenciaAsignacion TO expresion sentido sentencia
+   48             | FOR expresion TO expresion sentido sentencia
+
+   49 sentido: SENTIDO
+
+   50 sentenciaSalida: nombreSalida inicioParametros listaExpresionesCadena finParametros finSentencia
+
+   51 listaExpresionesCadena: expresion
+   52                       | listaExpresionesCadena COMA expresion
+
+   53 nombreSalida: PRINT
+
+   54 parametros: tipoDato identificador
+   55           | parametros COMA tipoDato identificador
+   56           | error
+   57           | %empty
+
+   58 expresion: ABRPAR expresion CERPAR
+   59          | MASMENOS expresion
+   60          | NOT expresion
+   61          | expresion MASMENOS expresion
+   62          | expresion OPMULT expresion
+   63          | expresion IGUALDAD expresion
+   64          | expresion DESIGUALDAD expresion
+   65          | expresion AND expresion
+   66          | expresion OR expresion
+   67          | expresion XOR expresion
+   68          | identificador
+   69          | literal
+   70          | funcion
+   71          | HASH expresion
+   72          | INTERR expresion
+   73          | expresion PLUSPLUS expresion AT expresion
+   74          | expresion MINMIN expresion
+   75          | expresion CONCAT expresion
+
+   76 funcion: identificador ABRPAR argumentos CERPAR
+
+   77 argumentos: expresion
+   78           | argumentos COMA expresion
+
+   79 identificador: IDENTIF
+
+   80 finSentencia: PYC
+   81             | error
+
+   82 lista: ABRCOR contenidoLista CERCOR
+
+   83 contenidoLista: expresion
+   84               | contenidoLista COMA expresion
+
+   85 sentenciaLista: identificador ITER finSentencia
+   86               | INITER identificador finSentencia
+
+   87 literal: LITERAL
+   88        | lista
+   89        | cadena
+
+   90 cadena: CADENA
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    error (256) 19 23 39 56 81
+    INIPROG (258) 2
+    ABRPAR (259) 10 58 76
+    CERPAR (260) 11 58 76
+    CERLLA (261) 15
+    ABRLLA (262) 14
+    ABRCOR (263) 82
+    CERCOR (264) 82
+    INIVAR (265) 12
+    FINVAR (266) 13
+    COMA (267) 22 52 55 78 84
+    DEFLISTA (268) 25
+    TIPODATO (269) 26
+    ASIG (270) 38
+    IF (271) 40 41
+    ELSE (272) 41
+    WHILE (273) 42
+    SCAN (274) 44
+    RETURN (275) 46
+    FOR (276) 47 48
+    TO (277) 47 48
+    SENTIDO (278) 49
+    PRINT (279) 53
+    PYC (280) 80
+    MASMENOS (281) 59 61
+    OPMULT (282) 62
+    IGUALDAD (283) 63
+    DESIGUALDAD (284) 64
+    AND (285) 65
+    OR (286) 66
+    XOR (287) 67
+    PLUSPLUS (288) 73
+    MINMIN (289) 74
+    CONCAT (290) 75
+    NOT (291) 60
+    HASH (292) 71
+    INTERR (293) 72
+    AT (294) 73
+    ITER (295) 85
+    INITER (296) 86
+    CADENA (297) 90
+    IDENTIF (298) 79
+    LITERAL (299) 87
+
+
+Nonterminals, with rules where they appear
+
+    $accept (45)
+        on left: 0
+    programa (46)
+        on left: 1
+        on right: 0
+    cabeceraPrograma (47)
+        on left: 2
+        on right: 1
+    bloque (48)
+        on left: 3
+        on right: 1 6 29
+    declararFuncionMulti (49)
+        on left: 4 5
+        on right: 3 4
+    declararFuncion (50)
+        on left: 6
+        on right: 4
+    declararVariablesLocalesMulti (51)
+        on left: 7 8
+        on right: 3
+    cabeceraFuncion (52)
+        on left: 9
+        on right: 6
+    inicioParametros (53)
+        on left: 10
+        on right: 9 40 41 42 45 50
+    finParametros (54)
+        on left: 11
+        on right: 9 40 41 42 45 50
+    marcaInicioVariable (55)
+        on left: 12
+        on right: 7
+    marcaFinVar (56)
+        on left: 13
+        on right: 7
+    inicioBloque (57)
+        on left: 14
+        on right: 3
+    finBloque (58)
+        on left: 15
+        on right: 3
+    variablesLocalesMulti (59)
+        on left: 16 17
+        on right: 7 16
+    variableLocal (60)
+        on left: 18 19
+        on right: 16
+    variableSolitaria (61)
+        on left: 20 21
+        on right: 18 20
+    coma (62)
+        on left: 22 23
+        on right: 20
+    tipoDato (63)
+        on left: 24 25
+        on right: 9 18 54 55
+    tipoElemental (64)
+        on left: 26
+        on right: 24 25
+    sentencias (65)
+        on left: 27 28
+        on right: 3 27
+    sentencia (66)
+        on left: 29 30 31 32 33 34 35 36 37
+        on right: 27 28 40 41 42 47 48
+    sentenciaAsignacion (67)
+        on left: 38 39
+        on right: 30 47
+    sentenciaIf (68)
+        on left: 40 41
+        on right: 31
+    sentenciaWhile (69)
+        on left: 42
+        on right: 32
+    sentenciaEntrada (70)
+        on left: 43
+        on right: 33
+    nombreEntrada (71)
+        on left: 44
+        on right: 43
+    listaVariables (72)
+        on left: 45
+        on right: 43
+    sentenciaReturn (73)
+        on left: 46
+        on right: 35
+    sentenciaFor (74)
+        on left: 47 48
+        on right: 36
+    sentido (75)
+        on left: 49
+        on right: 47 48
+    sentenciaSalida (76)
+        on left: 50
+        on right: 34
+    listaExpresionesCadena (77)
+        on left: 51 52
+        on right: 50 52
+    nombreSalida (78)
+        on left: 53
+        on right: 50
+    parametros (79)
+        on left: 54 55 56 57
+        on right: 9 45 55
+    expresion (80)
+        on left: 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75
+        on right: 38 40 41 42 46 47 48 51 52 58 59 60 61 62 63 64 65 66 67 71 72 73 74 75 77 78 83 84
+    funcion (81)
+        on left: 76
+        on right: 70
+    argumentos (82)
+        on left: 77 78
+        on right: 76 78
+    identificador (83)
+        on left: 79
+        on right: 9 18 20 38 54 55 68 76 85 86
+    finSentencia (84)
+        on left: 80 81
+        on right: 13 18 38 43 46 50 85 86
+    lista (85)
+        on left: 82
+        on right: 88
+    contenidoLista (86)
+        on left: 83 84
+        on right: 82 84
+    sentenciaLista (87)
+        on left: 85 86
+        on right: 37
+    literal (88)
+        on left: 87 88 89
+        on right: 69
+    cadena (89)
+        on left: 90
+        on right: 89
+
+
+State 0
+
+    0 $accept: • programa $end
+
+    INIPROG  shift, and go to state 1
+
+    programa          go to state 2
+    cabeceraPrograma  go to state 3
+
+
+State 1
+
+    2 cabeceraPrograma: INIPROG •
+
+    $default  reduce using rule 2 (cabeceraPrograma)
+
+
+State 2
+
+    0 $accept: programa • $end
+
+    $end  shift, and go to state 4
+
+
+State 3
+
+    1 programa: cabeceraPrograma • bloque
+
+    ABRLLA  shift, and go to state 5
+
+    bloque        go to state 6
+    inicioBloque  go to state 7
+
+
+State 4
+
+    0 $accept: programa $end •
+
+    $default  accept
+
+
+State 5
+
+   14 inicioBloque: ABRLLA •
+
+    $default  reduce using rule 14 (inicioBloque)
+
+
+State 6
+
+    1 programa: cabeceraPrograma bloque •
+
+    $default  reduce using rule 1 (programa)
+
+
+State 7
+
+    3 bloque: inicioBloque • declararVariablesLocalesMulti declararFuncionMulti sentencias finBloque
+
+    INIVAR  shift, and go to state 8
+
+    $default  reduce using rule 8 (declararVariablesLocalesMulti)
+
+    declararVariablesLocalesMulti  go to state 9
+    marcaInicioVariable            go to state 10
+
+
+State 8
+
+   12 marcaInicioVariable: INIVAR •
+
+    $default  reduce using rule 12 (marcaInicioVariable)
+
+
+State 9
+
+    3 bloque: inicioBloque declararVariablesLocalesMulti • declararFuncionMulti sentencias finBloque
+
+    $default  reduce using rule 5 (declararFuncionMulti)
+
+    declararFuncionMulti  go to state 11
+
+
+State 10
+
+    7 declararVariablesLocalesMulti: marcaInicioVariable • variablesLocalesMulti marcaFinVar
+
+    $default  reduce using rule 17 (variablesLocalesMulti)
+
+    variablesLocalesMulti  go to state 12
+
+
+State 11
+
+    3 bloque: inicioBloque declararVariablesLocalesMulti declararFuncionMulti • sentencias finBloque
+    4 declararFuncionMulti: declararFuncionMulti • declararFuncion
+
+    error     shift, and go to state 13
+    ABRLLA    shift, and go to state 5
+    DEFLISTA  shift, and go to state 14
+    TIPODATO  shift, and go to state 15
+    IF        shift, and go to state 16
+    WHILE     shift, and go to state 17
+    SCAN      shift, and go to state 18
+    RETURN    shift, and go to state 19
+    FOR       shift, and go to state 20
+    PRINT     shift, and go to state 21
+    INITER    shift, and go to state 22
+    IDENTIF   shift, and go to state 23
+
+    bloque               go to state 24
+    declararFuncion      go to state 25
+    cabeceraFuncion      go to state 26
+    inicioBloque         go to state 7
+    tipoDato             go to state 27
+    tipoElemental        go to state 28
+    sentencias           go to state 29
+    sentencia            go to state 30
+    sentenciaAsignacion  go to state 31
+    sentenciaIf          go to state 32
+    sentenciaWhile       go to state 33
+    sentenciaEntrada     go to state 34
+    nombreEntrada        go to state 35
+    sentenciaReturn      go to state 36
+    sentenciaFor         go to state 37
+    sentenciaSalida      go to state 38
+    nombreSalida         go to state 39
+    identificador        go to state 40
+    sentenciaLista       go to state 41
+
+
+State 12
+
+    7 declararVariablesLocalesMulti: marcaInicioVariable variablesLocalesMulti • marcaFinVar
+   16 variablesLocalesMulti: variablesLocalesMulti • variableLocal
+
+    error     shift, and go to state 42
+    FINVAR    shift, and go to state 43
+    DEFLISTA  shift, and go to state 14
+    TIPODATO  shift, and go to state 15
+
+    marcaFinVar    go to state 44
+    variableLocal  go to state 45
+    tipoDato       go to state 46
+    tipoElemental  go to state 28
+
+
+State 13
+
+   39 sentenciaAsignacion: error •
+
+    $default  reduce using rule 39 (sentenciaAsignacion)
+
+
+State 14
+
+   25 tipoDato: DEFLISTA • tipoElemental
+
+    TIPODATO  shift, and go to state 15
+
+    tipoElemental  go to state 47
+
+
+State 15
+
+   26 tipoElemental: TIPODATO •
+
+    $default  reduce using rule 26 (tipoElemental)
+
+
+State 16
+
+   40 sentenciaIf: IF • inicioParametros expresion finParametros sentencia
+   41            | IF • inicioParametros expresion finParametros sentencia ELSE sentencia
+
+    ABRPAR  shift, and go to state 48
+
+    inicioParametros  go to state 49
+
+
+State 17
+
+   42 sentenciaWhile: WHILE • inicioParametros expresion finParametros sentencia
+
+    ABRPAR  shift, and go to state 48
+
+    inicioParametros  go to state 50
+
+
+State 18
+
+   44 nombreEntrada: SCAN •
+
+    $default  reduce using rule 44 (nombreEntrada)
+
+
+State 19
+
+   46 sentenciaReturn: RETURN • expresion finSentencia
+
+    ABRPAR    shift, and go to state 51
+    ABRCOR    shift, and go to state 52
+    MASMENOS  shift, and go to state 53
+    NOT       shift, and go to state 54
+    HASH      shift, and go to state 55
+    INTERR    shift, and go to state 56
+    CADENA    shift, and go to state 57
+    IDENTIF   shift, and go to state 23
+    LITERAL   shift, and go to state 58
+
+    expresion      go to state 59
+    funcion        go to state 60
+    identificador  go to state 61
+    lista          go to state 62
+    literal        go to state 63
+    cadena         go to state 64
+
+
+State 20
+
+   47 sentenciaFor: FOR • sentenciaAsignacion TO expresion sentido sentencia
+   48             | FOR • expresion TO expresion sentido sentencia
+
+    error     shift, and go to state 13
+    ABRPAR    shift, and go to state 51
+    ABRCOR    shift, and go to state 52
+    MASMENOS  shift, and go to state 53
+    NOT       shift, and go to state 54
+    HASH      shift, and go to state 55
+    INTERR    shift, and go to state 56
+    CADENA    shift, and go to state 57
+    IDENTIF   shift, and go to state 23
+    LITERAL   shift, and go to state 58
+
+    sentenciaAsignacion  go to state 65
+    expresion            go to state 66
+    funcion              go to state 60
+    identificador        go to state 67
+    lista                go to state 62
+    literal              go to state 63
+    cadena               go to state 64
+
+
+State 21
+
+   53 nombreSalida: PRINT •
+
+    $default  reduce using rule 53 (nombreSalida)
+
+
+State 22
+
+   86 sentenciaLista: INITER • identificador finSentencia
+
+    IDENTIF  shift, and go to state 23
+
+    identificador  go to state 68
+
+
+State 23
+
+   79 identificador: IDENTIF •
+
+    $default  reduce using rule 79 (identificador)
+
+
+State 24
+
+   29 sentencia: bloque •
+
+    $default  reduce using rule 29 (sentencia)
+
+
+State 25
+
+    4 declararFuncionMulti: declararFuncionMulti declararFuncion •
+
+    $default  reduce using rule 4 (declararFuncionMulti)
+
+
+State 26
+
+    6 declararFuncion: cabeceraFuncion • bloque
+
+    ABRLLA  shift, and go to state 5
+
+    bloque        go to state 69
+    inicioBloque  go to state 7
+
+
+State 27
+
+    9 cabeceraFuncion: tipoDato • identificador inicioParametros parametros finParametros
+
+    IDENTIF  shift, and go to state 23
+
+    identificador  go to state 70
+
+
+State 28
+
+   24 tipoDato: tipoElemental •
+
+    $default  reduce using rule 24 (tipoDato)
+
+
+State 29
+
+    3 bloque: inicioBloque declararVariablesLocalesMulti declararFuncionMulti sentencias • finBloque
+   27 sentencias: sentencias • sentencia
+
+    error    shift, and go to state 13
+    CERLLA   shift, and go to state 71
+    ABRLLA   shift, and go to state 5
+    IF       shift, and go to state 16
+    WHILE    shift, and go to state 17
+    SCAN     shift, and go to state 18
+    RETURN   shift, and go to state 19
+    FOR      shift, and go to state 20
+    PRINT    shift, and go to state 21
+    INITER   shift, and go to state 22
+    IDENTIF  shift, and go to state 23
+
+    bloque               go to state 24
+    inicioBloque         go to state 7
+    finBloque            go to state 72
+    sentencia            go to state 73
+    sentenciaAsignacion  go to state 31
+    sentenciaIf          go to state 32
+    sentenciaWhile       go to state 33
+    sentenciaEntrada     go to state 34
+    nombreEntrada        go to state 35
+    sentenciaReturn      go to state 36
+    sentenciaFor         go to state 37
+    sentenciaSalida      go to state 38
+    nombreSalida         go to state 39
+    identificador        go to state 40
+    sentenciaLista       go to state 41
+
+
+State 30
+
+   28 sentencias: sentencia •
+
+    $default  reduce using rule 28 (sentencias)
+
+
+State 31
+
+   30 sentencia: sentenciaAsignacion •
+
+    $default  reduce using rule 30 (sentencia)
+
+
+State 32
+
+   31 sentencia: sentenciaIf •
+
+    $default  reduce using rule 31 (sentencia)
+
+
+State 33
+
+   32 sentencia: sentenciaWhile •
+
+    $default  reduce using rule 32 (sentencia)
+
+
+State 34
+
+   33 sentencia: sentenciaEntrada •
+
+    $default  reduce using rule 33 (sentencia)
+
+
+State 35
+
+   43 sentenciaEntrada: nombreEntrada • listaVariables finSentencia
+
+    ABRPAR  shift, and go to state 48
+
+    inicioParametros  go to state 74
+    listaVariables    go to state 75
+
+
+State 36
+
+   35 sentencia: sentenciaReturn •
+
+    $default  reduce using rule 35 (sentencia)
+
+
+State 37
+
+   36 sentencia: sentenciaFor •
+
+    $default  reduce using rule 36 (sentencia)
+
+
+State 38
+
+   34 sentencia: sentenciaSalida •
+
+    $default  reduce using rule 34 (sentencia)
+
+
+State 39
+
+   50 sentenciaSalida: nombreSalida • inicioParametros listaExpresionesCadena finParametros finSentencia
+
+    ABRPAR  shift, and go to state 48
+
+    inicioParametros  go to state 76
+
+
+State 40
+
+   38 sentenciaAsignacion: identificador • ASIG expresion finSentencia
+   85 sentenciaLista: identificador • ITER finSentencia
+
+    ASIG  shift, and go to state 77
+    ITER  shift, and go to state 78
+
+
+State 41
+
+   37 sentencia: sentenciaLista •
+
+    $default  reduce using rule 37 (sentencia)
+
+
+State 42
+
+   19 variableLocal: error •
+
+    $default  reduce using rule 19 (variableLocal)
+
+
+State 43
+
+   13 marcaFinVar: FINVAR • finSentencia
+
+    error  shift, and go to state 79
+    PYC    shift, and go to state 80
+
+    finSentencia  go to state 81
+
+
+State 44
+
+    7 declararVariablesLocalesMulti: marcaInicioVariable variablesLocalesMulti marcaFinVar •
+
+    $default  reduce using rule 7 (declararVariablesLocalesMulti)
+
+
+State 45
+
+   16 variablesLocalesMulti: variablesLocalesMulti variableLocal •
+
+    $default  reduce using rule 16 (variablesLocalesMulti)
+
+
+State 46
+
+   18 variableLocal: tipoDato • variableSolitaria identificador finSentencia
+
+    $default  reduce using rule 21 (variableSolitaria)
+
+    variableSolitaria  go to state 82
+
+
+State 47
+
+   25 tipoDato: DEFLISTA tipoElemental •
+
+    $default  reduce using rule 25 (tipoDato)
+
+
+State 48
+
+   10 inicioParametros: ABRPAR •
+
+    $default  reduce using rule 10 (inicioParametros)
+
+
+State 49
+
+   40 sentenciaIf: IF inicioParametros • expresion finParametros sentencia
+   41            | IF inicioParametros • expresion finParametros sentencia ELSE sentencia
+
+    ABRPAR    shift, and go to state 51
+    ABRCOR    shift, and go to state 52
+    MASMENOS  shift, and go to state 53
+    NOT       shift, and go to state 54
+    HASH      shift, and go to state 55
+    INTERR    shift, and go to state 56
+    CADENA    shift, and go to state 57
+    IDENTIF   shift, and go to state 23
+    LITERAL   shift, and go to state 58
+
+    expresion      go to state 83
+    funcion        go to state 60
+    identificador  go to state 61
+    lista          go to state 62
+    literal        go to state 63
+    cadena         go to state 64
+
+
+State 50
+
+   42 sentenciaWhile: WHILE inicioParametros • expresion finParametros sentencia
+
+    ABRPAR    shift, and go to state 51
+    ABRCOR    shift, and go to state 52
+    MASMENOS  shift, and go to state 53
+    NOT       shift, and go to state 54
+    HASH      shift, and go to state 55
+    INTERR    shift, and go to state 56
+    CADENA    shift, and go to state 57
+    IDENTIF   shift, and go to state 23
+    LITERAL   shift, and go to state 58
+
+    expresion      go to state 84
+    funcion        go to state 60
+    identificador  go to state 61
+    lista          go to state 62
+    literal        go to state 63
+    cadena         go to state 64
+
+
+State 51
+
+   58 expresion: ABRPAR • expresion CERPAR
+
+    ABRPAR    shift, and go to state 51
+    ABRCOR    shift, and go to state 52
+    MASMENOS  shift, and go to state 53
+    NOT       shift, and go to state 54
+    HASH      shift, and go to state 55
+    INTERR    shift, and go to state 56
+    CADENA    shift, and go to state 57
+    IDENTIF   shift, and go to state 23
+    LITERAL   shift, and go to state 58
+
+    expresion      go to state 85
+    funcion        go to state 60
+    identificador  go to state 61
+    lista          go to state 62
+    literal        go to state 63
+    cadena         go to state 64
+
+
+State 52
+
+   82 lista: ABRCOR • contenidoLista CERCOR
+
+    ABRPAR    shift, and go to state 51
+    ABRCOR    shift, and go to state 52
+    MASMENOS  shift, and go to state 53
+    NOT       shift, and go to state 54
+    HASH      shift, and go to state 55
+    INTERR    shift, and go to state 56
+    CADENA    shift, and go to state 57
+    IDENTIF   shift, and go to state 23
+    LITERAL   shift, and go to state 58
+
+    expresion       go to state 86
+    funcion         go to state 60
+    identificador   go to state 61
+    lista           go to state 62
+    contenidoLista  go to state 87
+    literal         go to state 63
+    cadena          go to state 64
+
+
+State 53
+
+   59 expresion: MASMENOS • expresion
+
+    ABRPAR    shift, and go to state 51
+    ABRCOR    shift, and go to state 52
+    MASMENOS  shift, and go to state 53
+    NOT       shift, and go to state 54
+    HASH      shift, and go to state 55
+    INTERR    shift, and go to state 56
+    CADENA    shift, and go to state 57
+    IDENTIF   shift, and go to state 23
+    LITERAL   shift, and go to state 58
+
+    expresion      go to state 88
+    funcion        go to state 60
+    identificador  go to state 61
+    lista          go to state 62
+    literal        go to state 63
+    cadena         go to state 64
+
+
+State 54
+
+   60 expresion: NOT • expresion
+
+    ABRPAR    shift, and go to state 51
+    ABRCOR    shift, and go to state 52
+    MASMENOS  shift, and go to state 53
+    NOT       shift, and go to state 54
+    HASH      shift, and go to state 55
+    INTERR    shift, and go to state 56
+    CADENA    shift, and go to state 57
+    IDENTIF   shift, and go to state 23
+    LITERAL   shift, and go to state 58
+
+    expresion      go to state 89
+    funcion        go to state 60
+    identificador  go to state 61
+    lista          go to state 62
+    literal        go to state 63
+    cadena         go to state 64
+
+
+State 55
+
+   71 expresion: HASH • expresion
+
+    ABRPAR    shift, and go to state 51
+    ABRCOR    shift, and go to state 52
+    MASMENOS  shift, and go to state 53
+    NOT       shift, and go to state 54
+    HASH      shift, and go to state 55
+    INTERR    shift, and go to state 56
+    CADENA    shift, and go to state 57
+    IDENTIF   shift, and go to state 23
+    LITERAL   shift, and go to state 58
+
+    expresion      go to state 90
+    funcion        go to state 60
+    identificador  go to state 61
+    lista          go to state 62
+    literal        go to state 63
+    cadena         go to state 64
+
+
+State 56
+
+   72 expresion: INTERR • expresion
+
+    ABRPAR    shift, and go to state 51
+    ABRCOR    shift, and go to state 52
+    MASMENOS  shift, and go to state 53
+    NOT       shift, and go to state 54
+    HASH      shift, and go to state 55
+    INTERR    shift, and go to state 56
+    CADENA    shift, and go to state 57
+    IDENTIF   shift, and go to state 23
+    LITERAL   shift, and go to state 58
+
+    expresion      go to state 91
+    funcion        go to state 60
+    identificador  go to state 61
+    lista          go to state 62
+    literal        go to state 63
+    cadena         go to state 64
+
+
+State 57
+
+   90 cadena: CADENA •
+
+    $default  reduce using rule 90 (cadena)
+
+
+State 58
+
+   87 literal: LITERAL •
+
+    $default  reduce using rule 87 (literal)
+
+
+State 59
+
+   46 sentenciaReturn: RETURN expresion • finSentencia
+   61 expresion: expresion • MASMENOS expresion
+   62          | expresion • OPMULT expresion
+   63          | expresion • IGUALDAD expresion
+   64          | expresion • DESIGUALDAD expresion
+   65          | expresion • AND expresion
+   66          | expresion • OR expresion
+   67          | expresion • XOR expresion
+   73          | expresion • PLUSPLUS expresion AT expresion
+   74          | expresion • MINMIN expresion
+   75          | expresion • CONCAT expresion
+
+    error        shift, and go to state 79
+    PYC          shift, and go to state 80
+    MASMENOS     shift, and go to state 92
+    OPMULT       shift, and go to state 93
+    IGUALDAD     shift, and go to state 94
+    DESIGUALDAD  shift, and go to state 95
+    AND          shift, and go to state 96
+    OR           shift, and go to state 97
+    XOR          shift, and go to state 98
+    PLUSPLUS     shift, and go to state 99
+    MINMIN       shift, and go to state 100
+    CONCAT       shift, and go to state 101
+
+    finSentencia  go to state 102
+
+
+State 60
+
+   70 expresion: funcion •
+
+    $default  reduce using rule 70 (expresion)
+
+
+State 61
+
+   68 expresion: identificador •
+   76 funcion: identificador • ABRPAR argumentos CERPAR
+
+    ABRPAR  shift, and go to state 103
+
+    $default  reduce using rule 68 (expresion)
+
+
+State 62
+
+   88 literal: lista •
+
+    $default  reduce using rule 88 (literal)
+
+
+State 63
+
+   69 expresion: literal •
+
+    $default  reduce using rule 69 (expresion)
+
+
+State 64
+
+   89 literal: cadena •
+
+    $default  reduce using rule 89 (literal)
+
+
+State 65
+
+   47 sentenciaFor: FOR sentenciaAsignacion • TO expresion sentido sentencia
+
+    TO  shift, and go to state 104
+
+
+State 66
+
+   48 sentenciaFor: FOR expresion • TO expresion sentido sentencia
+   61 expresion: expresion • MASMENOS expresion
+   62          | expresion • OPMULT expresion
+   63          | expresion • IGUALDAD expresion
+   64          | expresion • DESIGUALDAD expresion
+   65          | expresion • AND expresion
+   66          | expresion • OR expresion
+   67          | expresion • XOR expresion
+   73          | expresion • PLUSPLUS expresion AT expresion
+   74          | expresion • MINMIN expresion
+   75          | expresion • CONCAT expresion
+
+    TO           shift, and go to state 105
+    MASMENOS     shift, and go to state 92
+    OPMULT       shift, and go to state 93
+    IGUALDAD     shift, and go to state 94
+    DESIGUALDAD  shift, and go to state 95
+    AND          shift, and go to state 96
+    OR           shift, and go to state 97
+    XOR          shift, and go to state 98
+    PLUSPLUS     shift, and go to state 99
+    MINMIN       shift, and go to state 100
+    CONCAT       shift, and go to state 101
+
+
+State 67
+
+   38 sentenciaAsignacion: identificador • ASIG expresion finSentencia
+   68 expresion: identificador •
+   76 funcion: identificador • ABRPAR argumentos CERPAR
+
+    ABRPAR  shift, and go to state 103
+    ASIG    shift, and go to state 77
+
+    $default  reduce using rule 68 (expresion)
+
+
+State 68
+
+   86 sentenciaLista: INITER identificador • finSentencia
+
+    error  shift, and go to state 79
+    PYC    shift, and go to state 80
+
+    finSentencia  go to state 106
+
+
+State 69
+
+    6 declararFuncion: cabeceraFuncion bloque •
+
+    $default  reduce using rule 6 (declararFuncion)
+
+
+State 70
+
+    9 cabeceraFuncion: tipoDato identificador • inicioParametros parametros finParametros
+
+    ABRPAR  shift, and go to state 48
+
+    inicioParametros  go to state 107
+
+
+State 71
+
+   15 finBloque: CERLLA •
+
+    $default  reduce using rule 15 (finBloque)
+
+
+State 72
+
+    3 bloque: inicioBloque declararVariablesLocalesMulti declararFuncionMulti sentencias finBloque •
+
+    $default  reduce using rule 3 (bloque)
+
+
+State 73
+
+   27 sentencias: sentencias sentencia •
+
+    $default  reduce using rule 27 (sentencias)
+
+
+State 74
+
+   45 listaVariables: inicioParametros • parametros finParametros
+
+    error     shift, and go to state 108
+    DEFLISTA  shift, and go to state 14
+    TIPODATO  shift, and go to state 15
+
+    CERPAR  reduce using rule 57 (parametros)
+    COMA    reduce using rule 57 (parametros)
+
+    tipoDato       go to state 109
+    tipoElemental  go to state 28
+    parametros     go to state 110
+
+
+State 75
+
+   43 sentenciaEntrada: nombreEntrada listaVariables • finSentencia
+
+    error  shift, and go to state 79
+    PYC    shift, and go to state 80
+
+    finSentencia  go to state 111
+
+
+State 76
+
+   50 sentenciaSalida: nombreSalida inicioParametros • listaExpresionesCadena finParametros finSentencia
+
+    ABRPAR    shift, and go to state 51
+    ABRCOR    shift, and go to state 52
+    MASMENOS  shift, and go to state 53
+    NOT       shift, and go to state 54
+    HASH      shift, and go to state 55
+    INTERR    shift, and go to state 56
+    CADENA    shift, and go to state 57
+    IDENTIF   shift, and go to state 23
+    LITERAL   shift, and go to state 58
+
+    listaExpresionesCadena  go to state 112
+    expresion               go to state 113
+    funcion                 go to state 60
+    identificador           go to state 61
+    lista                   go to state 62
+    literal                 go to state 63
+    cadena                  go to state 64
+
+
+State 77
+
+   38 sentenciaAsignacion: identificador ASIG • expresion finSentencia
+
+    ABRPAR    shift, and go to state 51
+    ABRCOR    shift, and go to state 52
+    MASMENOS  shift, and go to state 53
+    NOT       shift, and go to state 54
+    HASH      shift, and go to state 55
+    INTERR    shift, and go to state 56
+    CADENA    shift, and go to state 57
+    IDENTIF   shift, and go to state 23
+    LITERAL   shift, and go to state 58
+
+    expresion      go to state 114
+    funcion        go to state 60
+    identificador  go to state 61
+    lista          go to state 62
+    literal        go to state 63
+    cadena         go to state 64
+
+
+State 78
+
+   85 sentenciaLista: identificador ITER • finSentencia
+
+    error  shift, and go to state 79
+    PYC    shift, and go to state 80
+
+    finSentencia  go to state 115
+
+
+State 79
+
+   81 finSentencia: error •
+
+    $default  reduce using rule 81 (finSentencia)
+
+
+State 80
+
+   80 finSentencia: PYC •
+
+    $default  reduce using rule 80 (finSentencia)
+
+
+State 81
+
+   13 marcaFinVar: FINVAR finSentencia •
+
+    $default  reduce using rule 13 (marcaFinVar)
+
+
+State 82
+
+   18 variableLocal: tipoDato variableSolitaria • identificador finSentencia
+   20 variableSolitaria: variableSolitaria • identificador coma
+
+    IDENTIF  shift, and go to state 23
+
+    identificador  go to state 116
+
+
+State 83
+
+   40 sentenciaIf: IF inicioParametros expresion • finParametros sentencia
+   41            | IF inicioParametros expresion • finParametros sentencia ELSE sentencia
+   61 expresion: expresion • MASMENOS expresion
+   62          | expresion • OPMULT expresion
+   63          | expresion • IGUALDAD expresion
+   64          | expresion • DESIGUALDAD expresion
+   65          | expresion • AND expresion
+   66          | expresion • OR expresion
+   67          | expresion • XOR expresion
+   73          | expresion • PLUSPLUS expresion AT expresion
+   74          | expresion • MINMIN expresion
+   75          | expresion • CONCAT expresion
+
+    CERPAR       shift, and go to state 117
+    MASMENOS     shift, and go to state 92
+    OPMULT       shift, and go to state 93
+    IGUALDAD     shift, and go to state 94
+    DESIGUALDAD  shift, and go to state 95
+    AND          shift, and go to state 96
+    OR           shift, and go to state 97
+    XOR          shift, and go to state 98
+    PLUSPLUS     shift, and go to state 99
+    MINMIN       shift, and go to state 100
+    CONCAT       shift, and go to state 101
+
+    finParametros  go to state 118
+
+
+State 84
+
+   42 sentenciaWhile: WHILE inicioParametros expresion • finParametros sentencia
+   61 expresion: expresion • MASMENOS expresion
+   62          | expresion • OPMULT expresion
+   63          | expresion • IGUALDAD expresion
+   64          | expresion • DESIGUALDAD expresion
+   65          | expresion • AND expresion
+   66          | expresion • OR expresion
+   67          | expresion • XOR expresion
+   73          | expresion • PLUSPLUS expresion AT expresion
+   74          | expresion • MINMIN expresion
+   75          | expresion • CONCAT expresion
+
+    CERPAR       shift, and go to state 117
+    MASMENOS     shift, and go to state 92
+    OPMULT       shift, and go to state 93
+    IGUALDAD     shift, and go to state 94
+    DESIGUALDAD  shift, and go to state 95
+    AND          shift, and go to state 96
+    OR           shift, and go to state 97
+    XOR          shift, and go to state 98
+    PLUSPLUS     shift, and go to state 99
+    MINMIN       shift, and go to state 100
+    CONCAT       shift, and go to state 101
+
+    finParametros  go to state 119
+
+
+State 85
+
+   58 expresion: ABRPAR expresion • CERPAR
+   61          | expresion • MASMENOS expresion
+   62          | expresion • OPMULT expresion
+   63          | expresion • IGUALDAD expresion
+   64          | expresion • DESIGUALDAD expresion
+   65          | expresion • AND expresion
+   66          | expresion • OR expresion
+   67          | expresion • XOR expresion
+   73          | expresion • PLUSPLUS expresion AT expresion
+   74          | expresion • MINMIN expresion
+   75          | expresion • CONCAT expresion
+
+    CERPAR       shift, and go to state 120
+    MASMENOS     shift, and go to state 92
+    OPMULT       shift, and go to state 93
+    IGUALDAD     shift, and go to state 94
+    DESIGUALDAD  shift, and go to state 95
+    AND          shift, and go to state 96
+    OR           shift, and go to state 97
+    XOR          shift, and go to state 98
+    PLUSPLUS     shift, and go to state 99
+    MINMIN       shift, and go to state 100
+    CONCAT       shift, and go to state 101
+
+
+State 86
+
+   61 expresion: expresion • MASMENOS expresion
+   62          | expresion • OPMULT expresion
+   63          | expresion • IGUALDAD expresion
+   64          | expresion • DESIGUALDAD expresion
+   65          | expresion • AND expresion
+   66          | expresion • OR expresion
+   67          | expresion • XOR expresion
+   73          | expresion • PLUSPLUS expresion AT expresion
+   74          | expresion • MINMIN expresion
+   75          | expresion • CONCAT expresion
+   83 contenidoLista: expresion •
+
+    MASMENOS     shift, and go to state 92
+    OPMULT       shift, and go to state 93
+    IGUALDAD     shift, and go to state 94
+    DESIGUALDAD  shift, and go to state 95
+    AND          shift, and go to state 96
+    OR           shift, and go to state 97
+    XOR          shift, and go to state 98
+    PLUSPLUS     shift, and go to state 99
+    MINMIN       shift, and go to state 100
+    CONCAT       shift, and go to state 101
+
+    $default  reduce using rule 83 (contenidoLista)
+
+
+State 87
+
+   82 lista: ABRCOR contenidoLista • CERCOR
+   84 contenidoLista: contenidoLista • COMA expresion
+
+    CERCOR  shift, and go to state 121
+    COMA    shift, and go to state 122
+
+
+State 88
+
+   59 expresion: MASMENOS expresion •
+   61          | expresion • MASMENOS expresion
+   62          | expresion • OPMULT expresion
+   63          | expresion • IGUALDAD expresion
+   64          | expresion • DESIGUALDAD expresion
+   65          | expresion • AND expresion
+   66          | expresion • OR expresion
+   67          | expresion • XOR expresion
+   73          | expresion • PLUSPLUS expresion AT expresion
+   74          | expresion • MINMIN expresion
+   75          | expresion • CONCAT expresion
+
+    CONCAT  shift, and go to state 101
+
+    $default  reduce using rule 59 (expresion)
+
+
+State 89
+
+   60 expresion: NOT expresion •
+   61          | expresion • MASMENOS expresion
+   62          | expresion • OPMULT expresion
+   63          | expresion • IGUALDAD expresion
+   64          | expresion • DESIGUALDAD expresion
+   65          | expresion • AND expresion
+   66          | expresion • OR expresion
+   67          | expresion • XOR expresion
+   73          | expresion • PLUSPLUS expresion AT expresion
+   74          | expresion • MINMIN expresion
+   75          | expresion • CONCAT expresion
+
+    CONCAT  shift, and go to state 101
+
+    $default  reduce using rule 60 (expresion)
+
+
+State 90
+
+   61 expresion: expresion • MASMENOS expresion
+   62          | expresion • OPMULT expresion
+   63          | expresion • IGUALDAD expresion
+   64          | expresion • DESIGUALDAD expresion
+   65          | expresion • AND expresion
+   66          | expresion • OR expresion
+   67          | expresion • XOR expresion
+   71          | HASH expresion •
+   73          | expresion • PLUSPLUS expresion AT expresion
+   74          | expresion • MINMIN expresion
+   75          | expresion • CONCAT expresion
+
+    CONCAT  shift, and go to state 101
+
+    $default  reduce using rule 71 (expresion)
+
+
+State 91
+
+   61 expresion: expresion • MASMENOS expresion
+   62          | expresion • OPMULT expresion
+   63          | expresion • IGUALDAD expresion
+   64          | expresion • DESIGUALDAD expresion
+   65          | expresion • AND expresion
+   66          | expresion • OR expresion
+   67          | expresion • XOR expresion
+   72          | INTERR expresion •
+   73          | expresion • PLUSPLUS expresion AT expresion
+   74          | expresion • MINMIN expresion
+   75          | expresion • CONCAT expresion
+
+    CONCAT  shift, and go to state 101
+
+    $default  reduce using rule 72 (expresion)
+
+
+State 92
+
+   61 expresion: expresion MASMENOS • expresion
+
+    ABRPAR    shift, and go to state 51
+    ABRCOR    shift, and go to state 52
+    MASMENOS  shift, and go to state 53
+    NOT       shift, and go to state 54
+    HASH      shift, and go to state 55
+    INTERR    shift, and go to state 56
+    CADENA    shift, and go to state 57
+    IDENTIF   shift, and go to state 23
+    LITERAL   shift, and go to state 58
+
+    expresion      go to state 123
+    funcion        go to state 60
+    identificador  go to state 61
+    lista          go to state 62
+    literal        go to state 63
+    cadena         go to state 64
+
+
+State 93
+
+   62 expresion: expresion OPMULT • expresion
+
+    ABRPAR    shift, and go to state 51
+    ABRCOR    shift, and go to state 52
+    MASMENOS  shift, and go to state 53
+    NOT       shift, and go to state 54
+    HASH      shift, and go to state 55
+    INTERR    shift, and go to state 56
+    CADENA    shift, and go to state 57
+    IDENTIF   shift, and go to state 23
+    LITERAL   shift, and go to state 58
+
+    expresion      go to state 124
+    funcion        go to state 60
+    identificador  go to state 61
+    lista          go to state 62
+    literal        go to state 63
+    cadena         go to state 64
+
+
+State 94
+
+   63 expresion: expresion IGUALDAD • expresion
+
+    ABRPAR    shift, and go to state 51
+    ABRCOR    shift, and go to state 52
+    MASMENOS  shift, and go to state 53
+    NOT       shift, and go to state 54
+    HASH      shift, and go to state 55
+    INTERR    shift, and go to state 56
+    CADENA    shift, and go to state 57
+    IDENTIF   shift, and go to state 23
+    LITERAL   shift, and go to state 58
+
+    expresion      go to state 125
+    funcion        go to state 60
+    identificador  go to state 61
+    lista          go to state 62
+    literal        go to state 63
+    cadena         go to state 64
+
+
+State 95
+
+   64 expresion: expresion DESIGUALDAD • expresion
+
+    ABRPAR    shift, and go to state 51
+    ABRCOR    shift, and go to state 52
+    MASMENOS  shift, and go to state 53
+    NOT       shift, and go to state 54
+    HASH      shift, and go to state 55
+    INTERR    shift, and go to state 56
+    CADENA    shift, and go to state 57
+    IDENTIF   shift, and go to state 23
+    LITERAL   shift, and go to state 58
+
+    expresion      go to state 126
+    funcion        go to state 60
+    identificador  go to state 61
+    lista          go to state 62
+    literal        go to state 63
+    cadena         go to state 64
+
+
+State 96
+
+   65 expresion: expresion AND • expresion
+
+    ABRPAR    shift, and go to state 51
+    ABRCOR    shift, and go to state 52
+    MASMENOS  shift, and go to state 53
+    NOT       shift, and go to state 54
+    HASH      shift, and go to state 55
+    INTERR    shift, and go to state 56
+    CADENA    shift, and go to state 57
+    IDENTIF   shift, and go to state 23
+    LITERAL   shift, and go to state 58
+
+    expresion      go to state 127
+    funcion        go to state 60
+    identificador  go to state 61
+    lista          go to state 62
+    literal        go to state 63
+    cadena         go to state 64
+
+
+State 97
+
+   66 expresion: expresion OR • expresion
+
+    ABRPAR    shift, and go to state 51
+    ABRCOR    shift, and go to state 52
+    MASMENOS  shift, and go to state 53
+    NOT       shift, and go to state 54
+    HASH      shift, and go to state 55
+    INTERR    shift, and go to state 56
+    CADENA    shift, and go to state 57
+    IDENTIF   shift, and go to state 23
+    LITERAL   shift, and go to state 58
+
+    expresion      go to state 128
+    funcion        go to state 60
+    identificador  go to state 61
+    lista          go to state 62
+    literal        go to state 63
+    cadena         go to state 64
+
+
+State 98
+
+   67 expresion: expresion XOR • expresion
+
+    ABRPAR    shift, and go to state 51
+    ABRCOR    shift, and go to state 52
+    MASMENOS  shift, and go to state 53
+    NOT       shift, and go to state 54
+    HASH      shift, and go to state 55
+    INTERR    shift, and go to state 56
+    CADENA    shift, and go to state 57
+    IDENTIF   shift, and go to state 23
+    LITERAL   shift, and go to state 58
+
+    expresion      go to state 129
+    funcion        go to state 60
+    identificador  go to state 61
+    lista          go to state 62
+    literal        go to state 63
+    cadena         go to state 64
+
+
+State 99
+
+   73 expresion: expresion PLUSPLUS • expresion AT expresion
+
+    ABRPAR    shift, and go to state 51
+    ABRCOR    shift, and go to state 52
+    MASMENOS  shift, and go to state 53
+    NOT       shift, and go to state 54
+    HASH      shift, and go to state 55
+    INTERR    shift, and go to state 56
+    CADENA    shift, and go to state 57
+    IDENTIF   shift, and go to state 23
+    LITERAL   shift, and go to state 58
+
+    expresion      go to state 130
+    funcion        go to state 60
+    identificador  go to state 61
+    lista          go to state 62
+    literal        go to state 63
+    cadena         go to state 64
+
+
+State 100
+
+   74 expresion: expresion MINMIN • expresion
+
+    ABRPAR    shift, and go to state 51
+    ABRCOR    shift, and go to state 52
+    MASMENOS  shift, and go to state 53
+    NOT       shift, and go to state 54
+    HASH      shift, and go to state 55
+    INTERR    shift, and go to state 56
+    CADENA    shift, and go to state 57
+    IDENTIF   shift, and go to state 23
+    LITERAL   shift, and go to state 58
+
+    expresion      go to state 131
+    funcion        go to state 60
+    identificador  go to state 61
+    lista          go to state 62
+    literal        go to state 63
+    cadena         go to state 64
+
+
+State 101
+
+   75 expresion: expresion CONCAT • expresion
+
+    ABRPAR    shift, and go to state 51
+    ABRCOR    shift, and go to state 52
+    MASMENOS  shift, and go to state 53
+    NOT       shift, and go to state 54
+    HASH      shift, and go to state 55
+    INTERR    shift, and go to state 56
+    CADENA    shift, and go to state 57
+    IDENTIF   shift, and go to state 23
+    LITERAL   shift, and go to state 58
+
+    expresion      go to state 132
+    funcion        go to state 60
+    identificador  go to state 61
+    lista          go to state 62
+    literal        go to state 63
+    cadena         go to state 64
+
+
+State 102
+
+   46 sentenciaReturn: RETURN expresion finSentencia •
+
+    $default  reduce using rule 46 (sentenciaReturn)
+
+
+State 103
+
+   76 funcion: identificador ABRPAR • argumentos CERPAR
+
+    ABRPAR    shift, and go to state 51
+    ABRCOR    shift, and go to state 52
+    MASMENOS  shift, and go to state 53
+    NOT       shift, and go to state 54
+    HASH      shift, and go to state 55
+    INTERR    shift, and go to state 56
+    CADENA    shift, and go to state 57
+    IDENTIF   shift, and go to state 23
+    LITERAL   shift, and go to state 58
+
+    expresion      go to state 133
+    funcion        go to state 60
+    argumentos     go to state 134
+    identificador  go to state 61
+    lista          go to state 62
+    literal        go to state 63
+    cadena         go to state 64
+
+
+State 104
+
+   47 sentenciaFor: FOR sentenciaAsignacion TO • expresion sentido sentencia
+
+    ABRPAR    shift, and go to state 51
+    ABRCOR    shift, and go to state 52
+    MASMENOS  shift, and go to state 53
+    NOT       shift, and go to state 54
+    HASH      shift, and go to state 55
+    INTERR    shift, and go to state 56
+    CADENA    shift, and go to state 57
+    IDENTIF   shift, and go to state 23
+    LITERAL   shift, and go to state 58
+
+    expresion      go to state 135
+    funcion        go to state 60
+    identificador  go to state 61
+    lista          go to state 62
+    literal        go to state 63
+    cadena         go to state 64
+
+
+State 105
+
+   48 sentenciaFor: FOR expresion TO • expresion sentido sentencia
+
+    ABRPAR    shift, and go to state 51
+    ABRCOR    shift, and go to state 52
+    MASMENOS  shift, and go to state 53
+    NOT       shift, and go to state 54
+    HASH      shift, and go to state 55
+    INTERR    shift, and go to state 56
+    CADENA    shift, and go to state 57
+    IDENTIF   shift, and go to state 23
+    LITERAL   shift, and go to state 58
+
+    expresion      go to state 136
+    funcion        go to state 60
+    identificador  go to state 61
+    lista          go to state 62
+    literal        go to state 63
+    cadena         go to state 64
+
+
+State 106
+
+   86 sentenciaLista: INITER identificador finSentencia •
+
+    $default  reduce using rule 86 (sentenciaLista)
+
+
+State 107
+
+    9 cabeceraFuncion: tipoDato identificador inicioParametros • parametros finParametros
+
+    error     shift, and go to state 108
+    DEFLISTA  shift, and go to state 14
+    TIPODATO  shift, and go to state 15
+
+    CERPAR  reduce using rule 57 (parametros)
+    COMA    reduce using rule 57 (parametros)
+
+    tipoDato       go to state 109
+    tipoElemental  go to state 28
+    parametros     go to state 137
+
+
+State 108
+
+   56 parametros: error •
+
+    $default  reduce using rule 56 (parametros)
+
+
+State 109
+
+   54 parametros: tipoDato • identificador
+
+    IDENTIF  shift, and go to state 23
+
+    identificador  go to state 138
+
+
+State 110
+
+   45 listaVariables: inicioParametros parametros • finParametros
+   55 parametros: parametros • COMA tipoDato identificador
+
+    CERPAR  shift, and go to state 117
+    COMA    shift, and go to state 139
+
+    finParametros  go to state 140
+
+
+State 111
+
+   43 sentenciaEntrada: nombreEntrada listaVariables finSentencia •
+
+    $default  reduce using rule 43 (sentenciaEntrada)
+
+
+State 112
+
+   50 sentenciaSalida: nombreSalida inicioParametros listaExpresionesCadena • finParametros finSentencia
+   52 listaExpresionesCadena: listaExpresionesCadena • COMA expresion
+
+    CERPAR  shift, and go to state 117
+    COMA    shift, and go to state 141
+
+    finParametros  go to state 142
+
+
+State 113
+
+   51 listaExpresionesCadena: expresion •
+   61 expresion: expresion • MASMENOS expresion
+   62          | expresion • OPMULT expresion
+   63          | expresion • IGUALDAD expresion
+   64          | expresion • DESIGUALDAD expresion
+   65          | expresion • AND expresion
+   66          | expresion • OR expresion
+   67          | expresion • XOR expresion
+   73          | expresion • PLUSPLUS expresion AT expresion
+   74          | expresion • MINMIN expresion
+   75          | expresion • CONCAT expresion
+
+    MASMENOS     shift, and go to state 92
+    OPMULT       shift, and go to state 93
+    IGUALDAD     shift, and go to state 94
+    DESIGUALDAD  shift, and go to state 95
+    AND          shift, and go to state 96
+    OR           shift, and go to state 97
+    XOR          shift, and go to state 98
+    PLUSPLUS     shift, and go to state 99
+    MINMIN       shift, and go to state 100
+    CONCAT       shift, and go to state 101
+
+    $default  reduce using rule 51 (listaExpresionesCadena)
+
+
+State 114
+
+   38 sentenciaAsignacion: identificador ASIG expresion • finSentencia
+   61 expresion: expresion • MASMENOS expresion
+   62          | expresion • OPMULT expresion
+   63          | expresion • IGUALDAD expresion
+   64          | expresion • DESIGUALDAD expresion
+   65          | expresion • AND expresion
+   66          | expresion • OR expresion
+   67          | expresion • XOR expresion
+   73          | expresion • PLUSPLUS expresion AT expresion
+   74          | expresion • MINMIN expresion
+   75          | expresion • CONCAT expresion
+
+    error        shift, and go to state 79
+    PYC          shift, and go to state 80
+    MASMENOS     shift, and go to state 92
+    OPMULT       shift, and go to state 93
+    IGUALDAD     shift, and go to state 94
+    DESIGUALDAD  shift, and go to state 95
+    AND          shift, and go to state 96
+    OR           shift, and go to state 97
+    XOR          shift, and go to state 98
+    PLUSPLUS     shift, and go to state 99
+    MINMIN       shift, and go to state 100
+    CONCAT       shift, and go to state 101
+
+    finSentencia  go to state 143
+
+
+State 115
+
+   85 sentenciaLista: identificador ITER finSentencia •
+
+    $default  reduce using rule 85 (sentenciaLista)
+
+
+State 116
+
+   18 variableLocal: tipoDato variableSolitaria identificador • finSentencia
+   20 variableSolitaria: variableSolitaria identificador • coma
+
+    error  shift, and go to state 144
+    COMA   shift, and go to state 145
+    PYC    shift, and go to state 80
+
+    coma          go to state 146
+    finSentencia  go to state 147
+
+
+State 117
+
+   11 finParametros: CERPAR •
+
+    $default  reduce using rule 11 (finParametros)
+
+
+State 118
+
+   40 sentenciaIf: IF inicioParametros expresion finParametros • sentencia
+   41            | IF inicioParametros expresion finParametros • sentencia ELSE sentencia
+
+    error    shift, and go to state 13
+    ABRLLA   shift, and go to state 5
+    IF       shift, and go to state 16
+    WHILE    shift, and go to state 17
+    SCAN     shift, and go to state 18
+    RETURN   shift, and go to state 19
+    FOR      shift, and go to state 20
+    PRINT    shift, and go to state 21
+    INITER   shift, and go to state 22
+    IDENTIF  shift, and go to state 23
+
+    bloque               go to state 24
+    inicioBloque         go to state 7
+    sentencia            go to state 148
+    sentenciaAsignacion  go to state 31
+    sentenciaIf          go to state 32
+    sentenciaWhile       go to state 33
+    sentenciaEntrada     go to state 34
+    nombreEntrada        go to state 35
+    sentenciaReturn      go to state 36
+    sentenciaFor         go to state 37
+    sentenciaSalida      go to state 38
+    nombreSalida         go to state 39
+    identificador        go to state 40
+    sentenciaLista       go to state 41
+
+
+State 119
+
+   42 sentenciaWhile: WHILE inicioParametros expresion finParametros • sentencia
+
+    error    shift, and go to state 13
+    ABRLLA   shift, and go to state 5
+    IF       shift, and go to state 16
+    WHILE    shift, and go to state 17
+    SCAN     shift, and go to state 18
+    RETURN   shift, and go to state 19
+    FOR      shift, and go to state 20
+    PRINT    shift, and go to state 21
+    INITER   shift, and go to state 22
+    IDENTIF  shift, and go to state 23
+
+    bloque               go to state 24
+    inicioBloque         go to state 7
+    sentencia            go to state 149
+    sentenciaAsignacion  go to state 31
+    sentenciaIf          go to state 32
+    sentenciaWhile       go to state 33
+    sentenciaEntrada     go to state 34
+    nombreEntrada        go to state 35
+    sentenciaReturn      go to state 36
+    sentenciaFor         go to state 37
+    sentenciaSalida      go to state 38
+    nombreSalida         go to state 39
+    identificador        go to state 40
+    sentenciaLista       go to state 41
+
+
+State 120
+
+   58 expresion: ABRPAR expresion CERPAR •
+
+    $default  reduce using rule 58 (expresion)
+
+
+State 121
+
+   82 lista: ABRCOR contenidoLista CERCOR •
+
+    $default  reduce using rule 82 (lista)
+
+
+State 122
+
+   84 contenidoLista: contenidoLista COMA • expresion
+
+    ABRPAR    shift, and go to state 51
+    ABRCOR    shift, and go to state 52
+    MASMENOS  shift, and go to state 53
+    NOT       shift, and go to state 54
+    HASH      shift, and go to state 55
+    INTERR    shift, and go to state 56
+    CADENA    shift, and go to state 57
+    IDENTIF   shift, and go to state 23
+    LITERAL   shift, and go to state 58
+
+    expresion      go to state 150
+    funcion        go to state 60
+    identificador  go to state 61
+    lista          go to state 62
+    literal        go to state 63
+    cadena         go to state 64
+
+
+State 123
+
+   61 expresion: expresion • MASMENOS expresion
+   61          | expresion MASMENOS expresion •
+   62          | expresion • OPMULT expresion
+   63          | expresion • IGUALDAD expresion
+   64          | expresion • DESIGUALDAD expresion
+   65          | expresion • AND expresion
+   66          | expresion • OR expresion
+   67          | expresion • XOR expresion
+   73          | expresion • PLUSPLUS expresion AT expresion
+   74          | expresion • MINMIN expresion
+   75          | expresion • CONCAT expresion
+
+    OPMULT    shift, and go to state 93
+    PLUSPLUS  shift, and go to state 99
+    MINMIN    shift, and go to state 100
+    CONCAT    shift, and go to state 101
+
+    $default  reduce using rule 61 (expresion)
+
+
+State 124
+
+   61 expresion: expresion • MASMENOS expresion
+   62          | expresion • OPMULT expresion
+   62          | expresion OPMULT expresion •
+   63          | expresion • IGUALDAD expresion
+   64          | expresion • DESIGUALDAD expresion
+   65          | expresion • AND expresion
+   66          | expresion • OR expresion
+   67          | expresion • XOR expresion
+   73          | expresion • PLUSPLUS expresion AT expresion
+   74          | expresion • MINMIN expresion
+   75          | expresion • CONCAT expresion
+
+    OPMULT    shift, and go to state 93
+    PLUSPLUS  shift, and go to state 99
+    MINMIN    shift, and go to state 100
+    CONCAT    shift, and go to state 101
+
+    $default  reduce using rule 62 (expresion)
+
+
+State 125
+
+   61 expresion: expresion • MASMENOS expresion
+   62          | expresion • OPMULT expresion
+   63          | expresion • IGUALDAD expresion
+   63          | expresion IGUALDAD expresion •
+   64          | expresion • DESIGUALDAD expresion
+   65          | expresion • AND expresion
+   66          | expresion • OR expresion
+   67          | expresion • XOR expresion
+   73          | expresion • PLUSPLUS expresion AT expresion
+   74          | expresion • MINMIN expresion
+   75          | expresion • CONCAT expresion
+
+    MASMENOS     shift, and go to state 92
+    OPMULT       shift, and go to state 93
+    DESIGUALDAD  shift, and go to state 95
+    PLUSPLUS     shift, and go to state 99
+    MINMIN       shift, and go to state 100
+    CONCAT       shift, and go to state 101
+
+    $default  reduce using rule 63 (expresion)
+
+
+State 126
+
+   61 expresion: expresion • MASMENOS expresion
+   62          | expresion • OPMULT expresion
+   63          | expresion • IGUALDAD expresion
+   64          | expresion • DESIGUALDAD expresion
+   64          | expresion DESIGUALDAD expresion •
+   65          | expresion • AND expresion
+   66          | expresion • OR expresion
+   67          | expresion • XOR expresion
+   73          | expresion • PLUSPLUS expresion AT expresion
+   74          | expresion • MINMIN expresion
+   75          | expresion • CONCAT expresion
+
+    MASMENOS  shift, and go to state 92
+    OPMULT    shift, and go to state 93
+    PLUSPLUS  shift, and go to state 99
+    MINMIN    shift, and go to state 100
+    CONCAT    shift, and go to state 101
+
+    $default  reduce using rule 64 (expresion)
+
+
+State 127
+
+   61 expresion: expresion • MASMENOS expresion
+   62          | expresion • OPMULT expresion
+   63          | expresion • IGUALDAD expresion
+   64          | expresion • DESIGUALDAD expresion
+   65          | expresion • AND expresion
+   65          | expresion AND expresion •
+   66          | expresion • OR expresion
+   67          | expresion • XOR expresion
+   73          | expresion • PLUSPLUS expresion AT expresion
+   74          | expresion • MINMIN expresion
+   75          | expresion • CONCAT expresion
+
+    MASMENOS     shift, and go to state 92
+    OPMULT       shift, and go to state 93
+    IGUALDAD     shift, and go to state 94
+    DESIGUALDAD  shift, and go to state 95
+    XOR          shift, and go to state 98
+    PLUSPLUS     shift, and go to state 99
+    MINMIN       shift, and go to state 100
+    CONCAT       shift, and go to state 101
+
+    $default  reduce using rule 65 (expresion)
+
+
+State 128
+
+   61 expresion: expresion • MASMENOS expresion
+   62          | expresion • OPMULT expresion
+   63          | expresion • IGUALDAD expresion
+   64          | expresion • DESIGUALDAD expresion
+   65          | expresion • AND expresion
+   66          | expresion • OR expresion
+   66          | expresion OR expresion •
+   67          | expresion • XOR expresion
+   73          | expresion • PLUSPLUS expresion AT expresion
+   74          | expresion • MINMIN expresion
+   75          | expresion • CONCAT expresion
+
+    MASMENOS     shift, and go to state 92
+    OPMULT       shift, and go to state 93
+    IGUALDAD     shift, and go to state 94
+    DESIGUALDAD  shift, and go to state 95
+    AND          shift, and go to state 96
+    XOR          shift, and go to state 98
+    PLUSPLUS     shift, and go to state 99
+    MINMIN       shift, and go to state 100
+    CONCAT       shift, and go to state 101
+
+    $default  reduce using rule 66 (expresion)
+
+
+State 129
+
+   61 expresion: expresion • MASMENOS expresion
+   62          | expresion • OPMULT expresion
+   63          | expresion • IGUALDAD expresion
+   64          | expresion • DESIGUALDAD expresion
+   65          | expresion • AND expresion
+   66          | expresion • OR expresion
+   67          | expresion • XOR expresion
+   67          | expresion XOR expresion •
+   73          | expresion • PLUSPLUS expresion AT expresion
+   74          | expresion • MINMIN expresion
+   75          | expresion • CONCAT expresion
+
+    MASMENOS     shift, and go to state 92
+    OPMULT       shift, and go to state 93
+    IGUALDAD     shift, and go to state 94
+    DESIGUALDAD  shift, and go to state 95
+    PLUSPLUS     shift, and go to state 99
+    MINMIN       shift, and go to state 100
+    CONCAT       shift, and go to state 101
+
+    $default  reduce using rule 67 (expresion)
+
+
+State 130
+
+   61 expresion: expresion • MASMENOS expresion
+   62          | expresion • OPMULT expresion
+   63          | expresion • IGUALDAD expresion
+   64          | expresion • DESIGUALDAD expresion
+   65          | expresion • AND expresion
+   66          | expresion • OR expresion
+   67          | expresion • XOR expresion
+   73          | expresion • PLUSPLUS expresion AT expresion
+   73          | expresion PLUSPLUS expresion • AT expresion
+   74          | expresion • MINMIN expresion
+   75          | expresion • CONCAT expresion
+
+    MASMENOS     shift, and go to state 92
+    OPMULT       shift, and go to state 93
+    IGUALDAD     shift, and go to state 94
+    DESIGUALDAD  shift, and go to state 95
+    AND          shift, and go to state 96
+    OR           shift, and go to state 97
+    XOR          shift, and go to state 98
+    PLUSPLUS     shift, and go to state 99
+    MINMIN       shift, and go to state 100
+    CONCAT       shift, and go to state 101
+    AT           shift, and go to state 151
+
+
+State 131
+
+   61 expresion: expresion • MASMENOS expresion
+   62          | expresion • OPMULT expresion
+   63          | expresion • IGUALDAD expresion
+   64          | expresion • DESIGUALDAD expresion
+   65          | expresion • AND expresion
+   66          | expresion • OR expresion
+   67          | expresion • XOR expresion
+   73          | expresion • PLUSPLUS expresion AT expresion
+   74          | expresion • MINMIN expresion
+   74          | expresion MINMIN expresion •
+   75          | expresion • CONCAT expresion
+
+    PLUSPLUS  shift, and go to state 99
+    MINMIN    shift, and go to state 100
+    CONCAT    shift, and go to state 101
+
+    $default  reduce using rule 74 (expresion)
+
+
+State 132
+
+   61 expresion: expresion • MASMENOS expresion
+   62          | expresion • OPMULT expresion
+   63          | expresion • IGUALDAD expresion
+   64          | expresion • DESIGUALDAD expresion
+   65          | expresion • AND expresion
+   66          | expresion • OR expresion
+   67          | expresion • XOR expresion
+   73          | expresion • PLUSPLUS expresion AT expresion
+   74          | expresion • MINMIN expresion
+   75          | expresion • CONCAT expresion
+   75          | expresion CONCAT expresion •
+
+    CONCAT  shift, and go to state 101
+
+    $default  reduce using rule 75 (expresion)
+
+
+State 133
+
+   61 expresion: expresion • MASMENOS expresion
+   62          | expresion • OPMULT expresion
+   63          | expresion • IGUALDAD expresion
+   64          | expresion • DESIGUALDAD expresion
+   65          | expresion • AND expresion
+   66          | expresion • OR expresion
+   67          | expresion • XOR expresion
+   73          | expresion • PLUSPLUS expresion AT expresion
+   74          | expresion • MINMIN expresion
+   75          | expresion • CONCAT expresion
+   77 argumentos: expresion •
+
+    MASMENOS     shift, and go to state 92
+    OPMULT       shift, and go to state 93
+    IGUALDAD     shift, and go to state 94
+    DESIGUALDAD  shift, and go to state 95
+    AND          shift, and go to state 96
+    OR           shift, and go to state 97
+    XOR          shift, and go to state 98
+    PLUSPLUS     shift, and go to state 99
+    MINMIN       shift, and go to state 100
+    CONCAT       shift, and go to state 101
+
+    $default  reduce using rule 77 (argumentos)
+
+
+State 134
+
+   76 funcion: identificador ABRPAR argumentos • CERPAR
+   78 argumentos: argumentos • COMA expresion
+
+    CERPAR  shift, and go to state 152
+    COMA    shift, and go to state 153
+
+
+State 135
+
+   47 sentenciaFor: FOR sentenciaAsignacion TO expresion • sentido sentencia
+   61 expresion: expresion • MASMENOS expresion
+   62          | expresion • OPMULT expresion
+   63          | expresion • IGUALDAD expresion
+   64          | expresion • DESIGUALDAD expresion
+   65          | expresion • AND expresion
+   66          | expresion • OR expresion
+   67          | expresion • XOR expresion
+   73          | expresion • PLUSPLUS expresion AT expresion
+   74          | expresion • MINMIN expresion
+   75          | expresion • CONCAT expresion
+
+    SENTIDO      shift, and go to state 154
+    MASMENOS     shift, and go to state 92
+    OPMULT       shift, and go to state 93
+    IGUALDAD     shift, and go to state 94
+    DESIGUALDAD  shift, and go to state 95
+    AND          shift, and go to state 96
+    OR           shift, and go to state 97
+    XOR          shift, and go to state 98
+    PLUSPLUS     shift, and go to state 99
+    MINMIN       shift, and go to state 100
+    CONCAT       shift, and go to state 101
+
+    sentido  go to state 155
+
+
+State 136
+
+   48 sentenciaFor: FOR expresion TO expresion • sentido sentencia
+   61 expresion: expresion • MASMENOS expresion
+   62          | expresion • OPMULT expresion
+   63          | expresion • IGUALDAD expresion
+   64          | expresion • DESIGUALDAD expresion
+   65          | expresion • AND expresion
+   66          | expresion • OR expresion
+   67          | expresion • XOR expresion
+   73          | expresion • PLUSPLUS expresion AT expresion
+   74          | expresion • MINMIN expresion
+   75          | expresion • CONCAT expresion
+
+    SENTIDO      shift, and go to state 154
+    MASMENOS     shift, and go to state 92
+    OPMULT       shift, and go to state 93
+    IGUALDAD     shift, and go to state 94
+    DESIGUALDAD  shift, and go to state 95
+    AND          shift, and go to state 96
+    OR           shift, and go to state 97
+    XOR          shift, and go to state 98
+    PLUSPLUS     shift, and go to state 99
+    MINMIN       shift, and go to state 100
+    CONCAT       shift, and go to state 101
+
+    sentido  go to state 156
+
+
+State 137
+
+    9 cabeceraFuncion: tipoDato identificador inicioParametros parametros • finParametros
+   55 parametros: parametros • COMA tipoDato identificador
+
+    CERPAR  shift, and go to state 117
+    COMA    shift, and go to state 139
+
+    finParametros  go to state 157
+
+
+State 138
+
+   54 parametros: tipoDato identificador •
+
+    $default  reduce using rule 54 (parametros)
+
+
+State 139
+
+   55 parametros: parametros COMA • tipoDato identificador
+
+    DEFLISTA  shift, and go to state 14
+    TIPODATO  shift, and go to state 15
+
+    tipoDato       go to state 158
+    tipoElemental  go to state 28
+
+
+State 140
+
+   45 listaVariables: inicioParametros parametros finParametros •
+
+    $default  reduce using rule 45 (listaVariables)
+
+
+State 141
+
+   52 listaExpresionesCadena: listaExpresionesCadena COMA • expresion
+
+    ABRPAR    shift, and go to state 51
+    ABRCOR    shift, and go to state 52
+    MASMENOS  shift, and go to state 53
+    NOT       shift, and go to state 54
+    HASH      shift, and go to state 55
+    INTERR    shift, and go to state 56
+    CADENA    shift, and go to state 57
+    IDENTIF   shift, and go to state 23
+    LITERAL   shift, and go to state 58
+
+    expresion      go to state 159
+    funcion        go to state 60
+    identificador  go to state 61
+    lista          go to state 62
+    literal        go to state 63
+    cadena         go to state 64
+
+
+State 142
+
+   50 sentenciaSalida: nombreSalida inicioParametros listaExpresionesCadena finParametros • finSentencia
+
+    error  shift, and go to state 79
+    PYC    shift, and go to state 80
+
+    finSentencia  go to state 160
+
+
+State 143
+
+   38 sentenciaAsignacion: identificador ASIG expresion finSentencia •
+
+    $default  reduce using rule 38 (sentenciaAsignacion)
+
+
+State 144
+
+   23 coma: error •
+   81 finSentencia: error •
+
+    IDENTIF   reduce using rule 23 (coma)
+    $default  reduce using rule 81 (finSentencia)
+
+
+State 145
+
+   22 coma: COMA •
+
+    $default  reduce using rule 22 (coma)
+
+
+State 146
+
+   20 variableSolitaria: variableSolitaria identificador coma •
+
+    $default  reduce using rule 20 (variableSolitaria)
+
+
+State 147
+
+   18 variableLocal: tipoDato variableSolitaria identificador finSentencia •
+
+    $default  reduce using rule 18 (variableLocal)
+
+
+State 148
+
+   40 sentenciaIf: IF inicioParametros expresion finParametros sentencia •
+   41            | IF inicioParametros expresion finParametros sentencia • ELSE sentencia
+
+    ELSE  shift, and go to state 161
+
+    ELSE      [reduce using rule 40 (sentenciaIf)]
+    $default  reduce using rule 40 (sentenciaIf)
+
+
+State 149
+
+   42 sentenciaWhile: WHILE inicioParametros expresion finParametros sentencia •
+
+    $default  reduce using rule 42 (sentenciaWhile)
+
+
+State 150
+
+   61 expresion: expresion • MASMENOS expresion
+   62          | expresion • OPMULT expresion
+   63          | expresion • IGUALDAD expresion
+   64          | expresion • DESIGUALDAD expresion
+   65          | expresion • AND expresion
+   66          | expresion • OR expresion
+   67          | expresion • XOR expresion
+   73          | expresion • PLUSPLUS expresion AT expresion
+   74          | expresion • MINMIN expresion
+   75          | expresion • CONCAT expresion
+   84 contenidoLista: contenidoLista COMA expresion •
+
+    MASMENOS     shift, and go to state 92
+    OPMULT       shift, and go to state 93
+    IGUALDAD     shift, and go to state 94
+    DESIGUALDAD  shift, and go to state 95
+    AND          shift, and go to state 96
+    OR           shift, and go to state 97
+    XOR          shift, and go to state 98
+    PLUSPLUS     shift, and go to state 99
+    MINMIN       shift, and go to state 100
+    CONCAT       shift, and go to state 101
+
+    $default  reduce using rule 84 (contenidoLista)
+
+
+State 151
+
+   73 expresion: expresion PLUSPLUS expresion AT • expresion
+
+    ABRPAR    shift, and go to state 51
+    ABRCOR    shift, and go to state 52
+    MASMENOS  shift, and go to state 53
+    NOT       shift, and go to state 54
+    HASH      shift, and go to state 55
+    INTERR    shift, and go to state 56
+    CADENA    shift, and go to state 57
+    IDENTIF   shift, and go to state 23
+    LITERAL   shift, and go to state 58
+
+    expresion      go to state 162
+    funcion        go to state 60
+    identificador  go to state 61
+    lista          go to state 62
+    literal        go to state 63
+    cadena         go to state 64
+
+
+State 152
+
+   76 funcion: identificador ABRPAR argumentos CERPAR •
+
+    $default  reduce using rule 76 (funcion)
+
+
+State 153
+
+   78 argumentos: argumentos COMA • expresion
+
+    ABRPAR    shift, and go to state 51
+    ABRCOR    shift, and go to state 52
+    MASMENOS  shift, and go to state 53
+    NOT       shift, and go to state 54
+    HASH      shift, and go to state 55
+    INTERR    shift, and go to state 56
+    CADENA    shift, and go to state 57
+    IDENTIF   shift, and go to state 23
+    LITERAL   shift, and go to state 58
+
+    expresion      go to state 163
+    funcion        go to state 60
+    identificador  go to state 61
+    lista          go to state 62
+    literal        go to state 63
+    cadena         go to state 64
+
+
+State 154
+
+   49 sentido: SENTIDO •
+
+    $default  reduce using rule 49 (sentido)
+
+
+State 155
+
+   47 sentenciaFor: FOR sentenciaAsignacion TO expresion sentido • sentencia
+
+    error    shift, and go to state 13
+    ABRLLA   shift, and go to state 5
+    IF       shift, and go to state 16
+    WHILE    shift, and go to state 17
+    SCAN     shift, and go to state 18
+    RETURN   shift, and go to state 19
+    FOR      shift, and go to state 20
+    PRINT    shift, and go to state 21
+    INITER   shift, and go to state 22
+    IDENTIF  shift, and go to state 23
+
+    bloque               go to state 24
+    inicioBloque         go to state 7
+    sentencia            go to state 164
+    sentenciaAsignacion  go to state 31
+    sentenciaIf          go to state 32
+    sentenciaWhile       go to state 33
+    sentenciaEntrada     go to state 34
+    nombreEntrada        go to state 35
+    sentenciaReturn      go to state 36
+    sentenciaFor         go to state 37
+    sentenciaSalida      go to state 38
+    nombreSalida         go to state 39
+    identificador        go to state 40
+    sentenciaLista       go to state 41
+
+
+State 156
+
+   48 sentenciaFor: FOR expresion TO expresion sentido • sentencia
+
+    error    shift, and go to state 13
+    ABRLLA   shift, and go to state 5
+    IF       shift, and go to state 16
+    WHILE    shift, and go to state 17
+    SCAN     shift, and go to state 18
+    RETURN   shift, and go to state 19
+    FOR      shift, and go to state 20
+    PRINT    shift, and go to state 21
+    INITER   shift, and go to state 22
+    IDENTIF  shift, and go to state 23
+
+    bloque               go to state 24
+    inicioBloque         go to state 7
+    sentencia            go to state 165
+    sentenciaAsignacion  go to state 31
+    sentenciaIf          go to state 32
+    sentenciaWhile       go to state 33
+    sentenciaEntrada     go to state 34
+    nombreEntrada        go to state 35
+    sentenciaReturn      go to state 36
+    sentenciaFor         go to state 37
+    sentenciaSalida      go to state 38
+    nombreSalida         go to state 39
+    identificador        go to state 40
+    sentenciaLista       go to state 41
+
+
+State 157
+
+    9 cabeceraFuncion: tipoDato identificador inicioParametros parametros finParametros •
+
+    $default  reduce using rule 9 (cabeceraFuncion)
+
+
+State 158
+
+   55 parametros: parametros COMA tipoDato • identificador
+
+    IDENTIF  shift, and go to state 23
+
+    identificador  go to state 166
+
+
+State 159
+
+   52 listaExpresionesCadena: listaExpresionesCadena COMA expresion •
+   61 expresion: expresion • MASMENOS expresion
+   62          | expresion • OPMULT expresion
+   63          | expresion • IGUALDAD expresion
+   64          | expresion • DESIGUALDAD expresion
+   65          | expresion • AND expresion
+   66          | expresion • OR expresion
+   67          | expresion • XOR expresion
+   73          | expresion • PLUSPLUS expresion AT expresion
+   74          | expresion • MINMIN expresion
+   75          | expresion • CONCAT expresion
+
+    MASMENOS     shift, and go to state 92
+    OPMULT       shift, and go to state 93
+    IGUALDAD     shift, and go to state 94
+    DESIGUALDAD  shift, and go to state 95
+    AND          shift, and go to state 96
+    OR           shift, and go to state 97
+    XOR          shift, and go to state 98
+    PLUSPLUS     shift, and go to state 99
+    MINMIN       shift, and go to state 100
+    CONCAT       shift, and go to state 101
+
+    $default  reduce using rule 52 (listaExpresionesCadena)
+
+
+State 160
+
+   50 sentenciaSalida: nombreSalida inicioParametros listaExpresionesCadena finParametros finSentencia •
+
+    $default  reduce using rule 50 (sentenciaSalida)
+
+
+State 161
+
+   41 sentenciaIf: IF inicioParametros expresion finParametros sentencia ELSE • sentencia
+
+    error    shift, and go to state 13
+    ABRLLA   shift, and go to state 5
+    IF       shift, and go to state 16
+    WHILE    shift, and go to state 17
+    SCAN     shift, and go to state 18
+    RETURN   shift, and go to state 19
+    FOR      shift, and go to state 20
+    PRINT    shift, and go to state 21
+    INITER   shift, and go to state 22
+    IDENTIF  shift, and go to state 23
+
+    bloque               go to state 24
+    inicioBloque         go to state 7
+    sentencia            go to state 167
+    sentenciaAsignacion  go to state 31
+    sentenciaIf          go to state 32
+    sentenciaWhile       go to state 33
+    sentenciaEntrada     go to state 34
+    nombreEntrada        go to state 35
+    sentenciaReturn      go to state 36
+    sentenciaFor         go to state 37
+    sentenciaSalida      go to state 38
+    nombreSalida         go to state 39
+    identificador        go to state 40
+    sentenciaLista       go to state 41
+
+
+State 162
+
+   61 expresion: expresion • MASMENOS expresion
+   62          | expresion • OPMULT expresion
+   63          | expresion • IGUALDAD expresion
+   64          | expresion • DESIGUALDAD expresion
+   65          | expresion • AND expresion
+   66          | expresion • OR expresion
+   67          | expresion • XOR expresion
+   73          | expresion • PLUSPLUS expresion AT expresion
+   73          | expresion PLUSPLUS expresion AT expresion •
+   74          | expresion • MINMIN expresion
+   75          | expresion • CONCAT expresion
+
+    CONCAT  shift, and go to state 101
+
+    $default  reduce using rule 73 (expresion)
+
+
+State 163
+
+   61 expresion: expresion • MASMENOS expresion
+   62          | expresion • OPMULT expresion
+   63          | expresion • IGUALDAD expresion
+   64          | expresion • DESIGUALDAD expresion
+   65          | expresion • AND expresion
+   66          | expresion • OR expresion
+   67          | expresion • XOR expresion
+   73          | expresion • PLUSPLUS expresion AT expresion
+   74          | expresion • MINMIN expresion
+   75          | expresion • CONCAT expresion
+   78 argumentos: argumentos COMA expresion •
+
+    MASMENOS     shift, and go to state 92
+    OPMULT       shift, and go to state 93
+    IGUALDAD     shift, and go to state 94
+    DESIGUALDAD  shift, and go to state 95
+    AND          shift, and go to state 96
+    OR           shift, and go to state 97
+    XOR          shift, and go to state 98
+    PLUSPLUS     shift, and go to state 99
+    MINMIN       shift, and go to state 100
+    CONCAT       shift, and go to state 101
+
+    $default  reduce using rule 78 (argumentos)
+
+
+State 164
+
+   47 sentenciaFor: FOR sentenciaAsignacion TO expresion sentido sentencia •
+
+    $default  reduce using rule 47 (sentenciaFor)
+
+
+State 165
+
+   48 sentenciaFor: FOR expresion TO expresion sentido sentencia •
+
+    $default  reduce using rule 48 (sentenciaFor)
+
+
+State 166
+
+   55 parametros: parametros COMA tipoDato identificador •
+
+    $default  reduce using rule 55 (parametros)
+
+
+State 167
+
+   41 sentenciaIf: IF inicioParametros expresion finParametros sentencia ELSE sentencia •
+
+    $default  reduce using rule 41 (sentenciaIf)
