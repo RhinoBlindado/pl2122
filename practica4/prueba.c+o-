@@ -1,0 +1,11 @@
+inicio
+{
+    inivar
+        entero a, b, c;
+        real d, e, f;
+    finvar;
+
+    a = b + c;
+    d = e + a;
+
+}

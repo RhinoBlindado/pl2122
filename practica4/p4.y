@@ -3,11 +3,81 @@
 #include <stdio.h>
 #include <string.h>
 
+// Incluyendo la tabla de símbolos
+#include "symbolTable.h"
+
+// Activar modo debug.
 //int yydebug=1; 
-void yyerror ( const char * msg ) ;
+void yyerror (const char * msg);
 int yylex(void);
 
-// int n_lineas = 1;
+
+// ANALIZADOR SEMANTICO
+
+#define MAX_TS 500
+
+uint TOPE = 0;
+uint IN_FUNC;
+
+symbolTable TS[MAX_TS];
+
+typedef struct 
+{
+  int atrib;
+  char* lexema;
+  dType type;
+} attr;
+
+#define YYSTYPE attr
+
+/**
+ * @brief Insertar un identificador en la tabla de símbolos
+ * 
+ */
+void pushAtrib(attr atrib)
+{
+  symbolTable newPush;
+
+  newPush.input = VARIABLE;
+  newPush.name = atrib.lexema;
+  
+  printf("Tipo: %d\n", atrib.type);
+  printf("Lexema leido: %s\n",atrib.lexema);
+  // Verificar que el identificador es únnico en este bloque
+
+  int isBlockStart = 0;
+  int actPos = TOPE;
+/*
+  actPos--;
+  while(!isBlockStart && TOPE > 0)
+  {
+
+  }
+*/
+
+/*
+  int i = TOPE - 1;
+  int found = 0;
+
+  while(i >= 0 && TS[i].entrada != MARCA && !found){
+    if (strcmp (atribb.lexema, TS[i].nombre) == 0)
+      found = 1; // Error
+    else
+      i--;
+  }
+
+  if (!found)
+    // Añadir a la pila
+*/
+}
+
+void pushIniBlock()
+{
+  TOPE++;
+
+  TS[TOPE].input = MARCA;
+}
+
 %}
 
 %define parse.error verbose
@@ -99,8 +169,6 @@ int yylex(void);
 %left HASH INTERR
 %right CONCAT
 
-
-
 %%
 
 programa                      : cabeceraPrograma bloque;
@@ -108,7 +176,7 @@ programa                      : cabeceraPrograma bloque;
 cabeceraPrograma              : INIPROG;
 
 bloque                        : inicioBloque declararVariablesLocalesMulti
-                                declararFuncionMulti sentencias finBloque;
+                                declararFuncionMulti sentencias finBloque; 
 
 declararFuncionMulti          : declararFuncionMulti declararFuncion
                               | /* cadena vacía */
@@ -132,7 +200,8 @@ marcaInicioVariable           : INIVAR;
 
 marcaFinVar                   : FINVAR finSentencia;
 
-inicioBloque                  : ABRLLA;
+inicioBloque                  : ABRLLA { pushIniBlock(); }
+                              ;  
 
 finBloque                     : CERLLA;
 
@@ -140,11 +209,10 @@ variablesLocalesMulti         : variablesLocalesMulti variableLocal
                               | /* cadena vacía */
                               ;
 
-variableLocal                 : tipoDato variableSolitaria identificador
-                                finSentencia
+variableLocal                 : tipoDato variableSolitaria identificador finSentencia { pushAtrib($3); }
                               | error;
 
-variableSolitaria             : variableSolitaria identificador coma
+variableSolitaria             : variableSolitaria identificador coma { pushAtrib($2); }
                               | /* cadena vacía*/
                               ;
 

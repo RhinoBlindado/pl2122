@@ -2,15 +2,15 @@
 %option noyywrap
 
 %{
-	// Incluye la tabla de tokens
-	#include "y.tab.h"
+    // Incluye la tabla de tokens
+    #include "y.tab.h"
 
-	// Definiciones de colores para la terminal
-	#define RED "\e[0;31m"
-	#define NC  "\e[0m"
+    // Definiciones de colores para la terminal
+    #define RED "\e[0;31m"
+    #define NC  "\e[0m"
 
-	// Inicializa el contador de líneas a 1
-	int n_lineas = 1;
+    // Inicializa el contador de líneas a 1
+    int n_lineas = 1;
 %}
 
 %%
@@ -27,10 +27,26 @@
 "finvar"                return(FINVAR);
 ","                     return(COMA);
 lista[ \t\n]+de         return(DEFLISTA);
-"entero"                return(TIPODATO);
-"real"                  return(TIPODATO);
-"caracter"              return(TIPODATO);
-"booleano"              return(TIPODATO);
+"entero"                {
+                            yylval.lexema = strdup(yytext);
+                            yylval.type = ENTERO;
+                            return(TIPODATO);
+                        }
+"real"                  {
+                            yylval.lexema = strdup(yytext);
+                            yylval.type = REAL;
+                            return(TIPODATO);
+                        }
+"caracter"              {
+                            yylval.lexema = strdup(yytext);
+                            yylval.type = CARACTER;
+                            return(TIPODATO);
+                        }
+"booleano"              {
+                            yylval.lexema = strdup(yytext);
+                            yylval.type = BOOLEANO;
+                            return(TIPODATO);
+                        }
 "="                     return(ASIG);
 "si"                    return(IF);
 "sino"                  return(ELSE);
@@ -68,17 +84,45 @@ lista[ \t\n]+de         return(DEFLISTA);
 ">>"                    return(ITER);
 "<<"                    return(ITER);
 "$"                     return(INITER);
-\"[^"]*\"               return(CADENA);
-"Verdadero"             return(LITERAL);
-"Falso"                 return(LITERAL);
-[A-Za-z][A-Za-z0-9]*    return(IDENTIF);
-[0-9]*\.[0-9]*          return(LITERAL);
-[0-9]+                  return(LITERAL);
-'.'                     return(LITERAL);
+\"[^"]*\"               {
+                            yylval.lexema = strdup(yytext);
+                            yylval.type = ENTERO;
+                            return(CADENA);
+                        }
+"Verdadero"             {
+                            yylval.lexema = strdup(yytext);
+                            yylval.type = ENTERO;
+                            return(LITERAL);
+                        }
+"Falso"                 {
+                            yylval.lexema = strdup(yytext);
+                            yylval.type = ENTERO;
+                            return(LITERAL);
+                        }
+[A-Za-z][A-Za-z0-9]*    {
+                            yylval.lexema = strdup(yytext);
+                            yylval.type = REAL;
+                            return(IDENTIF);
+                        }
+[0-9]*\.[0-9]*          {
+                            yylval.lexema = strdup(yytext);
+                            yylval.type = REAL;
+                            return(LITERAL);
+                        }
+[0-9]+                  {
+                            yylval.lexema = strdup(yytext);
+                            yylval.type = ENTERO;
+                            return(LITERAL);
+                        }
+'.'                     {
+                            yylval.lexema = strdup(yytext);
+                            yylval.type = ENTERO;
+                            return(LITERAL);
+                        }
 
  /*
- 	Ignora el espacio en blanco (espacio, tabuladores y saltos de línea)
- 	Si lee un salto de línea (\n), incrementa el contador de líneas
+     Ignora el espacio en blanco (espacio, tabuladores y saltos de línea)
+     Si lee un salto de línea (\n), incrementa el contador de líneas
  */
 [ \t\n]  {
             if (yytext[0] == '\n')
