@@ -12,12 +12,14 @@ void yyerror (const char * msg);
 int yylex(void);
 
 
-// ANALIZADOR SEMANTICO
+/* ANALIZADOR SEMANTICO */
 
 #define MAX_TS 500
 
-uint TOPE = 0;
+uint HEADER = 0;
 uint IN_FUNC;
+
+dType tempType;
 
 symbolTable TS[MAX_TS];
 
@@ -30,61 +32,109 @@ typedef struct
 
 #define YYSTYPE attr
 
+
+// FUNCIONES ANALIZADOR
+
+
+void printTS(symbolTable in)
+{
+  printf("[Input: %d | Name: %s | Data type: %d]\n", in.input, in.name, in.dataType);
+}
+
+/**
+ * @brief Ingresa los valores a la pila de símbolos y actualiza el puntero hacia delante. 
+ */
+void pushTS(typeInput input, char* name, dType dataType, uint params, uint dimens, int tamDimen)
+{
+  TS[HEADER].input = input;
+  TS[HEADER].name = name;
+  TS[HEADER].dataType = dataType;
+  TS[HEADER].params = params;
+  TS[HEADER].dimens = dimens;
+  TS[HEADER].tamDimen = tamDimen;
+
+  HEADER++;
+}
+
+/**
+ * @brief Anula los valores actuales del tope de la pila y reduce el puntero de la pila.
+ */
+void popTS()
+{
+  TS[HEADER].input = EMPTY;
+  TS[HEADER].name = NULL;
+  TS[HEADER].dataType = SUS;
+  TS[HEADER].params = -1;
+  TS[HEADER].dimens = -1;
+  TS[HEADER].tamDimen = -1;
+  
+  HEADER--;
+}
+
 /**
  * @brief Insertar un identificador en la tabla de símbolos
  * 
  */
-void pushAtrib(attr atrib)
+void pushAttr(attr atrib)
 {
-  symbolTable newPush;
-
-  newPush.input = VARIABLE;
-  newPush.name = atrib.lexema;
-  
-  printf("Tipo: %d\n", atrib.type);
   printf("Lexema leido: %s\n",atrib.lexema);
-  // Verificar que el identificador es únnico en este bloque
 
-  int isBlockStart = 0;
-  int actPos = TOPE;
-/*
-  actPos--;
-  while(!isBlockStart && TOPE > 0)
-  {
-
-  }
-*/
-
-/*
-  int i = TOPE - 1;
+  char* varName = atrib.lexema;
   int found = 0;
-
-  while(i >= 0 && TS[i].entrada != MARCA && !found){
-    if (strcmp (atribb.lexema, TS[i].nombre) == 0)
-      found = 1; // Error
-    else
-      i--;
+  
+  /*
+   * - Se comienza a buscar desde el valor actual del tope de la pila hacia atras
+   *   hasta el inicio, puesto que no deben haber tampoco variables repetidas en los
+   *   superbloques.
+   * - Si no hay coincidencias entonces es la unica.
+   */
+  
+  for(int i = HEADER - 1; i > 0; i--)
+  {
+    if(strcmp(varName, TS[i].name) == 0)
+    {
+      found = 1;
+      break;
+    }
   }
 
-  if (!found)
-    // Añadir a la pila
-*/
+  if(!found)
+  {
+    pushTS(VARIABLE, atrib.lexema, NO_ASIGNADO, 0, 0, 0);
+  }
+  else
+  {
+    char output[] = "[ERROR SEMÁNTICO], redefinición de variable \"";
+    strcat(output,atrib.lexema);
+    strcat(output,"\".");
+    yyerror(output);
+  }
+
 }
 
-void pushIniBlock()
-{
-  TOPE++;
 
-  TS[TOPE].input = MARCA;
+void blockStart()
+{
+  printf("Inicio bloque detectado\n");
+  pushTS(BLOCK_START, "BLOCK_START", -1, -1, -1, -1);
+}
+
+void blockEnd()
+{
+  printf("Fin bloque detectado\n");
+  // Le falta (obvio)
 }
 
 %}
+
+/*INICIO YACC*/
 
 %define parse.error verbose
 
 %start programa
 
-/* Tabla de tokens */
+/* Tabla de tokens */ 
+/*###################### Esta mierda no se puede mover a un .h???*/
 %token INIPROG
 %token ABRPAR
 %token CERPAR
@@ -200,19 +250,19 @@ marcaInicioVariable           : INIVAR;
 
 marcaFinVar                   : FINVAR finSentencia;
 
-inicioBloque                  : ABRLLA { pushIniBlock(); }
+inicioBloque                  : ABRLLA { blockStart(); }
                               ;  
 
-finBloque                     : CERLLA;
+finBloque                     : CERLLA { blockEnd(); };
 
 variablesLocalesMulti         : variablesLocalesMulti variableLocal
                               | /* cadena vacía */
                               ;
 
-variableLocal                 : tipoDato variableSolitaria identificador finSentencia { pushAtrib($3); }
+variableLocal                 : tipoDato variableSolitaria identificador finSentencia { pushAttr($3); }
                               | error;
 
-variableSolitaria             : variableSolitaria identificador coma { pushAtrib($2); }
+variableSolitaria             : variableSolitaria identificador coma {  pushAttr($2); }
                               | /* cadena vacía*/
                               ;
 

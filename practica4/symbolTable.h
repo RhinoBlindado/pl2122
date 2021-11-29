@@ -5,21 +5,21 @@
 
     typedef enum
     {
-        MARCA,   
-        FUNCION,
+        EMPTY,
+        BLOCK_START,   
+        FUNC,
         VARIABLE,
-        PARAMETER
+        PARAMETER,
     } typeInput;
-
 
     typedef enum
     {
+        SUS,
         ENTERO,
         REAL,
         CARACTER,
         BOOLEANO,
         LISTA,
-        SUS,
         NO_ASIGNADO
     } dType;
 
