@@ -101,7 +101,7 @@ void pushAttr(attr atrib)
    * - Si no hay coincidencias entonces es la unica.
    */
   
-  for(int i = HEADER; i > 0; i--)
+  for(int i = HEADER; i > 0 && TS[i].input != BLOCK_START; i--) // Buscar en el bloque actual
   {
     if(strcmp(varName, TS[i].name) == 0)
     {
