@@ -51,6 +51,8 @@ void checkBlockFunction();
 
 void blockEnd();
 
+dType getTypeVar(attr atrib);
+
 //void checkBooleans();
 
 /**
@@ -235,8 +237,38 @@ void insertFormalParameter(attr atrib){
   pushTS(PARAMETER, atrib.lexema, atrib.type, -1, -1, -1);
 }
 
+/**
+ * @brief Obtener el tipo de un identificador en una expresion.
+ * @param atrib Atributo detectado por el 
+ */
+dType getTypeVar(attr atrib)
+{
+  dType auxType = SUS;
+  int found = 0;
 
-// Función que mete un
+  for(int i = HEADER; i > 0; i--)
+  {
+    if(strcmp(atrib.lexema, TS[i].name) == 0)
+    {
+      found = 1;
+      auxType = TS[i].dataType;
+      break;
+    }
+  }
+
+  if(!found)
+  {
+    char output[] = "[ERROR SEMÁNTICO], Variable \"";
+    strcat(output,atrib.lexema);
+    strcat(output,"\" no definida previamente.");
+    yyerror(output);
+  }
+
+  return auxType;
+}
+
+
+// Función que mete un deez
 
 %}
 
@@ -470,8 +502,8 @@ expresion                     : ABRPAR expresion CERPAR
                                 }
                               | expresion OR expresion { if ($1.type == $2.type && $1.type == BOOLEANO) { fprintf(stderr, "not pog\n"); } }
                               | expresion XOR expresion { if ($1.type == $2.type && $1.type == BOOLEANO) { fprintf(stderr, "Error en el XOR\n"); } }
-                              | identificador { $$.type = getTypeVar($1) };
-                              | literal
+                              | identificador { $$.type = getTypeVar($1) }
+                              | literal { $$.type = $1.type; }
                               | funcion
                               | HASH expresion %prec HASH
                               | INTERR expresion %prec HASH
@@ -518,4 +550,3 @@ void yyerror( const char *msg )
 {
    fprintf(stderr, "[Linea %d]: %s\n", n_lineas, msg);
 }
-

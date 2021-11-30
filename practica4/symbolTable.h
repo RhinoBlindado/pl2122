@@ -9,7 +9,7 @@
         BLOCK_START,   // Marca para señalar los inicios de un nuevo bloque o cambio de scope
         FUNC,          // Indica que la entrada a la tabla de simbolos es una funcion
         VARIABLE,      // Indica que la entrada a la tabla de simbolos es una variable
-        PARAMETER,     // Indica que la entrada a la tabla de simbolos es un parámetro
+        PARAMETER      // Indica que la entrada a la tabla de simbolos es un parámetro
     } typeInput;
 
     typedef enum
