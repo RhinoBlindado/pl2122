@@ -25,8 +25,10 @@ uint IN_FUNC;
 // Variables para el control de parámetros y tipo de las llamadas
 typedef struct
 {
-  int currentFuncCall;
-  uint nParamCheck;
+  int currentFuncCall;  // Índice de la entrada de la función en TS
+  uint nParamCheck;     // Parámetro a checkear en cada momento
+  uint errorNParams;    // Bit para indicar num. incorrecto de parámetros
+  uint errorTypeParams; // Bit para indicar tipo incorrecto de parámetros
 } funcCheck;
 
 funcCheck FT[MAX_SIZE_FUNCTIONS];
@@ -524,6 +526,8 @@ void findFunctionCall(attr atrib){
   HEADER_FUNC += 1;
   FT[HEADER_FUNC].currentFuncCall = -1;
   FT[HEADER_FUNC].nParamCheck = 0;
+  FT[HEADER_FUNC].errorNParams = 0;
+  FT[HEADER_FUNC].errorTypeParams = 0;
   
   // Se busca en toda la tabla de símbolos la función
   int found = 0;
@@ -535,15 +539,8 @@ void findFunctionCall(attr atrib){
     }
 
   // Si no se encuentra, error
-  if (!found){
-    char output[MAX_SIZE_STRING];
-    strcat(output, "[ERROR SEMANTICO] Funcion no definida anteriormente");
-    yyerror(output);
-  }
-  else{
-    // Actualizar el parámetro a checkear
-    FT[HEADER_FUNC].nParamCheck = 1;
-  }
+  if (found)
+    FT[HEADER_FUNC].nParamCheck = 1;  // Actualizar el parámetro a checkear
 }
 
 /**
@@ -558,9 +555,7 @@ void findFunctionCall(attr atrib){
     // Se comprueba si el número de parámetros es correcto
     if(FT[HEADER_FUNC].nParamCheck == TS[FT[HEADER_FUNC].currentFuncCall].params + 1){
 
-      char output[MAX_SIZE_STRING];
-      strcat(output, "[ERROR SEMANTICO] Numero incorrecto de parametros (mas de la cuenta)");
-      yyerror(output);
+      FT[HEADER_FUNC].errorNParams = 1;     // Num. incorrecto de parámetros
       FT[HEADER_FUNC].currentFuncCall = -1; // Funcion no definida con esos parámetros
     }
     else{
@@ -573,12 +568,8 @@ void findFunctionCall(attr atrib){
         FT[HEADER_FUNC].nParamCheck += 1;
       }
       else{
-
-        // Tipos no concordantes
-        char output[MAX_SIZE_STRING];
-        strcat(output, "[ERROR SEMANTICO] Tipo incorrecto de parametros");
-        yyerror(output);
-        FT[HEADER_FUNC].currentFuncCall = -1; // Funcion no definida con esos parámetros
+        FT[HEADER_FUNC].errorTypeParams = 1;
+        FT[HEADER_FUNC].nParamCheck += 1;
       }
     }
    }
@@ -592,9 +583,18 @@ void endCallParameters(){
   // Si quedan parámetros por checkear, error
   int lastParams = FT[HEADER_FUNC].nParamCheck;
 
-  if(lastParams != TS[FT[HEADER_FUNC].currentFuncCall].params + 1 && FT[HEADER_FUNC].currentFuncCall != -1){
+  if(lastParams != TS[FT[HEADER_FUNC].currentFuncCall].params + 1 && FT[HEADER_FUNC].currentFuncCall != -1)
+    FT[HEADER_FUNC].errorNParams = 1; // Num. incorrecto de parámetros
+
+  // Mostrar salida de error semántico en comprobación de parámetros
+  if(FT[HEADER_FUNC].errorNParams){
     char output[MAX_SIZE_STRING];
-    strcat(output, "[ERROR SEMANTICO] Numero incorrecto de parametros (menos de la cuenta)");
+    strcat(output, "[ERROR SEMANTICO] Numero incorrecto de parametros");
+    yyerror(output);
+  }
+  else if (FT[HEADER_FUNC].errorTypeParams){
+    char output[MAX_SIZE_STRING];
+    strcat(output, "[ERROR SEMANTICO] Tipo incorrecto de parametros");
     yyerror(output);
   }
   
