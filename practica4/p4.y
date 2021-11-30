@@ -112,6 +112,17 @@ void pushAttr(attr atrib)
 
 }
 
+void assignType(dType p_dataType)
+{
+  int seekHead = HEADER - 1;
+  while(TS[seekHead].input == VARIABLE && TS[seekHead].dataType == NO_ASIGNADO)
+  {
+    TS[seekHead].dataType = p_dataType;
+    seekHead--;
+  }
+
+}
+
 
 void blockStart()
 {
@@ -121,8 +132,13 @@ void blockStart()
 
 void blockEnd()
 {
-  printf("Fin bloque detectado\n");
-  // Le falta (obvio)
+  while(TS[HEADER].input != BLOCK_START)
+  {
+    popTS();
+    printTS(TS[HEADER]);
+  }
+  popTS();
+
 }
 
 %}
@@ -259,10 +275,10 @@ variablesLocalesMulti         : variablesLocalesMulti variableLocal
                               | /* cadena vacía */
                               ;
 
-variableLocal                 : tipoDato variableSolitaria identificador finSentencia { pushAttr($3); }
+variableLocal                 : tipoDato variableSolitaria identificador finSentencia { pushAttr($3); assignType($1.type); }
                               | error;
 
-variableSolitaria             : variableSolitaria identificador coma {  pushAttr($2); }
+variableSolitaria             : variableSolitaria identificador coma { pushAttr($2); }
                               | /* cadena vacía*/
                               ;
 
