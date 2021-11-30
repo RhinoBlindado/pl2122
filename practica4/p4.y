@@ -16,7 +16,7 @@ int yylex(void);
 
 #define MAX_TS 500
 
-uint HEADER = 0;
+int HEADER = -1;
 uint IN_FUNC;
 
 dType tempType;
@@ -36,6 +36,17 @@ typedef struct
 // FUNCIONES ANALIZADOR
 
 
+void printTS_ALL()
+{
+  if(HEADER > -1)
+  {
+    for (int i = 0; i <= HEADER; i++)
+    {
+      printf("[%d]\tInput: %d\tName: %s\tData type: %d\n",i, TS[i].input, TS[i].name, TS[i].dataType);
+    }
+  }
+}
+
 void printTS(symbolTable in)
 {
   printf("[Input: %d | Name: %s | Data type: %d]\n", in.input, in.name, in.dataType);
@@ -46,6 +57,8 @@ void printTS(symbolTable in)
  */
 void pushTS(typeInput input, char* name, dType dataType, uint params, uint dimens, int tamDimen)
 {
+  HEADER++;
+
   TS[HEADER].input = input;
   TS[HEADER].name = name;
   TS[HEADER].dataType = dataType;
@@ -53,7 +66,6 @@ void pushTS(typeInput input, char* name, dType dataType, uint params, uint dimen
   TS[HEADER].dimens = dimens;
   TS[HEADER].tamDimen = tamDimen;
 
-  HEADER++;
 }
 
 /**
@@ -89,7 +101,7 @@ void pushAttr(attr atrib)
    * - Si no hay coincidencias entonces es la unica.
    */
   
-  for(int i = HEADER - 1; i > 0; i--)
+  for(int i = HEADER; i > 0; i--)
   {
     if(strcmp(varName, TS[i].name) == 0)
     {
@@ -114,7 +126,7 @@ void pushAttr(attr atrib)
 
 void assignType(dType p_dataType)
 {
-  int seekHead = HEADER - 1;
+  int seekHead = HEADER;
   while(TS[seekHead].input == VARIABLE && TS[seekHead].dataType == NO_ASIGNADO)
   {
     TS[seekHead].dataType = p_dataType;
@@ -122,7 +134,6 @@ void assignType(dType p_dataType)
   }
 
 }
-
 
 void blockStart()
 {
@@ -132,12 +143,15 @@ void blockStart()
 
 void blockEnd()
 {
+  printf("Fin bloque detectado, HEADER = %d\n", HEADER);
+  printTS_ALL();
   while(TS[HEADER].input != BLOCK_START)
   {
     popTS();
-    printTS(TS[HEADER]);
   }
   popTS();
+  printf("Ahora HEADER = %d\n", HEADER);
+  printTS_ALL();
 
 }
 
