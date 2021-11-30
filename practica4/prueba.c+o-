@@ -3,9 +3,17 @@ inicio
     inivar
         entero a, b, c;
         real d, e, f;
+        booleano xx, oo, zz;
+        lista de entero listEntero;
     finvar;
+    
 
-    a = b + c;
-    d = e + a;
+    real fun(real a, entero tete, caracter nano) {
+        repatriar a;
+    }
 
+    a = (b + c) + 4;
+    zz = xx y oo;
+
+    f = fun(d);
 }

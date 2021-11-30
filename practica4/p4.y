@@ -15,8 +15,11 @@ int yylex(void);
 /* ANALIZADOR SEMANTICO */
 
 #define MAX_TS 500
+#define MAX_SIZE_STRING 128
 
 int HEADER = -1;
+int CURRENT_FUNC_CALL = -1;
+uint N_PARAM_CHECK = 0;
 uint IN_FUNC;
 
 symbolTable TS[MAX_TS];
@@ -39,7 +42,7 @@ void printTS_ALL();
 
 void printTS(symbolTable in);
 
-void pushTS(typeInput input, char* name, dType dataType, uint params, uint dimens, int tamDimen);
+void pushTS(typeInput input, char* name, dType dataType, uint params, dType listDataType);
 
 void popTS();
 
@@ -53,6 +56,14 @@ void blockEnd();
 
 dType getTypeVar(attr atrib);
 
+dType getTypeFunc(attr atrib);
+
+dType getExpType(dType typ1, dType typ2);
+
+void insertFunction(attr atrib);
+
+void insertFormalParameter(attr atrib);
+
 //void checkBooleans();
 
 /**
@@ -64,7 +75,7 @@ void printTS_ALL()
   {
     for (int i = 0; i <= HEADER; i++)
     {
-      printf("[%d]\tInput: %d\tName: %s\tData type: %d\n",i, TS[i].input, TS[i].name, TS[i].dataType);
+      printf("[%d]input: %d name: %s dataType: %d params: %d listDataType: %d\n",i, TS[i].input, TS[i].name, TS[i].dataType, TS[i].params, TS[i].listDataType);
     }
   }
 }
@@ -74,19 +85,19 @@ void printTS_ALL()
  */
 void printTS(symbolTable in)
 {
-  printf("[Input: %d | Name: %s | Data type: %d]\n", in.input, in.name, in.dataType);
+      printf("input: %d name: %s dataType: %d params: %d listDataType: %d\n", in.input, in.name, in.dataType, in.params, in.listDataType);
 }
 
 /**
  * @brief Ingresa los valores a la pila de símbolos y actualiza el puntero hacia delante. 
  */
-void pushTS(typeInput input, char* name, dType dataType, uint params, uint dimens, int tamDimen)
+void pushTS(typeInput input, char* name, dType dataType, uint params, dType listDataType)
 {
-  if(HEADER == MAX_TS){
+  if(HEADER != MAX_TS){
     HEADER++;
   }
   else{
-    printf(stderr, "Se ha alcanzado el tope de la pila");
+    fprintf(stderr, "Se ha alcanzado el tope de la pila");
     printTS_ALL();
 		exit(-1);
   }
@@ -95,9 +106,7 @@ void pushTS(typeInput input, char* name, dType dataType, uint params, uint dimen
   TS[HEADER].name = name;
   TS[HEADER].dataType = dataType;
   TS[HEADER].params = params;
-  TS[HEADER].dimens = dimens;
-  TS[HEADER].tamDimen = tamDimen;
-
+  TS[HEADER].listDataType = listDataType;
 }
 
 /**
@@ -109,8 +118,7 @@ void popTS()
   TS[HEADER].name = NULL;
   TS[HEADER].dataType = SUS;
   TS[HEADER].params = -1;
-  TS[HEADER].dimens = -1;
-  TS[HEADER].tamDimen = -1;
+  TS[HEADER].listDataType = SUS;
   
   HEADER--;
 }
@@ -143,11 +151,11 @@ void pushAttr(attr atrib)
 
   if(!found)
   {
-    pushTS(VARIABLE, atrib.lexema, NO_ASIGNADO, 0, 0, 0);
+    pushTS(VARIABLE, atrib.lexema, NO_ASIGNADO, 0, 0);
   }
   else
   {
-    char output[] = "[ERROR SEMÁNTICO], redefinición de variable \"";
+    char output[MAX_SIZE_STRING] = "[ERROR SEMÁNTICO], redefinición de variable \"";
     strcat(output,atrib.lexema);
     strcat(output,"\".");
     yyerror(output);
@@ -169,10 +177,11 @@ void assignType(dType p_dataType)
 
 }
 
-// Función que realiza el chequeo de si el bloque está precedido de una declaración de función.
-// En ese caso, mete todos los parámetros formales de la función como variables locales después
-// de la marca de bloque.
-
+/**
+ * @brief Función que realiza el chequeo de si el bloque está precedido de una declaración de función.
+ * En ese caso, mete todos los parámetros formales de la función como variables locales después de la
+ * marca de bloque.
+ */
 void checkBlockFunction(){
 
   // Se comprueba el bit de declaración de función
@@ -191,14 +200,13 @@ void checkBlockFunction(){
 
     // Si no hay función, error
     if(!found){
-      char output[] = "[ERROR SEMÁNTICO], No se ha encontrado funcion \"";
-      strcat(output,"\".");
+      char output[MAX_SIZE_STRING] = "[ERROR SEMÁNTICO], No se ha encontrado funcion \"";
       yyerror(output);
     }
     else{
       // Copiar todos los parámetros formales como variables locales del bloque
       for (int i = posFunction + 1; i < posNow; i++)
-        pushTS(VARIABLE, TS[i].name, TS[i].dataType, -1 , -1, -1);
+        pushTS(VARIABLE, TS[i].name, TS[i].dataType, -1 , 0);
     }
     
   }
@@ -207,7 +215,7 @@ void checkBlockFunction(){
 void blockStart()
 {
   printf("Inicio bloque detectado\n");
-  pushTS(BLOCK_START, "BLOCK_START", -1, -1, -1, -1);
+  pushTS(BLOCK_START, "BLOCK_START", -1, -1, 0);
 
   // Se chequea si se deben introducir los parámtros formales como variables variables locales
   checkBlockFunction();
@@ -215,57 +223,141 @@ void blockStart()
 
 void blockEnd()
 {
-  printf("Fin bloque detectado, HEADER = %d\n", HEADER);
+  printf("Fin bloque detectado, HEADER = %d\nTABLA SIMBOLOS HASTA AHORA:\n", HEADER);
   printTS_ALL();
   while(TS[HEADER].input != BLOCK_START)
   {
     popTS();
   }
   popTS();
-  printf("Ahora HEADER = %d\n", HEADER);
+  printf("Ahora HEADER = %d\n TABLA DE SIMBOLOS LUEGO:\n", HEADER);
   printTS_ALL();
 
 }
 
-// Función que mete una entrada de tipo función en la tabla de símbolos
+/**
+ * @brief Irserción de una na entrada de tipo función en la tabla de símbolos.
+ * El número de parámetros de la función se inicializa a 0.
+ * @param atrib Atributo detectado.
+ */
 void insertFunction(attr atrib){
-  pushTS(FUNC, atrib.lexema, atrib.type, -1, -1, -1);
+  pushTS(FUNC, atrib.lexema, atrib.type, 0, -1);
 }
 
-// Función que mete una entrada de tipo parámetro formal en la tabla de símbolos
+/**
+ * @brief Inserción de un parámetro formal en la tabla de símbolos. Se incrementa
+ * el número de parámetros de la función anterior.
+ * @param atrib Atributo detectado.
+ */
 void insertFormalParameter(attr atrib){
-  pushTS(PARAMETER, atrib.lexema, atrib.type, -1, -1, -1);
+  pushTS(PARAMETER, atrib.lexema, atrib.type, -1, 0);
+
+  // Buscar función a la que hacen referencia los parámetros
+  int posFunction = -1;
+  int found = 0;
+
+  for (int i = HEADER; i > 0 && !found; i--)
+    if (TS[i].input == FUNC){
+      found = 1;
+      posFunction = i;
+    }
+
+  // Si no se ha encontrado función, error
+  if (!found){
+    char output[MAX_SIZE_STRING] = "[ERROR SEMÁNTICO], No se ha encontrado funcion \"";
+    yyerror(output);
+  }
+  else{
+    // Incrementar número de parámetros
+    TS[posFunction].params += 1;
+  }
+
 }
 
 /**
  * @brief Obtener el tipo de un identificador en una expresion.
- * @param atrib Atributo detectado por el 
+ * @param atrib Atributo detectado por el analizador sintactico.
+ * 
  */
 dType getTypeVar(attr atrib)
 {
   dType auxType = SUS;
   int found = 0;
 
-  for(int i = HEADER; i > 0; i--)
-  {
-    if(strcmp(atrib.lexema, TS[i].name) == 0)
-    {
-      found = 1;
-      auxType = TS[i].dataType;
-      break;
-    }
-  }
+  if (1) {
 
-  if(!found)
-  {
-    char output[] = "[ERROR SEMÁNTICO], Variable \"";
-    strcat(output,atrib.lexema);
-    strcat(output,"\" no definida previamente.");
-    yyerror(output);
+	for(int i = HEADER; i > 0; i--)
+	{
+		if(strcmp(atrib.lexema, TS[i].name) == 0)
+		{
+		found = 1;
+		auxType = TS[i].dataType;
+		break;
+		}
+	}
+
+	if(!found)
+	{
+		char output[MAX_SIZE_STRING];
+		strcat(output, "[ERROR SEMÁNTICO] Variable \"");
+		strcat(output,atrib.lexema);
+		strcat(output,"\" no definida previamente.");
+		yyerror(output);
+	}
   }
 
   return auxType;
 }
+
+/**
+ * @brief   Obtener el tipo de una función en una expresion.
+ * @param   atrib Atributo detectado por el analizador sintactivo
+ * @return  
+ */
+dType getTypeFunc(attr atrib) {
+  dType auxType = SUS;
+  int found = 0;
+
+  for(int i = HEADER; i > 0; i--)
+  {
+  	if(strcmp(atrib.lexema, TS[i].name) == 0)
+  	{
+  	found = 1;
+  	auxType = TS[i].dataType;
+  	break;
+  	}
+  }
+
+	if(!found)
+	{
+		char output[MAX_SIZE_STRING];
+		strcat(output, "[ERROR SEMÁNTICO] Variable \"");
+		strcat(output,atrib.lexema);
+		strcat(output,"\" no definida previamente.");
+		yyerror(output);
+	}
+  
+
+  return auxType;
+}
+
+/**
+ * 
+ */
+dType getExpType(dType typ1, dType typ2)
+{
+  dType aux = typ1;
+  if(typ1 != typ2)
+  {
+    char output[MAX_SIZE_STRING];
+    strcat(output, "[ERROR SEMÁNTICO] Operaciones con tipos diferentes");
+    yyerror(output);
+    aux = SUS;
+  }
+
+  return aux;
+}
+
 
 
 // Función que mete un deez
@@ -279,6 +371,7 @@ dType getTypeVar(attr atrib)
 %start programa
 
 /* Tabla de tokens */ 
+// #import "token.h"
 /*###################### Esta mierda no se puede mover a un .h???*/
 %token INIPROG
 %token ABRPAR
@@ -378,7 +471,7 @@ declararFuncionMulti          : declararFuncionMulti declararFuncion
                               ;
 
 declararFuncion               : cabeceraFuncion {IN_FUNC = 1;}
-                                bloque  {IN_FUNC = 0;}
+                                bloque {IN_FUNC = 0;}
                                 ;
 
 declararVariablesLocalesMulti : marcaInicioVariable variablesLocalesMulti
@@ -386,7 +479,8 @@ declararVariablesLocalesMulti : marcaInicioVariable variablesLocalesMulti
                               | /* cadena vacía*/
                               ;
 
-cabeceraFuncion               : tipoDato identificador inicioParametros
+cabeceraFuncion               : tipoDato identificador {$2.type = $1.type; insertFunction($2);}
+                                inicioParametros
                                 parametros finParametros;
 
 inicioParametros              : ABRPAR;
@@ -417,8 +511,8 @@ coma                          : COMA
                               | error
                               ;
 
-tipoDato                      : tipoElemental
-                              | DEFLISTA tipoElemental
+tipoDato                      : tipoElemental 
+                              | DEFLISTA tipoElemental 
                               ;
 
 tipoElemental                 : TIPODATO;
@@ -476,35 +570,36 @@ listaExpresionesCadena        : expresion
 
 nombreSalida                  : PRINT;
 
-parametros                    : tipoDato identificador
-                              | parametros COMA tipoDato identificador
+parametros                    : tipoDato identificador {$2.type = $1.type; insertFormalParameter($2);}
+                              | parametros COMA tipoDato identificador {$4.type = $3.type; insertFormalParameter($4);}
                               | error
                               | /* cadena vacía */
                               ;
 
-expresion                     : ABRPAR expresion CERPAR
-                              | MASMENOS expresion %prec HASH
-                              | NOT expresion %prec HASH
-                              | expresion MASMENOS expresion
-                              | expresion OPMULT expresion
+expresion                     : ABRPAR expresion CERPAR { $$.type = $2.type; }
+                              | MASMENOS expresion %prec HASH { $$.type = $2.type; }
+                              | NOT expresion %prec HASH { $$.type = $2.type; }
+                              | expresion MASMENOS expresion { $$.type = getExpType($1.type, $3.type); /* printf("exp1=%s (%d), exp2=%s (%d)\n", $1.lexema, $1.type, $3.lexema, $3.type ); */}
+                              | expresion OPMULT expresion { $$.type = getExpType($1.type, $3.type); }
                               // | expresion SLASH expresion
                               // | expresion HAT expresion
                               // | expresion ASTERISC expresion
                               // | expresion PERCENT expresion
-                              | expresion IGUALDAD expresion
-                              | expresion DESIGUALDAD expresion
+                              | expresion IGUALDAD expresion { $$.type = getExpType($1.type, $3.type); }
+                              | expresion DESIGUALDAD expresion { $$.type = getExpType($1.type, $3.type); }
                               | expresion AND expresion {
-                                    if ($1.type == BOOLEANO && $1.type == BOOLEANO) {
+                                    $$.type = getExpType($1.type, $3.type);
+                                    if ($1.type == BOOLEANO && $3.type == BOOLEANO) {
                                         $$.type = $1.type;
                                     } else {
                                         fprintf(stderr, "Error en el AND\n");
                                     }
                                 }
-                              | expresion OR expresion { if ($1.type == $2.type && $1.type == BOOLEANO) { fprintf(stderr, "not pog\n"); } }
-                              | expresion XOR expresion { if ($1.type == $2.type && $1.type == BOOLEANO) { fprintf(stderr, "Error en el XOR\n"); } }
-                              | identificador { $$.type = getTypeVar($1) }
+                              | expresion OR expresion { $$.type = getExpType($1.type, $3.type); }
+                              | expresion XOR expresion { $$.type = getExpType($1.type, $3.type); }
+                              | identificador { $$.type = getTypeVar($1); }
                               | literal { $$.type = $1.type; }
-                              | funcion
+                              | funcion { $$.type = getTypeFunc($1); }
                               | HASH expresion %prec HASH
                               | INTERR expresion %prec HASH
                               | expresion PLUSPLUS expresion AT expresion

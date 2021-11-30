@@ -19,10 +19,7 @@
         REAL,
         CARACTER,
         BOOLEANO,
-        LISTA_ENTERO,
-        LISTA_CARACTER,
-        LISTA_REAL,
-        LISTA_BOOLEANO,
+        LISTA,
         NO_ASIGNADO  // Variable sin tipo asignado (declaración)
     } dType;
 
@@ -36,9 +33,8 @@
         dType dataType;
         // Numero de datos de la funcion
         uint params;
-        // Para matrices
-        uint dimens;
-        int tamDimen;
+        // Elementos para lista
+        dType listDataType;
     } symbolTable;
 
 

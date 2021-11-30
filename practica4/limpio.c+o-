@@ -4,7 +4,6 @@ inicio
         entero ve;
         real vf;
         caracter vc, v2, v4;
-        caracter vc, v2, v4;
         booleano vl;
         lista de entero le, le2;
         lista de real lf, lf2;
