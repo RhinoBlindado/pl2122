@@ -19,8 +19,6 @@ int yylex(void);
 int HEADER = -1;
 uint IN_FUNC;
 
-dType tempType;
-
 symbolTable TS[MAX_TS];
 
 typedef struct 
@@ -35,7 +33,29 @@ typedef struct
 
 // FUNCIONES ANALIZADOR
 
+void blockStart();
 
+void printTS_ALL();
+
+void printTS(symbolTable in);
+
+void pushTS(typeInput input, char* name, dType dataType, uint params, uint dimens, int tamDimen);
+
+void popTS();
+
+void pushAttr(attr atrib);
+
+void assignType(dType p_dataType);
+
+void checkBlockFunction();
+
+void blockEnd();
+
+//void checkBooleans();
+
+/**
+ * @brief Imprime los valores de la pila
+ */
 void printTS_ALL()
 {
   if(HEADER > -1)
@@ -47,6 +67,9 @@ void printTS_ALL()
   }
 }
 
+/**
+ * @brief Muestra un elemento de la pila
+ */
 void printTS(symbolTable in)
 {
   printf("[Input: %d | Name: %s | Data type: %d]\n", in.input, in.name, in.dataType);
@@ -57,7 +80,14 @@ void printTS(symbolTable in)
  */
 void pushTS(typeInput input, char* name, dType dataType, uint params, uint dimens, int tamDimen)
 {
-  HEADER++;
+  if(HEADER == MAX_TS){
+    HEADER++;
+  }
+  else{
+    printf(stderr, "Se ha alcanzado el tope de la pila");
+    printTS_ALL();
+		exit(-1);
+  }
 
   TS[HEADER].input = input;
   TS[HEADER].name = name;
@@ -85,7 +115,6 @@ void popTS()
 
 /**
  * @brief Insertar un identificador en la tabla de símbolos
- * 
  */
 void pushAttr(attr atrib)
 {
@@ -124,6 +153,9 @@ void pushAttr(attr atrib)
 
 }
 
+/**
+ * @brief Asigna el tipo de una variable
+ */
 void assignType(dType p_dataType)
 {
   int seekHead = HEADER;
@@ -135,10 +167,48 @@ void assignType(dType p_dataType)
 
 }
 
+// Función que realiza el chequeo de si el bloque está precedido de una declaración de función.
+// En ese caso, mete todos los parámetros formales de la función como variables locales después
+// de la marca de bloque.
+
+void checkBlockFunction(){
+
+  // Se comprueba el bit de declaración de función
+  if (IN_FUNC == 1){
+
+    // Buscar función justo antes de inicio de bloque
+    int posNow = HEADER;
+    int posFunction = -1;
+    int found = 0;
+
+    for(int i = HEADER; i > 0 && !found; i--)
+      if(TS[i].input == FUNC){
+        found = 1;
+        posFunction = i;
+      }
+
+    // Si no hay función, error
+    if(!found){
+      char output[] = "[ERROR SEMÁNTICO], No se ha encontrado funcion \"";
+      strcat(output,"\".");
+      yyerror(output);
+    }
+    else{
+      // Copiar todos los parámetros formales como variables locales del bloque
+      for (int i = posFunction + 1; i < posNow; i++)
+        pushTS(VARIABLE, TS[i].name, TS[i].dataType, -1 , -1, -1);
+    }
+    
+  }
+}
+
 void blockStart()
 {
   printf("Inicio bloque detectado\n");
   pushTS(BLOCK_START, "BLOCK_START", -1, -1, -1, -1);
+
+  // Se chequea si se deben introducir los parámtros formales como variables variables locales
+  checkBlockFunction();
 }
 
 void blockEnd()
@@ -154,6 +224,19 @@ void blockEnd()
   printTS_ALL();
 
 }
+
+// Función que mete una entrada de tipo función en la tabla de símbolos
+void insertFunction(attr atrib){
+  pushTS(FUNC, atrib.lexema, atrib.type, -1, -1, -1);
+}
+
+// Función que mete una entrada de tipo parámetro formal en la tabla de símbolos
+void insertFormalParameter(attr atrib){
+  pushTS(PARAMETER, atrib.lexema, atrib.type, -1, -1, -1);
+}
+
+
+// Función que mete un
 
 %}
 
@@ -256,13 +339,15 @@ programa                      : cabeceraPrograma bloque;
 cabeceraPrograma              : INIPROG;
 
 bloque                        : inicioBloque declararVariablesLocalesMulti
-                                declararFuncionMulti sentencias finBloque; 
+                                declararFuncionMulti sentencias finBloque ; 
 
 declararFuncionMulti          : declararFuncionMulti declararFuncion
                               | /* cadena vacía */
                               ;
 
-declararFuncion               : cabeceraFuncion bloque;
+declararFuncion               : cabeceraFuncion {IN_FUNC = 1;}
+                                bloque  {IN_FUNC = 0;}
+                                ;
 
 declararVariablesLocalesMulti : marcaInicioVariable variablesLocalesMulti
                                 marcaFinVar
@@ -376,10 +461,16 @@ expresion                     : ABRPAR expresion CERPAR
                               // | expresion PERCENT expresion
                               | expresion IGUALDAD expresion
                               | expresion DESIGUALDAD expresion
-                              | expresion AND expresion
-                              | expresion OR expresion
-                              | expresion XOR expresion
-                              | identificador
+                              | expresion AND expresion {
+                                    if ($1.type == BOOLEANO && $1.type == BOOLEANO) {
+                                        $$.type = $1.type;
+                                    } else {
+                                        fprintf(stderr, "Error en el AND\n");
+                                    }
+                                }
+                              | expresion OR expresion { if ($1.type == $2.type && $1.type == BOOLEANO) { fprintf(stderr, "not pog\n"); } }
+                              | expresion XOR expresion { if ($1.type == $2.type && $1.type == BOOLEANO) { fprintf(stderr, "Error en el XOR\n"); } }
+                              | identificador { $$.type = getTypeVar($1) };
                               | literal
                               | funcion
                               | HASH expresion %prec HASH
@@ -427,3 +518,4 @@ void yyerror( const char *msg )
 {
    fprintf(stderr, "[Linea %d]: %s\n", n_lineas, msg);
 }
+
