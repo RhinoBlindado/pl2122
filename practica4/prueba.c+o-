@@ -4,16 +4,23 @@ inicio
         entero a, b, c;
         real d, e, f;
         booleano xx, oo, zz;
-        lista de entero listEntero;
+        lista de entero l1, l2, l3;
+        lista de real lf1, lf2;
+        caracter pppp;
     finvar;
     
+     entero funcionA(entero a1, real a2)
+    {
+        inivar
+            entero x1, x2;
+        finvar;
 
-    real fun(real a, entero tete, caracter nano) {
-        repatriar a;
+        repatriar a1;
     }
 
-    a = (b + c) + 4;
-    zz = xx y oo;
+    a = (#l1 + a);
+    l3 = l1 -- (a + b);
+    l1 = l2 ++ a @ a;
 
-    f = fun(d);
+    a = funcionA(a, d);
 }

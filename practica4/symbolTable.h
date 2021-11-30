@@ -23,6 +23,35 @@
         NO_ASIGNADO  // Variable sin tipo asignado (declaración)
     } dType;
 
+    char* getStr(dType t) {
+        char* res = (char*) malloc(50);
+        switch (t) {
+            case (SUS):
+                strcpy(res, "SUS");
+            break;
+            case (ENTERO):
+                strcpy(res, "ENTERO");
+            break;
+            case (REAL):
+                strcpy(res, "REAL");
+            break;
+            case (CARACTER):
+                strcpy(res, "CARACTER");
+            break;
+            case (BOOLEANO):
+                strcpy(res, "BOOLEANO");
+            break;
+            case (LISTA):
+                strcpy(res, "LISTA");
+            break;
+            case (NO_ASIGNADO):
+                strcpy(res, "NO_ASIGNADO");
+            break;
+    }
+
+    return res;
+    }
+
     typedef struct
     {
         // Tipo de entrada en la tabla de símbolos
