@@ -387,10 +387,10 @@ attr getTypeVar(attr atrib)
 
   // Si no encontrado error
   if(!found){
-    char output[MAX_SIZE_STRING];
+    char output[MAX_SIZE_STRING] = "";
     strcat(output, "[ERROR SEMÁNTICO] Variable \"");
     strcat(output,atrib.lexema);
-    strcat(output,"\"no definida previamente.");
+    strcat(output,"\" no definida previamente.");
     yyerror(output);
   }
 
@@ -418,7 +418,7 @@ dType getTypeFunc(attr atrib) {
 
 	if(!found)
 	{
-		char output[MAX_SIZE_STRING];
+		char output[MAX_SIZE_STRING] = "";
 		strcat(output, "[ERROR SEMÁNTICO] Variable \"");
 		strcat(output,atrib.lexema);
 		strcat(output,"\"no definida previamente.");
@@ -854,7 +854,7 @@ attr checkConcatExp(attr a, attr b)
   }
   else
   {
-    char output[MAX_SIZE_STRING];
+    char output[MAX_SIZE_STRING] = "";
     strcat(output, "[ERROR SEMÁNTICO] Tipo inesperado en concatenación");
     yyerror(output);
   }
