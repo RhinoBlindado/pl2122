@@ -777,13 +777,13 @@ sentenciaAsignacion           : identificador ASIG expresion finSentencia { $$.t
                               ;
 
 sentenciaIf                   : IF inicioParametros expresion finParametros 
-                                sentencia
+                                sentencia {$$.type = getExpType(BOOLEANO, $3.type);}
                               | IF inicioParametros expresion finParametros
-                                sentencia ELSE sentencia
+                                sentencia ELSE sentencia {$$.type = getExpType(BOOLEANO, $3.type);}
                               ;
 
 sentenciaWhile                : WHILE inicioParametros expresion finParametros
-                                sentencia;
+                                sentencia {$$.type = getExpType(BOOLEANO, $3.type);} ; 
 
 sentenciaEntrada              : nombreEntrada listaVariables finSentencia;
 
@@ -794,8 +794,8 @@ listaVariables                : inicioParametros parametros finParametros;
 sentenciaReturn               : RETURN expresion finSentencia;
 
 sentenciaFor                  : FOR sentenciaAsignacion TO expresion sentido
-                                sentencia
-                              | FOR expresion TO expresion sentido sentencia
+                                sentencia {$$.type = getExpType(BOOLEANO, $4.type);}
+                              | FOR expresion TO expresion sentido sentencia {$$.type = getExpType(BOOLEANO, getExpType($2.type, $4.type));}
                               ;
 
 sentido                       : SENTIDO;
@@ -862,8 +862,8 @@ contenidoLista                : expresion
                               | contenidoLista COMA expresion
                               ;
 
-sentenciaLista                : identificador ITER finSentencia
-                              | INITER identificador finSentencia
+sentenciaLista                : identificador ITER finSentencia {$$.type = getExpType(LISTA, $1.type);}
+                              | INITER identificador finSentencia {$$.type = getExpType(BOOLEANO, $2.type);}
                               ;
 
 literal                       : LITERAL | lista | cadena
