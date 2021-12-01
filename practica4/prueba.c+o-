@@ -1,26 +1,10 @@
 inicio
 {
     inivar
-        entero a, b, c;
-        real d, e, f;
-        booleano xx, oo, zz;
-        lista de entero l1, l2, l3;
-        lista de real lf1, lf2;
-        caracter pppp;
+        entero x, z;
+        booleano a, b;
+        lista de entero f, g;
     finvar;
-    
-     entero funcionA(entero a1, real a2)
-    {
-        inivar
-            entero x1, x2;
-        finvar;
 
-        repatriar a1;
-    }
-
-    a = (#l1 + a);
-    l3 = l1 -- (a + b);
-    l1 = l2 ++ a @ a;
-
-    a = funcionA(a, d);
+    x = f == g;
 }
