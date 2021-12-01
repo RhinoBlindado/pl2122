@@ -90,7 +90,7 @@ dType checkConcatExp(attr a, attr b);
 
 char* getStr(dType t);
 
-//void checkBooleans();
+void checkBooleans(dType typ1);
 
 /**
  * @brief Imprime los valores de la pila
@@ -602,6 +602,16 @@ void endCallParameters(){
   HEADER_FUNC -= 1;
 }
 
+/**
+ * @brief   Función simple, que espera recibir un booleano en caso contrario muestra por pantalla un error
+ * @param   atrib Atributo detectado por el analizador sintactico.
+ */
+void checkBooleans(dType typ1){
+  if(BOOLEANO != typ1){
+    yyerror("[ERROR SEMANTICO] Se esperaba un booleano");
+  }
+}
+
 %}
 
 /*INICIO YACC*/
@@ -777,13 +787,13 @@ sentenciaAsignacion           : identificador ASIG expresion finSentencia { $$.t
                               ;
 
 sentenciaIf                   : IF inicioParametros expresion finParametros 
-                                sentencia {$$.type = getExpType(BOOLEANO, $3.type);}
+                                sentencia {checkBooleans($3.type);}
                               | IF inicioParametros expresion finParametros
-                                sentencia ELSE sentencia {$$.type = getExpType(BOOLEANO, $3.type);}
+                                sentencia ELSE sentencia {checkBooleans($3.type);}
                               ;
 
 sentenciaWhile                : WHILE inicioParametros expresion finParametros
-                                sentencia {$$.type = getExpType(BOOLEANO, $3.type);} ; 
+                                sentencia {checkBooleans($3.type);} ; 
 
 sentenciaEntrada              : nombreEntrada listaVariables finSentencia;
 
@@ -794,8 +804,8 @@ listaVariables                : inicioParametros parametros finParametros;
 sentenciaReturn               : RETURN expresion finSentencia;
 
 sentenciaFor                  : FOR sentenciaAsignacion TO expresion sentido
-                                sentencia {$$.type = getExpType(BOOLEANO, $4.type);}
-                              | FOR expresion TO expresion sentido sentencia {$$.type = getExpType(BOOLEANO, getExpType($2.type, $4.type));}
+                                sentencia {checkBooleans($4.type);}
+                              | FOR expresion TO expresion sentido sentencia {checkBooleans($4.type);}
                               ;
 
 sentido                       : SENTIDO;
@@ -862,8 +872,8 @@ contenidoLista                : expresion
                               | contenidoLista COMA expresion
                               ;
 
-sentenciaLista                : identificador ITER finSentencia {$$.type = getExpType(LISTA, $1.type);}
-                              | INITER identificador finSentencia {$$.type = getExpType(BOOLEANO, $2.type);}
+sentenciaLista                : identificador ITER finSentencia
+                              | INITER identificador finSentencia
                               ;
 
 literal                       : LITERAL | lista | cadena
