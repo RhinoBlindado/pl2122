@@ -70,6 +70,8 @@ dType getTypeVar(attr atrib);
 
 dType getTypeFunc(attr atrib);
 
+dType getTypeList(attr atrib);
+
 dType getExpType(dType typ1, dType typ2);
 
 void insertFunction(attr atrib);
@@ -84,9 +86,15 @@ void endCallParameters();
 
 int checkIfList(attr atrib);
 
+attr checkOpMultExp(attr a, attr b, attr op);
+
+dType checkDesigualdadExp(dType a, dType b);
+
+dType checkBooleanExp(dType a, dType b);
+
 dType checkPlusPlusExp(attr a, attr b, attr c);
 
-dType checkConcatExp(attr a, attr b);
+attr checkConcatExp(attr a, attr b);
 
 char* getStr(dType t);
 
@@ -375,6 +383,7 @@ dType getTypeFunc(attr atrib) {
   return auxType;
 }
 
+
 /**
  * 
  */
@@ -442,6 +451,166 @@ dType checkInterrExp(attr a)
   return retVal;
 }
 
+attr checkOpMultExp(attr a, attr b, attr op)
+{
+  attr res;
+  res.type = SUS;
+
+  //printf("valores: %d - %s - %d - %d\n", a.atrib, a.lexema, a.type, a.isList);
+  //printf("porfa: %d\n", getTypeList(a));
+  //printf("lmao: %d\n", op.atrib);
+  switch (op.atrib)
+  {
+    case 0: // Operador /
+      if (a.isList && b.isList == 0) {
+        if (a.type == b.type) {
+          if (a.type == ENTERO || a.type == REAL) {
+            res.type = a.type;
+            res.isList = 1;
+          } else {
+            char msg[50] = "[ERROR SEMÁNTICO] No se esperaba ";
+            strcat(msg, getStr(a.type));
+            yyerror(msg);
+          }
+        } else {
+          char msg[50] = "[ERROR SEMÁNTICO] No coinciden los tipos ";
+          yyerror(msg);
+        }
+      } else if (a.isList == 0 && b.isList == 0) {
+        if (a.type == b.type) {
+          if (a.type == ENTERO || a.type == REAL) {
+            res.type = a.type;
+            res.isList = 0;
+          } else {
+            char msg[50] = "[ERROR SEMÁNTICO] No se esperaba ";
+            strcat(msg, getStr(a.type));
+            yyerror(msg);
+          }
+        } else {
+          char msg[50] = "[ERROR SEMÁNTICO] No coinciden los tipos ";
+          yyerror(msg);
+        }
+      } else {
+        yyerror("[ERROR SEMÁNTICO] El segundo atributo no puede ser una lista");
+      }
+    break;
+    case 2: // Operador *
+      if (a.isList == 1 && b.isList == 0) {
+        if (a.type == b.type) {
+          if (a.type == ENTERO || a.type == REAL) {
+            res.type = a.type;
+            res.isList = 1;
+          } else {
+            char msg[50] = "[ERROR SEMÁNTICO] No se esperaba ";
+            strcat(msg, getStr(a.type));
+            yyerror(msg);
+          }
+        } else {
+          char msg[50] = "[ERROR SEMÁNTICO] No coinciden los tipos ";
+          yyerror(msg);
+        }
+      } else if (a.isList == 0 && b.isList == 1) {
+        if (a.type == b.type) {
+          if (a.type == ENTERO || a.type == REAL) {
+            res.type = a.type;
+            res.isList = 0;
+          } else {
+            char msg[50] = "[ERROR SEMÁNTICO] No se esperaba ";
+            strcat(msg, getStr(a.type));
+            yyerror(msg);
+          }
+        } else {
+          char msg[50] = "[ERROR SEMÁNTICO] No coinciden los tipos ";
+          yyerror(msg);
+        }
+      } else if (a.isList == 0 && b.isList == 0) {
+        if (a.type == b.type) {
+          if (a.type == ENTERO || a.type == REAL) {
+            res.type = a.type;
+            res.isList = 0;
+          } else {
+            char msg[50] = "[ERROR SEMÁNTICO] No se esperaba ";
+            strcat(msg, getStr(a.type));
+            yyerror(msg);
+          }
+        } else {
+          char msg[50] = "[ERROR SEMÁNTICO] No coinciden los tipos ";
+          yyerror(msg);
+        }
+      } else {
+        yyerror("[ERROR SEMÁNTICO] Ambos valores no pueden ser listas");
+      }
+    break;
+    case 3: // Operador %
+      if (a.isList == 1 && b.isList == 0) {
+        if (b.type == ENTERO) {
+          res.type = a.type;
+          res.isList = 1;
+        } else {
+          char msg[50] = "[ERROR SEMÁNTICO] No se esperaba ";
+          strcat(msg, getStr(a.type));
+          yyerror(msg);
+        }
+      } else if (a.isList == 0 && b.isList == 0) {
+        if (a.type == ENTERO && b.type == ENTERO) {
+          res.type = ENTERO;
+          res.isList = 1;
+        } else {
+          char msg[50] = "[ERROR SEMÁNTICO] No se esperaba ";
+          strcat(msg, getStr(a.type));
+          yyerror(msg);
+        }
+      } else {
+        char msg[50] = "[ERROR SEMÁNTICO] No se esperaba LISTA DE ";
+        strcat(msg, getStr(b.type));
+        yyerror(msg);
+      }
+    break;
+  }
+  return res;
+}
+
+dType checkDesigualdadExp(dType a, dType b)
+{
+  dType retVal = SUS;
+  if (a != LISTA)
+  {
+    if (a == b) {
+      retVal = BOOLEANO;
+    }
+    else
+    {
+      char msg[50] = "[ERROR SEMÁNTICO] Esperado ";
+      strcat(msg, getStr(a));
+      yyerror(msg);
+    }
+  }
+  else
+  {
+    yyerror("[ERROR SEMÁNTICO] No se esperaba LISTA");
+  }
+  return retVal;
+}
+
+dType checkBooleanExp(dType a, dType b)
+{
+  dType retVal = SUS;
+  if (a == BOOLEANO) {
+    if (b == BOOLEANO) {
+      retVal = BOOLEANO;
+    }
+    else
+    {
+      yyerror("[ERROR SEMÁNTICO] Esperado BOOLEANO.");
+    }
+  }
+  else
+  {
+      yyerror("[ERROR SEMÁNTICO] Esperado BOOLEANO.");
+  }
+  return retVal;
+}
+
 dType checkPlusPlusAtExp(attr a, attr b, attr c)
 {
   dType retVal = SUS;
@@ -492,18 +661,21 @@ dType checkMinMinExp(attr a, attr b)
   }
 }
 
-dType checkConcatExp(attr a, attr b)
+attr checkConcatExp(attr a, attr b)
 {
-  if(getExpType(a.type, LISTA) && getExpType(b.type, LISTA))
+  attr res; res.type = SUS;
+  if (a.isList && b.isList)
+  //if(getExpType(a.type, LISTA) && getExpType(b.type, LISTA)
   {
-    if(getTypeList(a) == getTypeList(b))
+    //if(getTypeList(a) == getTypeList(b))
+    if (a.type == b.type)
     {
-      return LISTA;
+      res.type = a.type;
+      res.isList = a.isList;
     }
     else
     {
       yyerror("[ERROR SEMÁNTICO] Concatenacion entre listas de tipos diferentes.");
-      return SUS;
     }
 
   }
@@ -512,8 +684,8 @@ dType checkConcatExp(attr a, attr b)
     char output[MAX_SIZE_STRING];
     strcat(output, "[ERROR SEMÁNTICO] Tipo inesperado en concatenación");
     yyerror(output);
-    return SUS;
   }
+  return res;
 }
 
 /**
@@ -828,29 +1000,22 @@ parametros                    : tipoDato identificador {$2.type = $1.type; inser
 
 expresion                     : ABRPAR expresion CERPAR { $$.type = $2.type; }
                               | MASMENOS expresion %prec HASH { $$.type = $2.type; }
-                              | NOT expresion %prec HASH { $$.type = $2.type; }
-                              | expresion MASMENOS expresion { $$.type = getExpType($1.type, $3.type); /* printf("exp1=%s (%d), exp2=%s (%d)\n", $1.lexema, $1.type, $3.lexema, $3.type ); */}
-                              | expresion OPMULT expresion { $$.type = getExpType($1.type, $3.type); }
-                              | expresion IGUALDAD expresion { $$.type = getExpType($1.type, $3.type); }
-                              | expresion DESIGUALDAD expresion { $$.type = getExpType($1.type, $3.type); }
-                              | expresion AND expresion {
-                                    $$.type = getExpType($1.type, $3.type);
-                                    if ($1.type == BOOLEANO && $3.type == BOOLEANO) {
-                                        $$.type = $1.type;
-                                    } else {
-                                        fprintf(stderr, "Error en el AND\n");
-                                    }
-                                }
-                              | expresion OR expresion { $$.type = getExpType($1.type, $3.type); }
-                              | expresion XOR expresion { $$.type = getExpType($1.type, $3.type); }
-                              | identificador { $$.type = getTypeVar($1); }
+                              | NOT expresion %prec HASH { $$.type = checkBooleanExp($2.type, $2.type); }
+                              | expresion MASMENOS expresion { $$.type = getExpType($1.type, $3.type); }
+                              | expresion OPMULT expresion { $$ = checkOpMultExp($1, $3, $2); }
+                              | expresion IGUALDAD expresion { $$.type = checkDesigualdadExp($1.type, $3.type); }
+                              | expresion DESIGUALDAD expresion { $$.type = checkDesigualdadExp($1.type, $3.type); }
+                              | expresion AND expresion { $$.type = checkBooleanExp($1.type, $3.type); }
+                              | expresion OR expresion { $$.type = checkBooleanExp($1.type, $3.type); }
+                              | expresion XOR expresion { $$.type = checkBooleanExp($1.type, $3.type); }
+                              | identificador { $$.type = getTypeVar($1); if ($$.type == LISTA) { $$.isList = 1; $$.type = getTypeList($1); } }
                               | literal { $$.type = $1.type; }
                               | funcion { $$.type = getTypeFunc($1); }
                               | HASH expresion { $$.type = checkHashExp($1); }
                               | INTERR expresion %prec HASH {$$.type = checkInterrExp($1); }
                               | expresion PLUSPLUS expresion AT expresion {$$.type = checkPlusPlusAtExp($1, $3, $5); }
                               | expresion MINMIN expresion {$$.type = checkMinMinExp($1, $3); }
-                              | expresion CONCAT expresion {$$.type = checkConcatExp($1, $3); }
+                              | expresion CONCAT expresion {$$ = checkConcatExp($1, $3); }
                               ;
 
 funcion                       : identificador {findFunctionCall($1);}
