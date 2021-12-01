@@ -66,7 +66,7 @@ void checkBlockFunction();
 
 void blockEnd();
 
-dType getTypeVar(attr atrib);
+attr getTypeVar(attr atrib);
 
 dType getTypeFunc(attr atrib);
 
@@ -86,9 +86,13 @@ void endCallParameters();
 
 int checkIfList(attr atrib);
 
+attr checkAsignacion(attr, attr);
+
+attr checkMasMenosExp(attr, attr b, attr op);
+
 attr checkOpMultExp(attr a, attr b, attr op);
 
-dType checkDesigualdadExp(dType a, dType b);
+attr checkDesigualdadExp(attr a, attr b);
 
 dType checkBooleanExp(dType a, dType b);
 
@@ -99,6 +103,8 @@ attr checkConcatExp(attr a, attr b);
 char* getStr(dType t);
 
 void checkBooleans(dType typ1);
+
+void checkReturn(attr a);
 
 /**
  * @brief Imprime los valores de la pila
@@ -248,7 +254,7 @@ void checkBlockFunction(){
     else{
       // Copiar todos los parámetros formales como variables locales del bloque
       for (int i = posFunction + 1; i < posNow; i++)
-        pushTS(VARIABLE, TS[i].name, TS[i].dataType, -1 , 0);
+        pushTS(VARIABLE, TS[i].name, TS[i].dataType, -1 , TS[i].listDataType);
     }
     
   }
@@ -256,7 +262,7 @@ void checkBlockFunction(){
 
 void blockStart()
 {
-  printf("Inicio bloque detectado\n");
+  //printf("Inicio bloque detectado\n");
   pushTS(BLOCK_START, "BLOCK_START", -1, -1, 0);
 
   // Se chequea si se deben introducir los parámtros formales como variables variables locales
@@ -265,15 +271,16 @@ void blockStart()
 
 void blockEnd()
 {
-  printf("Fin bloque detectado, HEADER = %d\nTABLA SIMBOLOS HASTA AHORA:\n", HEADER);
-  printTS_ALL();
+ // printf("Fin bloque detectado\n");
+ // printf("HEADER = %d\nTABLA SIMBOLOS HASTA AHORA:\n", HEADER);
+ // printTS_ALL();
   while(TS[HEADER].input != BLOCK_START)
   {
     popTS();
   }
   popTS();
-  printf("Ahora HEADER = %d\n TABLA DE SIMBOLOS LUEGO:\n", HEADER);
-  printTS_ALL();
+  //printf("Ahora HEADER = %d\n TABLA DE SIMBOLOS LUEGO:\n", HEADER);
+  //printTS_ALL();
 
 }
 
@@ -283,7 +290,10 @@ void blockEnd()
  * @param atrib Atributo detectado.
  */
 void insertFunction(attr atrib){
-  pushTS(FUNC, atrib.lexema, atrib.type, 0, -1);
+  if (atrib.isList)
+    pushTS(FUNC, atrib.lexema, LISTA, 0, atrib.type);
+  else
+    pushTS(FUNC, atrib.lexema, atrib.type, 0, -1);
 }
 
 /**
@@ -292,7 +302,10 @@ void insertFunction(attr atrib){
  * @param atrib Atributo detectado.
  */
 void insertFormalParameter(attr atrib){
-  pushTS(PARAMETER, atrib.lexema, atrib.type, -1, 0);
+  if (atrib.isList)
+    pushTS(PARAMETER, atrib.lexema, LISTA, -1, atrib.type);
+  else
+    pushTS(PARAMETER, atrib.lexema, atrib.type, -1, -1);
 
   // Buscar función a la que hacen referencia los parámetros
   int posFunction = -1;
@@ -316,36 +329,69 @@ void insertFormalParameter(attr atrib){
 
 }
 
+
 /**
  * @brief Obtener el tipo de un identificador en una expresion.
  * @param atrib Atributo detectado por el analizador sintactico.
  * 
  */
-dType getTypeVar(attr atrib)
+attr getTypeVar(attr atrib)
 {
-  dType auxType = SUS;
+  attr auxType;
+  auxType.type = SUS;
+  auxType.isList = 0;
+
   int found = 0;
 
-  if (1) {
+  if (!IN_FUNC) {
 
-	for(int i = HEADER; i > 0; i--)
-	{
-		if(strcmp(atrib.lexema, TS[i].name) == 0 && TS[i].input == VARIABLE)
-		{
-      found = 1;
-      auxType = TS[i].dataType;
-      break;
-		}
-	}
-
-    if(!found)
+    for(int i = HEADER; i > 0; i--)
     {
-      char output[MAX_SIZE_STRING];
-      strcat(output, "[ERROR SEMÁNTICO] Variable \"");
-      strcat(output,atrib.lexema);
-      strcat(output,"\" no definida previamente.");
-      yyerror(output);
+      if (strcmp(atrib.lexema, TS[i].name) == 0 && TS[i].input == VARIABLE && TS[i].dataType == LISTA)
+      {
+        found = 1;
+        auxType.type = TS[i].listDataType;
+        auxType.isList = 1;
+        break;
+      }
+      else if(strcmp(atrib.lexema, TS[i].name) == 0 && TS[i].input == VARIABLE)
+      {
+        found = 1;
+        auxType.type = TS[i].dataType;
+        auxType.isList = 0;
+        break;
+      }
     }
+  }
+  else{
+
+    // Buscar solo de la posición actual hasta la última marca de inicio de bloque
+    for(int i = HEADER; i > 0 && TS[i].input != BLOCK_START && !found; i--)
+    {
+      if (strcmp(atrib.lexema, TS[i].name) == 0 && TS[i].input == VARIABLE && TS[i].dataType == LISTA)
+      {
+        found = 1;
+        auxType.type = TS[i].listDataType;
+        auxType.isList = 1;
+        break;
+      }
+      else if(strcmp(atrib.lexema, TS[i].name) == 0 && TS[i].input == VARIABLE)
+      {
+        found = 1;
+        auxType.type = TS[i].dataType;
+        auxType.isList = 0;
+        break;
+      }
+    }
+  }
+
+  // Si no encontrado error
+  if(!found){
+    char output[MAX_SIZE_STRING];
+    strcat(output, "[ERROR SEMÁNTICO] Variable \"");
+    strcat(output,atrib.lexema);
+    strcat(output,"\" no definida previamente.");
+    yyerror(output);
   }
 
   return auxType;
@@ -353,7 +399,7 @@ dType getTypeVar(attr atrib)
 
 /**
  * @brief   Obtener el tipo de una función en una expresion.
- * @param   atrib Atributo detectado por el analizador sintactivo
+ * @param   atrib Atributo detectado por el analizador sintáctico
  * @return  
  */
 dType getTypeFunc(attr atrib) {
@@ -362,7 +408,7 @@ dType getTypeFunc(attr atrib) {
 
   for(int i = HEADER; i > 0; i--)
   {
-  	if(strcmp(atrib.lexema, TS[i].name) == 0)
+  	if(strcmp(atrib.lexema, TS[i].name) == 0 && TS[i].input == FUNC)
   	{
       found = 1;
       auxType = TS[i].dataType;
@@ -426,22 +472,34 @@ dType getTypeList(attr atrib)
   return auxType;
 }
 
-dType checkHashExp(attr a)
+attr checkHashExp(attr a)
 {
-  dType retVal = SUS;
-  if(getExpType(a.type, LISTA))
+  attr retVal;
+
+  retVal.type = SUS;
+  retVal.isList = 0; 
+  
+  if(a.isList)
   {
-    return ENTERO;
+    retVal.type = ENTERO;
+  }
+  else
+  {
+    yyerror("[ERROR SEMÁNTICO] Elemento no es de tipo lista.");
   }
   return retVal;
 }
 
-dType checkInterrExp(attr a)
+attr checkInterrExp(attr a)
 {
-  dType retVal = SUS;
-  if(getExpType(a.type, LISTA))
+  attr retVal;
+
+  retVal.type = SUS;
+  retVal.isList = 0;
+
+  if(a.isList)
   {
-    return  getTypeList(a);
+    retVal.type = a.type;
   }
   else
   {
@@ -451,10 +509,111 @@ dType checkInterrExp(attr a)
   return retVal;
 }
 
+attr checkAsignacion(attr a, attr b)
+{
+  attr t;
+  t = getTypeVar(a);
+
+  if (t.type != b.type) {
+    char msg[100] = "[ERROR SEMÁNTICO] Se esperaba una variable de tipo ";
+    strcat(msg, getStr(t.type));
+    yyerror(msg);
+  }
+  return t;
+}
+
+void checkReturn(attr a){
+
+  // Buscar marca de inicio  de bloque
+  int markFound = 0;
+  int posMark = -1;
+
+  for(int i = HEADER; i > 0 && !markFound; i--)
+    if(TS[i].input == BLOCK_START){
+      markFound = 1;
+      posMark = i;
+    }
+  
+  // Buscar función
+  int found = 0;
+  int entryFunc = -1;
+
+  for(int i = posMark - 1; i > 0 && !found; i--)
+    if(TS[i].input == FUNC){
+      found = 1;
+      entryFunc = i;
+    }
+  
+  if(found && (TS[entryFunc].dataType != a.type || (a.isList && TS[entryFunc].dataType == LISTA && a.type == TS[entryFunc].listDataType))){
+    yyerror("[ERROR SEMANTICO] Estas intentado devolver una variable de un tipo distinto al esperado");
+  }
+  else if(!found){
+    yyerror("[ERROR SEMANTICO] Este repatriar no esta asociado a una funcion");
+  }
+
+  
+}
+
+attr checkMasMenosExp(attr a, attr b, attr op)
+{
+  attr res;
+  res.type = SUS;
+  res.isList = 0;
+  
+  if (a.isList == 1 && b.isList == 0) {
+    if (a.type == b.type) {
+      if (a.type == ENTERO || a.type == REAL) {
+        res.type = a.type;
+        res.isList = 1;
+      } else {
+        char msg[50] = "[ERROR SEMÁNTICO] No se esperaba ";
+        strcat(msg, getStr(a.type));
+        yyerror(msg);
+      }
+    } else {
+      char msg[50] = "[ERROR SEMÁNTICO] No coinciden los tipos ";
+      yyerror(msg);
+    }
+  } else if (a.isList == 0 && b.isList == 1) {
+    if (a.type == b.type) {
+      if (a.type == ENTERO || a.type == REAL) {
+        res.type = a.type;
+        res.isList = 0;
+      } else {
+        char msg[50] = "[ERROR SEMÁNTICO] No se esperaba ";
+        strcat(msg, getStr(a.type));
+        yyerror(msg);
+      }
+    } else {
+      char msg[50] = "[ERROR SEMÁNTICO] No coinciden los tipos ";
+      yyerror(msg);
+    }
+  } else if (a.isList == 0 && b.isList == 0) {
+    if (a.type == b.type) {
+      if (a.type == ENTERO || a.type == REAL) {
+        res.type = a.type;
+        res.isList = 0;
+      } else {
+        char msg[50] = "[ERROR SEMÁNTICO] No se esperaba ";
+        strcat(msg, getStr(a.type));
+        yyerror(msg);
+      }
+    } else {
+      char msg[50] = "[ERROR SEMÁNTICO] No coinciden los tipos ";
+      yyerror(msg);
+    }
+  } else {
+    yyerror("[ERROR SEMÁNTICO] Ambos valores no pueden ser listas");
+  }
+
+  return res;
+}
+
 attr checkOpMultExp(attr a, attr b, attr op)
 {
   attr res;
   res.type = SUS;
+  res.isList = 0;
 
   //printf("valores: %d - %s - %d - %d\n", a.atrib, a.lexema, a.type, a.isList);
   //printf("porfa: %d\n", getTypeList(a));
@@ -570,18 +729,20 @@ attr checkOpMultExp(attr a, attr b, attr op)
   return res;
 }
 
-dType checkDesigualdadExp(dType a, dType b)
+attr checkDesigualdadExp(attr a, attr b)
 {
-  dType retVal = SUS;
-  if (a != LISTA)
+  attr retVal;
+  retVal.type = SUS;
+  retVal.isList = 0;
+  if (a.isList != 1)
   {
-    if (a == b) {
-      retVal = BOOLEANO;
+    if (a.type == b.type) {
+      retVal.type = BOOLEANO;
     }
     else
     {
       char msg[50] = "[ERROR SEMÁNTICO] Esperado ";
-      strcat(msg, getStr(a));
+      strcat(msg, getStr(a.type));
       yyerror(msg);
     }
   }
@@ -611,16 +772,21 @@ dType checkBooleanExp(dType a, dType b)
   return retVal;
 }
 
-dType checkPlusPlusAtExp(attr a, attr b, attr c)
+attr checkPlusPlusAtExp(attr a, attr b, attr c)
 {
-  dType retVal = SUS;
-  if(getExpType(a.type, LISTA))
+  attr retVal;
+  
+  retVal.type = SUS;
+  retVal.isList = 0;
+  
+  if(a.isList)
   {
-    if(getTypeList(a) == getTypeVar(b))
+    if(a.type == b.type)
     {
       if(getExpType(c.type, ENTERO))
       {
-        retVal = LISTA;
+        retVal.type = b.type;
+        retVal.isList = 1;
       }
       else
       {
@@ -640,34 +806,41 @@ dType checkPlusPlusAtExp(attr a, attr b, attr c)
   return retVal;
 }
 
-dType checkMinMinExp(attr a, attr b)
+attr checkMinMinExp(attr a, attr b)
 {
-  if(getExpType(a.type, LISTA))
+  attr res; 
+  res.isList = 0;
+  res.type = SUS;
+
+  if(a.isList)
   {
     if(getExpType(b.type, ENTERO))
     {
-      return LISTA;
+      res.type = a.type;
+      res.isList = 1;
     }
     else
     {
       yyerror("[ERROR SEMÁNTICO] Segundo elemento no es tipo entero.");
-      return SUS;
     }
   }
   else
   {
     yyerror("[ERROR SEMÁNTICO] Primer elemento no es tipo lista.");
-    return SUS;
   }
+  
+  return res;
 }
 
 attr checkConcatExp(attr a, attr b)
 {
-  attr res; res.type = SUS;
+  attr res;
+  
+  res.isList = 0; 
+  res.type = SUS;
+  
   if (a.isList && b.isList)
-  //if(getExpType(a.type, LISTA) && getExpType(b.type, LISTA)
   {
-    //if(getTypeList(a) == getTypeList(b))
     if (a.type == b.type)
     {
       res.type = a.type;
@@ -691,7 +864,7 @@ attr checkConcatExp(attr a, attr b)
 /**
  * @brief   Función que checkea si una función existe al ser llamada.
  *          Si se encuentra, marca su posición en la pila en la variable CURRENT_FUNC_CALL.
- * @param   atrib Atributo detectado por el analizador sintactivo.
+ * @param   atrib Atributo detectado por el analizador sintáctico.
  */
 void findFunctionCall(attr atrib){
   // Se incrementa contador de la pila de funciones e inicializacion
@@ -718,7 +891,7 @@ void findFunctionCall(attr atrib){
 /**
  * @brief   Función que checkea los tipos y el número de parámetros de una función.
  *          Se va realizando la comparación desde el último parámetro al primero.
- * @param   atrib Atributo detectado por el analizador sintactivo.
+ * @param   atrib Atributo detectado por el analizador sintáctico.
  */
  void checkCallParameters(attr atrib){
   // Si se ha encontrado la función
@@ -735,7 +908,8 @@ void findFunctionCall(attr atrib){
       // Comprobar tipos
       int indParam = FT[HEADER_FUNC].currentFuncCall + FT[HEADER_FUNC].nParamCheck;
 
-      if (atrib.type == TS[indParam].dataType){
+      if (atrib.type == TS[indParam].dataType || 
+          (atrib.isList && atrib.type == TS[indParam].listDataType && TS[indParam].dataType == LISTA)){
         // Actualizar parametro a checkear
         FT[HEADER_FUNC].nParamCheck += 1;
       }
@@ -749,7 +923,7 @@ void findFunctionCall(attr atrib){
 
 /**
  * @brief   Función que checkea el número de parámetros de una función cuando se han acabado los parámetros.
- * @param   atrib Atributo detectado por el analizador sintactivo.
+ * @param   atrib Atributo detectado por el analizador sintáctico.
  */
 void endCallParameters(){
   // Si quedan parámetros por checkear, error
@@ -776,9 +950,10 @@ void endCallParameters(){
 
 /**
  * @brief   Función simple, que espera recibir un booleano en caso contrario muestra por pantalla un error
- * @param   atrib Atributo detectado por el analizador sintactico.
+ * @param   atrib Atributo detectado por yacc.
  */
-void checkBooleans(dType typ1){
+void checkBooleans(dType typ1)
+{
   if(BOOLEANO != typ1){
     yyerror("[ERROR SEMANTICO] Se esperaba un booleano");
   }
@@ -863,7 +1038,7 @@ void checkBooleans(dType typ1){
 %left DESIGUALDAD
 // %left LT LE GT GE               // Operadores de relación
 // %left PLUS MINUS                // Operadores aditivos
-%left MASMENOS
+%right MASMENOS
 %right OPMULT
 // %left ASTERISC SLASH PERCENT HAT// Operadores multiplicativos
 
@@ -954,7 +1129,7 @@ sentencia                     : bloque
                               | sentenciaLista
                               ;
 
-sentenciaAsignacion           : identificador ASIG expresion finSentencia { $$.type = getExpType($1.type, $3.type); }
+sentenciaAsignacion           : identificador ASIG expresion finSentencia { $$ = checkAsignacion($1, $3); }
                               | error
                               ;
 
@@ -973,11 +1148,11 @@ nombreEntrada                 : SCAN;
 
 listaVariables                : inicioParametros parametros finParametros;
 
-sentenciaReturn               : RETURN expresion finSentencia;
+sentenciaReturn               : RETURN expresion finSentencia{checkReturn($2);};
 
 sentenciaFor                  : FOR sentenciaAsignacion TO expresion sentido
-                                sentencia {checkBooleans($4.type);}
-                              | FOR expresion TO expresion sentido sentencia {checkBooleans($4.type);}
+                                sentencia {if ($2.type != getExpType(ENTERO, $4.type)){ yyerror("[ERROR SEMANTICO] Tipos distintos en bucle for"); }}
+                              | FOR expresion TO expresion sentido sentencia {if (ENTERO != getExpType($2.type, $4.type)){ yyerror("[ERROR SEMANTICO] Tipos distintos en bucle for"); }}
                               ;
 
 sentido                       : SENTIDO;
@@ -1001,28 +1176,28 @@ parametros                    : tipoDato identificador {$2.type = $1.type; inser
 expresion                     : ABRPAR expresion CERPAR { $$.type = $2.type; }
                               | MASMENOS expresion %prec HASH { $$.type = $2.type; }
                               | NOT expresion %prec HASH { $$.type = checkBooleanExp($2.type, $2.type); }
-                              | expresion MASMENOS expresion { $$.type = getExpType($1.type, $3.type); }
+                              | expresion MASMENOS expresion { $$ = checkMasMenosExp($1, $3, $2); }
                               | expresion OPMULT expresion { $$ = checkOpMultExp($1, $3, $2); }
-                              | expresion IGUALDAD expresion { $$.type = checkDesigualdadExp($1.type, $3.type); }
-                              | expresion DESIGUALDAD expresion { $$.type = checkDesigualdadExp($1.type, $3.type); }
+                              | expresion IGUALDAD expresion { $$ = checkDesigualdadExp($1, $3); }
+                              | expresion DESIGUALDAD expresion { $$ = checkDesigualdadExp($1, $3); }
                               | expresion AND expresion { $$.type = checkBooleanExp($1.type, $3.type); }
                               | expresion OR expresion { $$.type = checkBooleanExp($1.type, $3.type); }
                               | expresion XOR expresion { $$.type = checkBooleanExp($1.type, $3.type); }
-                              | identificador { $$.type = getTypeVar($1); if ($$.type == LISTA) { $$.isList = 1; $$.type = getTypeList($1); } }
-                              | literal { $$.type = $1.type; }
+                              | identificador { $$ = getTypeVar($1); }
+                              | literal { $$ = $1; }
                               | funcion { $$.type = getTypeFunc($1); }
-                              | HASH expresion { $$.type = checkHashExp($1); }
-                              | INTERR expresion %prec HASH {$$.type = checkInterrExp($1); }
-                              | expresion PLUSPLUS expresion AT expresion {$$.type = checkPlusPlusAtExp($1, $3, $5); }
-                              | expresion MINMIN expresion {$$.type = checkMinMinExp($1, $3); }
-                              | expresion CONCAT expresion {$$ = checkConcatExp($1, $3); }
+                              | HASH expresion { $$ = checkHashExp($2); }
+                              | INTERR expresion %prec HASH { $$ = checkInterrExp($2); }
+                              | expresion PLUSPLUS expresion AT expresion { $$= checkPlusPlusAtExp($1, $3, $5); }
+                              | expresion MINMIN expresion { $$ = checkMinMinExp($1, $3); }
+                              | expresion CONCAT expresion { $$ = checkConcatExp($1, $3); }
                               ;
 
 funcion                       : identificador {findFunctionCall($1);}
-                                ABRPAR argumentos CERPAR {endCallParameters();}
+                                ABRPAR argumentos CERPAR { endCallParameters(); }
 
 argumentos                    : expresion {checkCallParameters($1);}
-                              | argumentos COMA expresion {checkCallParameters($3);}
+                              | argumentos COMA expresion { checkCallParameters($3); }
                               ;
 
 identificador                 : IDENTIF;
@@ -1031,17 +1206,19 @@ finSentencia                  : PYC
                               | error
                               ;
 
-lista                         : ABRCOR contenidoLista CERCOR;
+lista                         : ABRCOR contenidoLista CERCOR { $$ = $2; };
 
-contenidoLista                : expresion
-                              | contenidoLista COMA expresion
+contenidoLista                : expresion { if ($$.type == SUS) { $$.type = $1.type; } else if ($$.type != $1.type) { printf("not pog :("); } }
+                              | contenidoLista COMA expresion { if ($$.type == SUS) { $$.type = $3.type; } else if ($$.type != $3.type) { printf("not pog :("); } }
                               ;
 
 sentenciaLista                : identificador ITER finSentencia
                               | INITER identificador finSentencia
                               ;
 
-literal                       : LITERAL | lista | cadena
+literal                       : LITERAL { $$ = $1; }
+                              | lista { $$ = $1; }
+                              | cadena
                               ;
 
 cadena                        : CADENA
@@ -1055,5 +1232,5 @@ cadena                        : CADENA
 /* Se implementa la función yyerror */
 void yyerror( const char *msg )
 {
-   fprintf(stderr, "[Linea %d]: %s\n", n_lineas, msg);
+   fprintf(stderr, RED "[ERROR SINTÁCTICO]" NC "%s en la linea %d\n", n_lineas, msg);
 }

@@ -9,21 +9,35 @@ inicio
         caracter pppp;
     finvar;
     
-     entero funcionA(entero a1, real a2)
+
+    entero funcionA(entero a1, real a2)
     {
         inivar
-            entero x1, x2;
-        finvar;
-
+            entero x, x2;
+        finvar;        
+        
         repatriar a1;
     }
 
-    a = (#l1 + a);
-    l3 = l1 -- (a + b);
-    l1 = l2 ++ a @ a;
+    a = a + a;
+    
+    l3 = l1 -- (a+1);
+    lf1 = lf2 ++ d @ a;
+    l1 = [2, 1, 6];
 
     a = funcionA(a, d);
-    zz = xx == oo;
-    si(1 == 2){
+    
+    si((a+1 < b))
+    {
+        f = 2.0;
+    }
+
+    mientras(1 == 3){
+        xx = Verdadero;
+    }
+
+    para a = 1; hasta 10 aumentando{
+        a = a + 2;
     }
 }
+

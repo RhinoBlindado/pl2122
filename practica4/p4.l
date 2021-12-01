@@ -59,8 +59,8 @@ lista[ \t\n]+de         return(DEFLISTA);
 "decrementando"         return(SENTIDO);
 "anunciar"              return(PRINT);
 ";"                     return(PYC);
-"+"                     return(MASMENOS);
-"-"                     return(MASMENOS);
+"+"                     yylval.atrib = 0; return(MASMENOS);
+"-"                     yylval.atrib = 1; return(MASMENOS);
 "/"                     yylval.atrib = 0; return(OPMULT);
 "^"                     yylval.atrib = 1; return(OPMULT);
 "*"                     yylval.atrib = 2; return(OPMULT);
@@ -99,7 +99,7 @@ lista[ \t\n]+de         return(DEFLISTA);
                             yylval.type = BOOLEANO;
                             return(LITERAL);
                         }
-[A-Za-z][A-Za-z0-9]*    {
+[A-Za-z][A-Za-z0-9_]*    {
                             yylval.lexema = strdup(yytext);
                             // yylval.type = REAL;
                             return(IDENTIF);

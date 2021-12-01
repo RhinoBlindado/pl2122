@@ -5,16 +5,16 @@ inicio
         real vf;
         caracter vc, v2, v4;
         booleano vl;
-        lista de entero le, le2;
-        lista de real lf, lf2;
-        lista de caracter lc, lc2;
+        lista de entero le, le2, pe;
+        lista de real lf, lf2, pf;
+        lista de caracter lc, lc2, pc;
         lista de booleano lb;
     finvar;
 
     entero funcionA(entero a1, real a2, caracter a3)
     {
         inivar
-            entero x1, x2;
+            entero x1, x2, a;
         finvar;
 
         caracter funcionB(caracter b1, booleano b2)
@@ -57,13 +57,13 @@ inicio
             inivar
                 caracter dato;
                 entero valor;
+                booleano a, b, poggers;
             finvar;
 
             caracter funcionE(caracter e1, caracter e2)
             {
                 anunciar ("Introduce dos caracteres: ");
                 escanear (caracter e1, caracter e2);
-
 
                 si(e1 == "a")
                 {
@@ -83,21 +83,22 @@ inicio
             }
 
             si (a) {
-               dato = 3;
+               dato = '3';
                si (b) {
-                  dato = 1;
+                  dato = '1';
                } sino {
-                  dato = 2;
+                  dato = '2';
                }
             }
 
             anunciar ("Introduce un valor entero :");
             escanear (entero valor);
 
-            si(d1 > 0.0 < pog)
+            si(d1 > 0.0 != poggers)
             {
                 inivar
                     entero dato;
+                    entero hola, prueba;
                 finvar;
 
                 dato = 2 + hola + prueba;
@@ -108,12 +109,11 @@ inicio
                 valor = valor * 100;
                 d1 = d1 / 1000.0;
             }
-
             repatriar d1;
         }
         repatriar a;
     }
     pe = pe ++ 10 @ 1;
     pf = pf ++ -10.0 @ 0;
-    pc = pc ++ "#" @ 0;
+    pc = pc ++ '#' @ 0;
 }
