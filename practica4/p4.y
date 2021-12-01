@@ -106,6 +106,8 @@ void checkBooleans(dType typ1);
 
 void checkReturn(attr a);
 
+attr checkLista(attr a, attr b);
+
 /**
  * @brief Imprime los valores de la pila
  */
@@ -514,11 +516,18 @@ attr checkAsignacion(attr a, attr b)
   attr t;
   t = getTypeVar(a);
 
-  if (t.type != b.type) {
-    char msg[100] = "[ERROR SEMÁNTICO] Se esperaba una variable de tipo ";
-    strcat(msg, getStr(t.type));
-    yyerror(msg);
+  if (t.type != b.type || t.isList != b.isList) {
+    if (t.isList == 0) {
+      char msg[100] = "[ERROR SEMÁNTICO] Se esperaba una variable de tipo ";
+      strcat(msg, getStr(t.type));
+      yyerror(msg);
+    } else {
+      char msg[100] = "[ERROR SEMÁNTICO] Se esperaba una variable de tipo LISTA DE ";
+      strcat(msg, getStr(t.type));
+      yyerror(msg);
+    }
   }
+
   return t;
 }
 
@@ -959,6 +968,22 @@ void checkBooleans(dType typ1)
   }
 }
 
+attr checkLista(attr a, attr b) {
+  attr res;
+  res.type = SUS;
+  res.isList = 0;
+
+  if (a.type == b.type) {
+    res.type = a.type;
+  } else {
+    char msg[50] = "Se esperaba una variable de tipo ";
+    strcat(msg, getStr(a.type));
+    yyerror(msg);
+  }
+
+  return res;
+}
+
 %}
 
 /*INICIO YACC*/
@@ -1206,10 +1231,10 @@ finSentencia                  : PYC
                               | error
                               ;
 
-lista                         : ABRCOR contenidoLista CERCOR { $$ = $2; };
+lista                         : ABRCOR contenidoLista CERCOR { $$ = $2; $$.isList = 1; };
 
-contenidoLista                : expresion { if ($$.type == SUS) { $$.type = $1.type; } else if ($$.type != $1.type) {  } }
-                              | contenidoLista COMA expresion { if ($$.type == SUS) { $$.type = $3.type; } else if ($$.type != $3.type) {  } }
+contenidoLista                : expresion { $$ = $1; }
+                              | contenidoLista COMA expresion { $$ = checkLista($1, $3); }
                               ;
 
 sentenciaLista                : identificador ITER finSentencia
