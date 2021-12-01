@@ -195,7 +195,7 @@ void pushAttr(attr atrib)
   }
   else
   {
-    char output[MAX_SIZE_STRING] = "Redefinición de variable \"";
+    char output[MAX_SIZE_STRING] = "[ERROR SEMÁNTICO], redefinición de variable \"";
     strcat(output,atrib.lexema);
     strcat(output,"\".");
     yyerror(output);
@@ -248,7 +248,7 @@ void checkBlockFunction(){
 
     // Si no hay función, error
     if(!found){
-      char output[MAX_SIZE_STRING] = ", No se ha encontrado funcion \"";
+      char output[MAX_SIZE_STRING] = "[ERROR SEMÁNTICO], No se ha encontrado funcion \"";
       yyerror(output);
     }
     else{
@@ -319,7 +319,7 @@ void insertFormalParameter(attr atrib){
 
   // Si no se ha encontrado función, error
   if (!found){
-    char output[MAX_SIZE_STRING] = ", No se ha encontrado funcion \"";
+    char output[MAX_SIZE_STRING] = "[ERROR SEMÁNTICO], No se ha encontrado funcion \"";
     yyerror(output);
   }
   else{
@@ -388,7 +388,7 @@ attr getTypeVar(attr atrib)
   // Si no encontrado error
   if(!found){
     char output[MAX_SIZE_STRING];
-    strcat(output, "Variable \"");
+    strcat(output, "[ERROR SEMÁNTICO] Variable \"");
     strcat(output,atrib.lexema);
     strcat(output,"\"no definida previamente.");
     yyerror(output);
@@ -419,7 +419,7 @@ dType getTypeFunc(attr atrib) {
 	if(!found)
 	{
 		char output[MAX_SIZE_STRING];
-		strcat(output, "Variable \"");
+		strcat(output, "[ERROR SEMÁNTICO] Variable \"");
 		strcat(output,atrib.lexema);
 		strcat(output,"\"no definida previamente.");
 		yyerror(output);
@@ -485,7 +485,7 @@ attr checkHashExp(attr a)
   }
   else
   {
-    yyerror("Elemento no es de tipo lista.");
+    yyerror("[ERROR SEMÁNTICO] Elemento no es de tipo lista.");
   }
   return retVal;
 }
@@ -503,7 +503,7 @@ attr checkInterrExp(attr a)
   }
   else
   {
-    yyerror("Elemento no es de tipo lista.");
+    yyerror("[ERROR SEMÁNTICO] Elemento no es de tipo lista.");
   }
 
   return retVal;
@@ -515,15 +515,9 @@ attr checkAsignacion(attr a, attr b)
   t = getTypeVar(a);
 
   if (t.type != b.type) {
-    if (t.isList) {
-      char msg[100] = "Se esperaba una variable de tipo LISTA DE ";
-      strcat(msg, getStr(t.type));
-      yyerror(msg);
-    } else {
-      char msg[100] = "Se esperaba una variable de tipo ";
-      strcat(msg, getStr(t.type));
-      yyerror(msg);
-    }
+    char msg[100] = "[ERROR SEMÁNTICO] Se esperaba una variable de tipo ";
+    strcat(msg, getStr(t.type));
+    yyerror(msg);
   }
   return t;
 }
@@ -572,12 +566,12 @@ attr checkMasMenosExp(attr a, attr b, attr op)
         res.type = a.type;
         res.isList = 1;
       } else {
-        char msg[50] = "No se esperaba ";
+        char msg[50] = "[ERROR SEMÁNTICO] No se esperaba ";
         strcat(msg, getStr(a.type));
         yyerror(msg);
       }
     } else {
-      char msg[50] = "No coinciden los tipos ";
+      char msg[50] = "[ERROR SEMÁNTICO] No coinciden los tipos ";
       yyerror(msg);
     }
   } else if (a.isList == 0 && b.isList == 1) {
@@ -586,12 +580,12 @@ attr checkMasMenosExp(attr a, attr b, attr op)
         res.type = a.type;
         res.isList = 0;
       } else {
-        char msg[50] = "No se esperaba ";
+        char msg[50] = "[ERROR SEMÁNTICO] No se esperaba ";
         strcat(msg, getStr(a.type));
         yyerror(msg);
       }
     } else {
-      char msg[50] = "No coinciden los tipos ";
+      char msg[50] = "[ERROR SEMÁNTICO] No coinciden los tipos ";
       yyerror(msg);
     }
   } else if (a.isList == 0 && b.isList == 0) {
@@ -600,16 +594,16 @@ attr checkMasMenosExp(attr a, attr b, attr op)
         res.type = a.type;
         res.isList = 0;
       } else {
-        char msg[50] = "No se esperaba ";
+        char msg[50] = "[ERROR SEMÁNTICO] No se esperaba ";
         strcat(msg, getStr(a.type));
         yyerror(msg);
       }
     } else {
-      char msg[50] = "No coinciden los tipos ";
+      char msg[50] = "[ERROR SEMÁNTICO] No coinciden los tipos ";
       yyerror(msg);
     }
   } else {
-    yyerror("Ambos valores no pueden ser listas");
+    yyerror("[ERROR SEMÁNTICO] Ambos valores no pueden ser listas");
   }
 
   return res;
@@ -633,12 +627,12 @@ attr checkOpMultExp(attr a, attr b, attr op)
             res.type = a.type;
             res.isList = 1;
           } else {
-            char msg[50] = "No se esperaba ";
+            char msg[50] = "[ERROR SEMÁNTICO] No se esperaba ";
             strcat(msg, getStr(a.type));
             yyerror(msg);
           }
         } else {
-          char msg[50] = "No coinciden los tipos ";
+          char msg[50] = "[ERROR SEMÁNTICO] No coinciden los tipos ";
           yyerror(msg);
         }
       } else if (a.isList == 0 && b.isList == 0) {
@@ -647,16 +641,16 @@ attr checkOpMultExp(attr a, attr b, attr op)
             res.type = a.type;
             res.isList = 0;
           } else {
-            char msg[50] = "No se esperaba ";
+            char msg[50] = "[ERROR SEMÁNTICO] No se esperaba ";
             strcat(msg, getStr(a.type));
             yyerror(msg);
           }
         } else {
-          char msg[50] = "No coinciden los tipos ";
+          char msg[50] = "[ERROR SEMÁNTICO] No coinciden los tipos ";
           yyerror(msg);
         }
       } else {
-        yyerror("El segundo atributo no puede ser una lista");
+        yyerror("[ERROR SEMÁNTICO] El segundo atributo no puede ser una lista");
       }
     break;
     case 2: // Operador *
@@ -666,12 +660,12 @@ attr checkOpMultExp(attr a, attr b, attr op)
             res.type = a.type;
             res.isList = 1;
           } else {
-            char msg[50] = "No se esperaba ";
+            char msg[50] = "[ERROR SEMÁNTICO] No se esperaba ";
             strcat(msg, getStr(a.type));
             yyerror(msg);
           }
         } else {
-          char msg[50] = "No coinciden los tipos ";
+          char msg[50] = "[ERROR SEMÁNTICO] No coinciden los tipos ";
           yyerror(msg);
         }
       } else if (a.isList == 0 && b.isList == 1) {
@@ -680,12 +674,12 @@ attr checkOpMultExp(attr a, attr b, attr op)
             res.type = a.type;
             res.isList = 0;
           } else {
-            char msg[50] = "No se esperaba ";
+            char msg[50] = "[ERROR SEMÁNTICO] No se esperaba ";
             strcat(msg, getStr(a.type));
             yyerror(msg);
           }
         } else {
-          char msg[50] = "No coinciden los tipos ";
+          char msg[50] = "[ERROR SEMÁNTICO] No coinciden los tipos ";
           yyerror(msg);
         }
       } else if (a.isList == 0 && b.isList == 0) {
@@ -694,16 +688,16 @@ attr checkOpMultExp(attr a, attr b, attr op)
             res.type = a.type;
             res.isList = 0;
           } else {
-            char msg[50] = "No se esperaba ";
+            char msg[50] = "[ERROR SEMÁNTICO] No se esperaba ";
             strcat(msg, getStr(a.type));
             yyerror(msg);
           }
         } else {
-          char msg[50] = "No coinciden los tipos ";
+          char msg[50] = "[ERROR SEMÁNTICO] No coinciden los tipos ";
           yyerror(msg);
         }
       } else {
-        yyerror("Ambos valores no pueden ser listas");
+        yyerror("[ERROR SEMÁNTICO] Ambos valores no pueden ser listas");
       }
     break;
     case 3: // Operador %
@@ -712,7 +706,7 @@ attr checkOpMultExp(attr a, attr b, attr op)
           res.type = a.type;
           res.isList = 1;
         } else {
-          char msg[50] = "No se esperaba ";
+          char msg[50] = "[ERROR SEMÁNTICO] No se esperaba ";
           strcat(msg, getStr(a.type));
           yyerror(msg);
         }
@@ -721,12 +715,12 @@ attr checkOpMultExp(attr a, attr b, attr op)
           res.type = ENTERO;
           res.isList = 1;
         } else {
-          char msg[50] = "No se esperaba ";
+          char msg[50] = "[ERROR SEMÁNTICO] No se esperaba ";
           strcat(msg, getStr(a.type));
           yyerror(msg);
         }
       } else {
-        char msg[50] = "No se esperaba LISTA DE ";
+        char msg[50] = "[ERROR SEMÁNTICO] No se esperaba LISTA DE ";
         strcat(msg, getStr(b.type));
         yyerror(msg);
       }
@@ -747,14 +741,14 @@ attr checkDesigualdadExp(attr a, attr b)
     }
     else
     {
-      char msg[50] = "Esperado ";
+      char msg[50] = "[ERROR SEMÁNTICO] Esperado ";
       strcat(msg, getStr(a.type));
       yyerror(msg);
     }
   }
   else
   {
-    yyerror("No se esperaba LISTA");
+    yyerror("[ERROR SEMÁNTICO] No se esperaba LISTA");
   }
   return retVal;
 }
@@ -768,12 +762,12 @@ dType checkBooleanExp(dType a, dType b)
     }
     else
     {
-      yyerror("Esperado BOOLEANO.");
+      yyerror("[ERROR SEMÁNTICO] Esperado BOOLEANO.");
     }
   }
   else
   {
-      yyerror("Esperado BOOLEANO.");
+      yyerror("[ERROR SEMÁNTICO] Esperado BOOLEANO.");
   }
   return retVal;
 }
@@ -796,17 +790,17 @@ attr checkPlusPlusAtExp(attr a, attr b, attr c)
       }
       else
       {
-        yyerror("Tercer elemento no es de tipo entero.");
+        yyerror("[ERROR SEMÁNTICO] Tercer elemento no es de tipo entero.");
       }
     }
     else
     {
-      yyerror("Segundo elemento no coincide con el tipo de lista.");
+      yyerror("[ERROR SEMÁNTICO] Segundo elemento no coincide con el tipo de lista.");
     }
   }
   else
   {
-    yyerror("Primer elemento no es tipo lista.");
+    yyerror("[ERROR SEMÁNTICO] Primer elemento no es tipo lista.");
   }
 
   return retVal;
@@ -827,12 +821,12 @@ attr checkMinMinExp(attr a, attr b)
     }
     else
     {
-      yyerror("Segundo elemento no es tipo entero.");
+      yyerror("[ERROR SEMÁNTICO] Segundo elemento no es tipo entero.");
     }
   }
   else
   {
-    yyerror("Primer elemento no es tipo lista.");
+    yyerror("[ERROR SEMÁNTICO] Primer elemento no es tipo lista.");
   }
   
   return res;
@@ -854,14 +848,14 @@ attr checkConcatExp(attr a, attr b)
     }
     else
     {
-      yyerror("Concatenacion entre listas de tipos diferentes.");
+      yyerror("[ERROR SEMÁNTICO] Concatenacion entre listas de tipos diferentes.");
     }
 
   }
   else
   {
     char output[MAX_SIZE_STRING];
-    strcat(output, "Tipo inesperado en concatenación");
+    strcat(output, "[ERROR SEMÁNTICO] Tipo inesperado en concatenación");
     yyerror(output);
   }
   return res;
@@ -1238,5 +1232,5 @@ cadena                        : CADENA
 /* Se implementa la función yyerror */
 void yyerror( const char *msg )
 {
-   fprintf(stderr, RED "[ERROR SEMÁNTICO]" NC " %s en la linea %d\n", msg, n_lineas);
+  fprintf(stderr, "[Linea %d]: %s\n", n_lineas, msg);
 }
