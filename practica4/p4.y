@@ -345,7 +345,7 @@ attr getTypeVar(attr atrib)
 
   int found = 0;
 
-  if (!IN_FUNC) {
+  if (1) {
 
     for(int i = HEADER; i > 0; i--)
     {

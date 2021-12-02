@@ -19,21 +19,20 @@ inicio
         repatriar a1;
     }
 
-    a = a + a;
+    a = 1111;
     
-    l3 = l1 -- (a+1);
     lf1 = lf2 ++ d @ a;
     l1 = [2, 1, 6];
 
-    a = funcionA(a, d);
-    
-    si((a+1 < b))
-    {
-        f = 2.0;
-    }
+    lf2 = lf1--4;
 
-    mientras(1 == 3){
-        xx = Verdadero;
+    lf2 = (lf1 ** lf2);
+
+    d = d / f + (lf1 * 2.5);
+
+
+    mientras(Verdadero y  Falso){
+        xx = no Verdadero;
     }
 
     para a = 1; hasta 10 aumentando{
