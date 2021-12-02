@@ -1198,7 +1198,7 @@ parametros                    : tipoDato identificador {$2.type = $1.type; inser
                               | /* cadena vacía */
                               ;
 
-expresion                     : ABRPAR expresion CERPAR { $$.type = $2.type; }
+expresion                     : ABRPAR expresion CERPAR { $$ = $2; }
                               | MASMENOS expresion %prec HASH { $$.type = $2.type; }
                               | NOT expresion %prec HASH { $$.type = checkBooleanExp($2.type, $2.type); }
                               | expresion MASMENOS expresion { $$ = checkMasMenosExp($1, $3, $2); }
@@ -1218,14 +1218,14 @@ expresion                     : ABRPAR expresion CERPAR { $$.type = $2.type; }
                               | expresion CONCAT expresion { $$ = checkConcatExp($1, $3); }
                               ;
 
-funcion                       : identificador {findFunctionCall($1);}
+funcion                       : identificador { findFunctionCall($1); }
                                 ABRPAR argumentos CERPAR { endCallParameters(); }
 
-argumentos                    : expresion {checkCallParameters($1);}
+argumentos                    : expresion { checkCallParameters($1);}
                               | argumentos COMA expresion { checkCallParameters($3); }
                               ;
 
-identificador                 : IDENTIF;
+identificador                 : IDENTIF ;
 
 finSentencia                  : PYC
                               | error
@@ -1237,8 +1237,8 @@ contenidoLista                : expresion { $$ = $1; }
                               | contenidoLista COMA expresion { $$ = checkLista($1, $3); }
                               ;
 
-sentenciaLista                : identificador ITER finSentencia
-                              | INITER identificador finSentencia
+sentenciaLista                : identificador ITER finSentencia { if (getTypeVar($1).isList == 0) yyerror("[ERROR SEMÁNTICO]: Solo se puede iterar una lista."); }
+                              | INITER identificador finSentencia { if (getTypeVar($1).isList == 0) yyerror("[ERROR SEMÁNTICO]: Solo se puede iterar una lista."); }
                               ;
 
 literal                       : LITERAL { $$ = $1; }
