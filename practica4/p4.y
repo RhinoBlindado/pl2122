@@ -511,6 +511,26 @@ attr checkInterrExp(attr a)
   return retVal;
 }
 
+attr checkAtExp(attr a, attr b) {
+  attr retVal;
+  retVal.type = SUS;
+
+  if (a.isList == 1) {
+    if (b.type == ENTERO && b.isList == 0) {
+      retVal.type = a.type;
+      retVal.isList = 0;
+    } else {
+      char msg[100] = "[ERROR SEMÁNTICO] Se esperaba una variable de tipo ENTERO";
+      yyerror(msg);
+    }
+  } else {
+    char msg[100] = "[ERROR SEMÁNTICO] Se esperaba una lista";
+    yyerror(msg);
+  }
+
+  return retVal;
+}
+
 attr checkAsignacion(attr a, attr b)
 {
   attr t;
@@ -1040,18 +1060,20 @@ attr checkLista(attr a, attr b) {
 %token AND
 %token OR
 %token XOR
+%token AT
 %token PLUSPLUS
 %token MINMIN
 %token CONCAT
 %token NOT
 %token HASH
 %token INTERR
-%token AT
 %token ITER
 %token INITER
 %token CADENA
 %token IDENTIF
 %token LITERAL
+
+%right AT
 
 %left OR                        // OR lógico
 %left AND // AND lógico
@@ -1073,7 +1095,6 @@ attr checkLista(attr a, attr b) {
 %left ABRPAR                    // índices
 
 // Listas
-%right AT
 %left ITER
 %left INITER
 %left HASH INTERR
@@ -1213,6 +1234,7 @@ expresion                     : ABRPAR expresion CERPAR { $$ = $2; }
                               | funcion { $$.type = getTypeFunc($1); }
                               | HASH expresion { $$ = checkHashExp($2); }
                               | INTERR expresion %prec HASH { $$ = checkInterrExp($2); }
+                              | expresion AT expresion { $$ = checkAtExp($1, $3); }
                               | expresion PLUSPLUS expresion AT expresion { $$= checkPlusPlusAtExp($1, $3, $5); }
                               | expresion MINMIN expresion { $$ = checkMinMinExp($1, $3); }
                               | expresion CONCAT expresion { $$ = checkConcatExp($1, $3); }
