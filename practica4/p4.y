@@ -1266,7 +1266,7 @@ sentenciaLista                : identificador ITER finSentencia { if (getTypeVar
 
 literal                       : LITERAL { $$ = $1; }
                               | lista { $$ = $1; }
-                              | cadena
+                              | cadena { $$.type = CARACTER; $$.isList = 1; }
                               ;
 
 cadena                        : CADENA
