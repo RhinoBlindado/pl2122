@@ -1,0 +1,128 @@
+inicio
+{
+    inivar
+        entero ve;
+        real vf;
+        caracter vc, v2, v4;
+        booleano vl;
+        lista de entero le, le2, pe;
+        lista de real lf, lf2, pf;
+        lista de caracter lc, lc2, pc;
+        lista de booleano lb;
+    finvar;
+
+    entero funcionA(entero a1, real a2, caracter a3)
+    {
+        inivar
+            entero x1, x2, a;
+        finvar;
+
+        caracter funcionB(caracter b1, booleano b2)
+        {
+            inivar
+                real xf, x2;
+            finvar;
+
+            real funcionC(booleano c1, entero c2)
+            {
+                inivar
+                    real x1;
+                finvar;
+
+                x1 = 1.3;
+
+                si (c2 > 10)
+                {
+                    c2 = c2 - 1;
+                }
+                sino
+                {
+                    x1 = 3.1;
+                }
+
+                repatriar x1;
+            }
+
+            xf = funcionC(Verdadero, 10);
+            x2 = xf * (funcionC(Falso, 1) - funcionC(Verdadero, 23)) / 10.0;
+
+            mientras(x2 * funcionC(Falso, 1) - xf <10.0)
+            {
+                x2 = x2*xf;
+            }
+        }
+
+        real funcionD(real d1)
+        {
+            inivar
+                caracter dato;
+                entero valor;
+                booleano a, b, poggers;
+            finvar;
+
+            caracter funcionE(caracter e1, caracter e2)
+            {
+                anunciar ("Introduce dos caracteres: ");
+                escanear (caracter e1, caracter e2);
+
+                si(e1 == "a")
+                {
+                    repatriar e1;
+                }
+                sino
+                {
+                    si(e1 == "b")
+                    {
+                        repatriar e2;
+                    }
+                    sino
+                    {
+                        repatriar " ";
+                    }
+                }
+            }
+
+            si (a) {
+               dato = '3';
+               si (b) {
+                  dato = '1';
+               } sino {
+                  dato = '2';
+               }
+            }
+
+            anunciar ("Introduce un valor entero :");
+            escanear (entero valor);
+
+            si(d1 > 0.0 != poggers)
+            {
+                inivar
+                    entero dato;
+                    entero hola, prueba;
+                finvar;
+
+                dato = 2 + hola + prueba;
+                dato = valor * 20 / dato;
+            }
+            sino
+            {
+                valor = valor * 100;
+                d1 = d1 / 1000.0;
+            }
+            repatriar d1;
+        }
+        repatriar a;
+    }
+    pe = pe ++ 10 @ 1;
+    pf = lf ++ -10.0 @ 0;
+    pc = pc ++ '#' @ 0;
+
+    si (#pe > 10)
+    {
+        pf = lf ** lf2;
+    }
+    sino
+    {
+        pc = pc ++ 'x' @ 0;
+    }
+}

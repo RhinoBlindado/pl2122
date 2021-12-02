@@ -1,0 +1,42 @@
+inicio
+{
+    inivar
+        entero a, b, c;
+        real d, e, f;
+        booleano xx, oo, zz;
+        lista de entero l1, l2, l3;
+        lista de real lf1, lf2;
+        caracter pppp;
+    finvar;
+    
+
+    entero funcionA(entero a1, real a2)
+    {
+        inivar
+            entero x, x2;
+        finvar;        
+        
+        repatriar a1;
+    }
+
+    a = 1111;
+    
+    lf1 = lf2 ++ d @ a;
+    l1 = [2, 1, 6];
+
+    lf2 = lf1--4;
+
+    lf2 = (lf1 ** lf2);
+
+    d = d / f + (lf1 * 2.5);
+
+
+    mientras(Verdadero y  Falso){
+        xx = no Verdadero;
+    }
+
+    para a = 1; hasta 10 aumentando{
+        a = a + 2;
+    }
+}
+
