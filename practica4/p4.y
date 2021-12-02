@@ -1220,6 +1220,7 @@ expresion                     : ABRPAR expresion CERPAR { $$.type = $2.type; }
 
 funcion                       : identificador {findFunctionCall($1);}
                                 ABRPAR argumentos CERPAR { endCallParameters(); }
+                              ;
 
 argumentos                    : expresion {checkCallParameters($1);}
                               | argumentos COMA expresion { checkCallParameters($3); }
