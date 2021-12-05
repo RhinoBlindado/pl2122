@@ -23,6 +23,15 @@
         NO_ASIGNADO  // Variable sin tipo asignado (declaración)
     } dType;
 
+    typedef struct 
+    {
+        int atrib;
+        char* lexema;
+        dType type;
+        int isList;
+    } attr;
+
+
     char* getStr(dType t) {
         char* res = (char*) malloc(50);
         switch (t) {
