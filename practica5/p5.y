@@ -126,10 +126,10 @@ uint IN_FUNC;
 programa                      : cabeceraPrograma bloque { closeFile();}
                               ; 
 
-cabeceraPrograma              : INIPROG {  openFile(); genHeaders(); };
+cabeceraPrograma              : INIPROG { openFile(); genHeaders(); writeInit(); };
 
-bloque                        : inicioBloque declararVariablesLocalesMulti
-                                declararFuncionMulti sentencias finBloque ; 
+bloque                        : inicioBloque { writeWithTabs("{\n"); numTabs += 1; } declararVariablesLocalesMulti
+                                declararFuncionMulti sentencias finBloque { numTabs -= 1; writeWithTabs("}\n"); } ; 
 
 declararFuncionMulti          : declararFuncionMulti declararFuncion
                               | /* cadena vacía */
@@ -166,10 +166,10 @@ variablesLocalesMulti         : variablesLocalesMulti variableLocal
                               | /* cadena vacía */
                               ;
 
-variableLocal                 : tipoDato variableSolitaria identificador finSentencia { pushAttr($3); assignType($1); }
+variableLocal                 : tipoDato variableSolitaria identificador finSentencia { pushAttr($3); assignType($1); normalWrite($3.lexema); normalWrite(";\n"); } 
                               | error;
 
-variableSolitaria             : variableSolitaria identificador coma { pushAttr($2); }
+variableSolitaria             : variableSolitaria identificador coma { pushAttr($2); normalWrite($2.lexema); normalWrite(", "); }
                               | /* cadena vacía*/
                               ;
 
@@ -177,7 +177,7 @@ coma                          : COMA
                               | error
                               ;
 
-tipoDato                      : tipoElemental { $$.type = $1.type; $$.isList = 0; }
+tipoDato                      : tipoElemental { $$.type = $1.type; $$.isList = 0; writeCType($1.type); }
                               | DEFLISTA tipoElemental { $$.type = $2.type; $$.isList = 1; }
                               ;
 
@@ -245,15 +245,15 @@ parametros                    : tipoDato identificador {$2.type = $1.type; inser
 expresion                     : ABRPAR expresion CERPAR { $$ = $2; }
                               | MASMENOS expresion %prec HASH { $$.type = $2.type; }
                               | NOT expresion %prec HASH { $$.type = checkBooleanExp($2.type, $2.type); }
-                              | expresion MASMENOS expresion { $$ = checkMasMenosExp($1, $3, $2); }
+                              | expresion MASMENOS expresion { $$ = checkMasMenosExp($1, $3, $2); $$.nameTmp = temporal(); writeCType($$.type); normalWrite($$.nameTmp); normalWrite(";\n"); writeWithTabs($$.nameTmp); normalWrite(" = "); normalWrite($1.nameTmp); normalWrite(" "); normalWrite($2.lexema); normalWrite($3.nameTmp); normalWrite(";\n"); }
                               | expresion OPMULT expresion { $$ = checkOpMultExp($1, $3, $2); }
                               | expresion IGUALDAD expresion { $$ = checkDesigualdadExp($1, $3); }
                               | expresion DESIGUALDAD expresion { $$ = checkDesigualdadExp($1, $3); }
                               | expresion AND expresion { $$.type = checkBooleanExp($1.type, $3.type); }
                               | expresion OR expresion { $$.type = checkBooleanExp($1.type, $3.type); }
                               | expresion XOR expresion { $$.type = checkBooleanExp($1.type, $3.type); }
-                              | identificador { $$ = getTypeVar($1); }
-                              | literal { $$ = $1; }
+                              | identificador { $$ = getTypeVar($1); $$.nameTmp = $1.lexema; }
+                              | literal { $$ = $1; $$.nameTmp = $1.lexema; }
                               | funcion { $$.type = getTypeFunc($1); }
                               | HASH expresion { $$ = checkHashExp($2); }
                               | INTERR expresion %prec HASH { $$ = checkInterrExp($2); }

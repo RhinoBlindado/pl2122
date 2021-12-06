@@ -59,7 +59,7 @@ lista[ \t\n]+de         return(DEFLISTA);
 "decrementando"         return(SENTIDO);
 "anunciar"              return(PRINT);
 ";"                     return(PYC);
-"+"                     yylval.atrib = 0; return(MASMENOS);
+"+"                     yylval.lexema = strdup(yytext); yylval.atrib = 0; return(MASMENOS);
 "-"                     yylval.atrib = 1; return(MASMENOS);
 "/"                     yylval.atrib = 0; return(OPMULT);
 "^"                     yylval.atrib = 1; return(OPMULT);

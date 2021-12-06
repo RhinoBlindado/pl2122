@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdlib.h>
 #ifndef SYMBOL_TABLE
 
     #define SYMBOL_TABLE
@@ -29,11 +30,13 @@
         char* lexema;
         dType type;
         int isList;
+        char* nameTmp;
     } attr;
 
 
     char* getStr(dType t) {
-        char* res = (char*) malloc(50);
+        char* res = malloc(50);
+
         switch (t) {
             case (SUS):
                 strcpy(res, "SUS");
