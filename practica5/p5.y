@@ -123,13 +123,13 @@ uint IN_FUNC;
 
 %%
 
-programa                      : cabeceraPrograma bloque { closeFile();}
+programa                      : cabeceraPrograma { globalVars = 1; } bloque { closeFile();}
                               ; 
 
-cabeceraPrograma              : INIPROG { openFile(); genHeaders(); writeInit(); };
+cabeceraPrograma              : INIPROG { openFile(); genHeaders(); };
 
-bloque                        : inicioBloque { writeWithTabs("{\n"); numTabs += 1; } declararVariablesLocalesMulti
-                                declararFuncionMulti sentencias finBloque { numTabs -= 1; writeWithTabs("}\n"); } ; 
+bloque                        : inicioBloque declararVariablesLocalesMulti
+                                declararFuncionMulti sentencias finBloque ; 
 
 declararFuncionMulti          : declararFuncionMulti declararFuncion
                               | /* cadena vacía */
@@ -140,7 +140,7 @@ declararFuncion               : cabeceraFuncion {IN_FUNC = 1;}
                                 ;
 
 declararVariablesLocalesMulti : marcaInicioVariable variablesLocalesMulti
-                                marcaFinVar
+                                marcaFinVar { controlGlobalVars(); }
                               | /* cadena vacía*/
                               ;
 
@@ -156,28 +156,28 @@ marcaInicioVariable           : INIVAR;
 
 marcaFinVar                   : FINVAR finSentencia;
 
-inicioBloque                  : ABRLLA { blockStart(); }
+inicioBloque                  : ABRLLA { blockStart(); writeStartBlock(); }
                               ;  
 
-finBloque                     : CERLLA { blockEnd(); }
+finBloque                     : CERLLA { blockEnd(); writeEndBlock();}
                               ;
 
 variablesLocalesMulti         : variablesLocalesMulti variableLocal
                               | /* cadena vacía */
                               ;
 
-variableLocal                 : tipoDato variableSolitaria identificador finSentencia { pushAttr($3); assignType($1); normalWrite($3.lexema); normalWrite(";\n"); } 
+variableLocal                 : tipoDato variableSolitaria identificador finSentencia { pushAttr($3); assignType($1); writeVars($1, $2, $3); } 
                               | error;
 
-variableSolitaria             : variableSolitaria identificador coma { pushAttr($2); normalWrite($2.lexema); normalWrite(", "); }
-                              | /* cadena vacía*/
+variableSolitaria             : variableSolitaria identificador coma { pushAttr($2); $$.nameTmp = concatVars($1, $2); }
+                              | { $$.nameTmp = ""; } /* cadena vacía*/
                               ;
 
 coma                          : COMA
                               | error
                               ;
 
-tipoDato                      : tipoElemental { $$.type = $1.type; $$.isList = 0; writeCType($1.type); }
+tipoDato                      : tipoElemental { $$.type = $1.type; $$.isList = 0; $$.nameTmp = getCType($1.type); }
                               | DEFLISTA tipoElemental { $$.type = $2.type; $$.isList = 1; }
                               ;
 
@@ -245,7 +245,7 @@ parametros                    : tipoDato identificador {$2.type = $1.type; inser
 expresion                     : ABRPAR expresion CERPAR { $$ = $2; }
                               | MASMENOS expresion %prec HASH { $$.type = $2.type; }
                               | NOT expresion %prec HASH { $$.type = checkBooleanExp($2.type, $2.type); }
-                              | expresion MASMENOS expresion { $$ = checkMasMenosExp($1, $3, $2); $$.nameTmp = temporal(); writeCType($$.type); normalWrite($$.nameTmp); normalWrite(";\n"); writeWithTabs($$.nameTmp); normalWrite(" = "); normalWrite($1.nameTmp); normalWrite(" "); normalWrite($2.lexema); normalWrite($3.nameTmp); normalWrite(";\n"); }
+                              | expresion MASMENOS expresion { $$ = checkMasMenosExp($1, $3, $2); }//$$.nameTmp = temporal(); writeCType($$.type); normalWrite($$.nameTmp); normalWrite(";\n"); writeWithTabs($$.nameTmp); normalWrite(" = "); normalWrite($1.nameTmp); normalWrite(" "); normalWrite($2.lexema); normalWrite($3.nameTmp); normalWrite(";\n"); }
                               | expresion OPMULT expresion { $$ = checkOpMultExp($1, $3, $2); }
                               | expresion IGUALDAD expresion { $$ = checkDesigualdadExp($1, $3); }
                               | expresion DESIGUALDAD expresion { $$ = checkDesigualdadExp($1, $3); }

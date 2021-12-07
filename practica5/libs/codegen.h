@@ -9,6 +9,8 @@
 
     void genHeaders();
 
+	char * temporal();
+
     void writeTabs();
 
     void writeInit();
@@ -17,8 +19,15 @@
 
     void normalWrite(const char* something);
 
-    void writeCType(dType t);
+	void writeStartBlock();
 
-    char * temporal();
+	void writeEndBlock()
 
+    char* getCType(dType t);
+
+	void writeVars(attr type, attr idsMiddle, attr idFinal);
+
+	char * concatVars(attr variousIds, attr newId);
+
+	void controlGlobalVars();
 #endif

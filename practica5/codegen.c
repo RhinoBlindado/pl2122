@@ -4,6 +4,7 @@
 FILE *output;
 int varTemp = 0;
 int numTabs = 0;
+int globalVars = 0;
 
 
 void openFile()
@@ -21,15 +22,16 @@ void genHeaders()
     fprintf(output,"/* PROGRAMA GENERADO POR YACC/LEX */\n");
     fprintf(output, "#include <stdio.h>\n");
     fprintf(output, "#include <stdlib.h>\n");
-    fprintf(output, "#include <stdbool.h>\n");
+    fprintf(output, "#include <stdbool.h>\n\n");
 }
 
-
-void writeff()
+char * temporal()
 {
-    fprintf(output, "a\n");
+    char* res = malloc(50);
+    sprintf(res, "tmp%i", varTemp);
+    varTemp += 1;
+    return res;
 }
-
 
 void writeTabs()
 {
@@ -53,23 +55,56 @@ void normalWrite(const char* something)
     fprintf(output, "%s", something);
 }
 
-void writeCType(dType t)
+void writeStartBlock()
 {
-    if (t == ENTERO)
-        writeWithTabs("int ");
-    else if (t == REAL)
-        writeWithTabs("double ");
-    else if (t == CARACTER)
-        writeWithTabs("char ");
-    else if (t == BOOLEANO)
-        writeWithTabs("bool ");
+    if(!globalVars){
+        writeWithTabs("{\n");
+        numTabs += 1;
+    }
 }
 
-char * temporal()
+void writeEndBlock()
+{
+	numTabs -= 1;
+	writeWithTabs("}\n");
+}
+
+char * getCType(dType t)
 {
     char* res = malloc(50);
-    sprintf(res, "tmp%i", varTemp);
-    varTemp += 1;
+
+    if (t == ENTERO)
+        sprintf(res, "int ");
+    else if (t == REAL)
+        sprintf(res, "double ");
+    else if (t == CARACTER)
+        sprintf(res, "char ");
+    else if (t == BOOLEANO)
+        sprintf(res, "bool ");
+
     return res;
+}
+
+void writeVars(attr type, attr idsMiddle, attr idFinal)
+{
+    char* res = malloc(150);
+	sprintf(res, "%s%s%s;\n", type.nameTmp, idsMiddle.nameTmp, idFinal.lexema);
+	writeWithTabs(res);
+}
+
+char * concatVars(attr variousIds, attr newId)
+{
+	char* res = malloc(150);
+	sprintf(res, "%s%s, ", variousIds.nameTmp, newId.lexema);
+	return res;
+}
+
+void controlGlobalVars()
+{
+	if(globalVars){
+		writeInit();
+		globalVars = 0;
+		writeStartBlock();
+	}
 }
 
