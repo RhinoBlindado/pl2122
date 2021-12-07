@@ -5,6 +5,7 @@ FILE *output;
 int varTemp = 0;
 int numTabs = 0;
 int globalVars = 0;
+int specialBlock = 0;
 
 
 void openFile()
@@ -108,3 +109,50 @@ void controlGlobalVars()
 	}
 }
 
+void controlStartSpecialBlock()
+{
+	if(!specialBlock)
+	{
+		writeStartBlock();
+		specialBlock = 1;
+	}
+}
+
+void controlEndSpecialBlock()
+{
+	if(specialBlock)
+	{
+		writeEndBlock();
+		specialBlock = 0;
+	}
+}
+
+void writeFinalAsig(attr left, attr right)
+{
+	char* res = malloc(150);
+	sprintf(res, "%s = %s;\n", left.lexema, right.nameTmp);
+	writeWithTabs(res);
+}
+
+void writeMasMenosExpr(attr newVar, attr left, attr op, attr right)
+{
+	// Control de la escritura del bloque de inicio
+	controlStartSpecialBlock();
+
+	// Declarar nueva variables
+	char* declaration = malloc(150);
+	sprintf(declaration, "%s%s;\n", getCType(newVar.type), newVar.nameTmp);
+	writeWithTabs(declaration);
+
+	// Determinar operador
+	char* operador = malloc(10);
+	if(op.atrib == 0)
+		operador = "+";
+	else
+		operador = "-";
+
+	// Escribir asignación intermedia
+	char* asigIntermedia = malloc(150);
+	sprintf(asigIntermedia, "%s = %s %s %s;\n\n", newVar.nameTmp, left.nameTmp, operador, right.nameTmp);
+	writeWithTabs(asigIntermedia);
+}

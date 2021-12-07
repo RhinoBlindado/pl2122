@@ -27,7 +27,15 @@
 
 	void writeVars(attr type, attr idsMiddle, attr idFinal);
 
-	char * concatVars(attr variousIds, attr newId);
+	char* concatVars(attr variousIds, attr newId);
 
 	void controlGlobalVars();
+
+	void controlStartSpecialBlock();
+
+	void controlEndSpecialBlock();
+
+	void writeFinalAsig(attr left, attr right);
+
+	void writeMasMenosExpr(attr newVar, attr left, attr op, attr right);
 #endif

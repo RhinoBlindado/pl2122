@@ -198,7 +198,7 @@ sentencia                     : bloque
                               | sentenciaLista
                               ;
 
-sentenciaAsignacion           : identificador ASIG expresion finSentencia { $$ = checkAsignacion($1, $3); }
+sentenciaAsignacion           : identificador ASIG expresion finSentencia { $$ = checkAsignacion($1, $3); writeFinalAsig($1, $3); controlEndSpecialBlock(); }
                               | error
                               ;
 
@@ -245,7 +245,7 @@ parametros                    : tipoDato identificador {$2.type = $1.type; inser
 expresion                     : ABRPAR expresion CERPAR { $$ = $2; }
                               | MASMENOS expresion %prec HASH { $$.type = $2.type; }
                               | NOT expresion %prec HASH { $$.type = checkBooleanExp($2.type, $2.type); }
-                              | expresion MASMENOS expresion { $$ = checkMasMenosExp($1, $3, $2); }//$$.nameTmp = temporal(); writeCType($$.type); normalWrite($$.nameTmp); normalWrite(";\n"); writeWithTabs($$.nameTmp); normalWrite(" = "); normalWrite($1.nameTmp); normalWrite(" "); normalWrite($2.lexema); normalWrite($3.nameTmp); normalWrite(";\n"); }
+                              | expresion MASMENOS expresion { $$ = checkMasMenosExp($1, $3, $2); $$.nameTmp = temporal(); writeMasMenosExpr($$, $1, $2, $3); }
                               | expresion OPMULT expresion { $$ = checkOpMultExp($1, $3, $2); }
                               | expresion IGUALDAD expresion { $$ = checkDesigualdadExp($1, $3); }
                               | expresion DESIGUALDAD expresion { $$ = checkDesigualdadExp($1, $3); }
