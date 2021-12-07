@@ -198,7 +198,7 @@ sentencia                     : bloque
                               | sentenciaLista
                               ;
 
-sentenciaAsignacion           : identificador ASIG expresion finSentencia { $$ = checkAsignacion($1, $3); writeFinalAsig($1, $3); controlEndSpecialBlock(); }
+sentenciaAsignacion           : identificador ASIG expresion finSentencia { $$ = checkAsignacion($1, $3); writeAsig($1, $3); }
                               | error
                               ;
 
@@ -217,7 +217,7 @@ nombreEntrada                 : SCAN;
 
 listaVariables                : inicioParametros parametros finParametros;
 
-sentenciaReturn               : RETURN expresion finSentencia{checkReturn($2);};
+sentenciaReturn               : RETURN expresion finSentencia{checkReturn($2); };
 
 sentenciaFor                  : FOR sentenciaAsignacion TO expresion sentido
                                 sentencia {if ($2.type != getExpType(ENTERO, $4.type)){ yyerror("Tipos distintos en bucle for"); }}
@@ -230,8 +230,8 @@ sentenciaSalida               : nombreSalida inicioParametros
                                 listaExpresionesCadena finParametros
                                 finSentencia;
 
-listaExpresionesCadena        : expresion
-                              | listaExpresionesCadena COMA expresion
+listaExpresionesCadena        : expresion {writePrint($1);}  
+                              | listaExpresionesCadena COMA expresion {writePrint($3);}
                               ;
 
 nombreSalida                  : PRINT;
@@ -242,18 +242,18 @@ parametros                    : tipoDato identificador {$2.type = $1.type; inser
                               | /* cadena vacía */
                               ;
 
-expresion                     : ABRPAR expresion CERPAR { $$ = $2; }
-                              | MASMENOS expresion %prec HASH { $$.type = $2.type; }
-                              | NOT expresion %prec HASH { $$.type = checkBooleanExp($2.type, $2.type); }
-                              | expresion MASMENOS expresion { $$ = checkMasMenosExp($1, $3, $2); $$.nameTmp = temporal(); writeMasMenosExpr($$, $1, $2, $3); }
-                              | expresion OPMULT expresion { $$ = checkOpMultExp($1, $3, $2); }
-                              | expresion IGUALDAD expresion { $$ = checkDesigualdadExp($1, $3); }
-                              | expresion DESIGUALDAD expresion { $$ = checkDesigualdadExp($1, $3); }
-                              | expresion AND expresion { $$.type = checkBooleanExp($1.type, $3.type); }
-                              | expresion OR expresion { $$.type = checkBooleanExp($1.type, $3.type); }
-                              | expresion XOR expresion { $$.type = checkBooleanExp($1.type, $3.type); }
-                              | identificador { $$ = getTypeVar($1); $$.nameTmp = $1.lexema; }
-                              | literal { $$ = $1; $$.nameTmp = $1.lexema; }
+expresion                     : ABRPAR expresion CERPAR { $$ = $2; $$.nameTmp = $2.nameTmp; $$.gen = $2.gen; }
+                              | MASMENOS expresion %prec HASH { $$.type = $2.type; $$.nameTmp = temporal(); $$.gen = $2.gen; $$.gen = concatGen($$.gen, getMasMenosSufExpr($$, $1, $2)); }
+                              | NOT expresion %prec HASH { $$.type = checkBooleanExp($2.type, $2.type); $$.nameTmp = temporal(); $$.gen = concatGen($2.gen, getNotExpr($$, $1, $2)); }
+                              | expresion MASMENOS expresion { $$ = checkMasMenosExp($1, $3, $2); $$.nameTmp = temporal(); $$.gen = concatGen($1.gen, concatGen($3.gen, getMasMenosExpr($$, $1, $2, $3))); }
+                              | expresion OPMULT expresion { $$ = checkOpMultExp($1, $3, $2); $$.nameTmp = temporal(); $$.gen = concatGen($1.gen, concatGen($3.gen, getOpMultExpr($$, $1, $2, $3))); }
+                              | expresion IGUALDAD expresion { $$ = checkDesigualdadExp($1, $3); $$.nameTmp = temporal(); $$.gen = concatGen($1.gen, concatGen($3.gen, getIgualdadExpr($$, $1, $2, $3))); }
+                              | expresion DESIGUALDAD expresion { $$ = checkDesigualdadExp($1, $3); $$.nameTmp = temporal(); $$.gen = concatGen($1.gen, concatGen($3.gen, getDesigualExpr($$, $1, $2, $3))); }
+                              | expresion AND expresion { $$.type = checkBooleanExp($1.type, $3.type); $$.nameTmp = temporal(); $$.gen = concatGen($1.gen, concatGen($3.gen, getAndExpr($$, $1, $2, $3))); }
+                              | expresion OR expresion { $$.type = checkBooleanExp($1.type, $3.type); $$.nameTmp = temporal(); $$.gen = concatGen($1.gen, concatGen($3.gen, getOrExpr($$, $1, $2, $3))); }
+                              | expresion XOR expresion { $$.type = checkBooleanExp($1.type, $3.type); $$.nameTmp = temporal(); $$.gen = concatGen($1.gen, concatGen($3.gen, getXorExpr($$, $1, $2, $3))); }
+                              | identificador { $$ = getTypeVar($1); $$.nameTmp = $1.lexema; $$.gen = ""; }
+                              | literal { $$ = $1; $$.nameTmp = equivalentCLexema($1); $$.gen = ""; }
                               | funcion { $$.type = getTypeFunc($1); }
                               | HASH expresion { $$ = checkHashExp($2); }
                               | INTERR expresion %prec HASH { $$ = checkInterrExp($2); }

@@ -602,6 +602,24 @@ attr checkOpMultExp(attr a, attr b, attr op)
         yyerror("[ERROR SEMÁNTICO] El segundo atributo no puede ser una lista");
       }
     break;
+	case 1: // Operador ^
+		if(!a.isList && !b.isList){
+			if((a.type == ENTERO || a.type == REAL) && (b.type == ENTERO || b.type == REAL)){
+				if(a.type == REAL || b.type == REAL)
+					res.type = REAL;
+				else
+					res.type = ENTERO;
+			}
+			else{
+				char msg[70] = "[ERROR SEMÁNTICO] Los atributos deben de ser reales o enteros";
+				yyerror(msg);
+			}
+		}
+		else{
+			char msg[70] = "[ERROR SEMÁNTICO] Ninguno de los atributos puede ser una lista";
+			yyerror(msg);	
+		}
+	break;
     case 2: // Operador *
       if (a.isList == 1 && b.isList == 0) {
         if (a.type == b.type) {
@@ -662,7 +680,7 @@ attr checkOpMultExp(attr a, attr b, attr op)
       } else if (a.isList == 0 && b.isList == 0) {
         if (a.type == ENTERO && b.type == ENTERO) {
           res.type = ENTERO;
-          res.isList = 1;
+          res.isList = 0;
         } else {
           char msg[50] = "[ERROR SEMÁNTICO] No se esperaba ";
           strcat(msg, getStr(a.type));

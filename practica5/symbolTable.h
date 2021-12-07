@@ -31,6 +31,7 @@
         dType type;
         int isList;
         char* nameTmp;
+        char* gen;
     } attr;
 
 

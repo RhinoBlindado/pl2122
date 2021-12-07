@@ -1,0 +1,14 @@
+inicio
+{
+    inivar
+        entero ve, ve2;
+        real vf;
+        caracter vc, v2, v4;
+        booleano vl, vl2, vl3, vl4;
+    finvar;
+
+    ve = 3 + 4 * 5 * 7 % 7 ^ 2;
+	ve2 = (3 * 4 + 5) * 20;
+
+	anunciar(ve, ve2, 4*9);
+}
