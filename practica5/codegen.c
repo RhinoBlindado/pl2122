@@ -3,9 +3,9 @@
 
 FILE *output;
 int varTemp = 0;
+int etiquet = 0;
 int numTabs = 0;
 int globalVars = 0;
-int specialBlock = 0;
 
 
 void openFile()
@@ -18,13 +18,15 @@ void closeFile()
     fclose(output);
 }
 
-void genHeaders()
+char* genHeaders()
 {
-    fprintf(output,"/* PROGRAMA GENERADO POR YACC/LEX */\n");
-    fprintf(output, "#include <stdio.h>\n");
-    fprintf(output, "#include <stdlib.h>\n");
-	fprintf(output, "#include <math.h>\n");
-    fprintf(output, "#include <stdbool.h>\n\n");
+	char* res = malloc(300);
+    sprintf(res,"/* PROGRAMA GENERADO POR YACC/LEX */\n");
+    sprintf(res, "%s#include <stdio.h>\n", res);
+    sprintf(res, "%s#include <stdlib.h>\n", res);
+	sprintf(res, "%s#include <math.h>\n", res);
+    sprintf(res, "%s#include <stdbool.h>\n\n", res);
+	return res;
 }
 
 char * temporal()
@@ -35,50 +37,56 @@ char * temporal()
     return res;
 }
 
-void writeTabs()
+char * etiqueta()
 {
-    for(int i = 0; i < numTabs; i++)
-        fprintf(output, "\t");
+    char* res = malloc(50);
+    sprintf(res, "etiqueta%i", etiquet);
+    etiquet += 1;
+    return res;
 }
 
-void writeInit()
+char* getInit()
 {
-    fprintf(output, "\nint main()\n");
-}
-
-void writeWithTabs(const char* something)
-{
-    writeTabs();
-    fprintf(output, "%s", something);
+	char* res = malloc(50);
+    sprintf(res, "\nint main()\n");
+	return res;
 }
 
 char* getTabs()
 {
 	char* res = malloc(20);
-	for(int i = 0; i < numTabs + 1; i++)
+	for(int i = 0; i < numTabs; i++)
 		res[i] = '\t';
-	res[numTabs + 1] = '\0';
+	res[numTabs] = '\0';
 
 	return res;
 }
 
-void normalWrite(const char* something)
+char* getWithTabs(const char* something)
 {
-    fprintf(output, "%s", something);
+	char* res = malloc(400);
+    sprintf(res, "%s%s", getTabs(), something);
+	return res;
 }
 
-void writeStartBlock()
+char* getStartBlock()
 {
+	char* res = malloc(30);
+	res[0] = '\0';
     if(!globalVars){
-        writeWithTabs("{\n");
-        numTabs += 1;
-    }
+        sprintf(res, "%s{\n", getTabs());
+		numTabs += 1;
+	}
+	return res;
 }
 
-void writeEndBlock()
+char* getEndBlock()
 {
+	char* res = malloc(30);
+	res[0] = '\0';
 	numTabs -= 1;
-	writeWithTabs("}\n");
+    sprintf(res, "%s}\n", getTabs());
+	return res;
 }
 
 char * getCType(dType t)
@@ -99,11 +107,11 @@ char * getCType(dType t)
     return res;
 }
 
-void writeVars(attr type, attr idsMiddle, attr idFinal)
+char* getVars(attr type, attr idsMiddle, attr idFinal)
 {
     char* res = malloc(150);
-	sprintf(res, "%s%s%s;\n", type.nameTmp, idsMiddle.nameTmp, idFinal.lexema);
-	writeWithTabs(res);
+	sprintf(res, "%s%s%s%s;\n", getTabs(), type.nameTmp, idsMiddle.nameTmp, idFinal.lexema);
+	return res;
 }
 
 char * concatVars(attr variousIds, attr newId)
@@ -113,24 +121,15 @@ char * concatVars(attr variousIds, attr newId)
 	return res;
 }
 
-void controlGlobalVars()
+char* controlGlobalVars()
 {
+	char* res = malloc(500);
+	res[0] = '\0';
 	if(globalVars){
-		writeInit();
 		globalVars = 0;
-		writeStartBlock();
+		sprintf(res, "%s%s", getInit(), getStartBlock());
 	}
-}
-
-
-void writeAsig(attr left, attr right)
-{
-	writeStartBlock();
-	normalWrite(right.gen);
-	char* res = malloc(150);
-	sprintf(res, "%s = %s;\n", left.lexema, right.nameTmp);
-	writeWithTabs(res);
-	writeEndBlock();
+	return res;
 }
 
 char* getMasMenosExpr(attr newVar, attr left, attr op, attr right)
@@ -151,7 +150,7 @@ char* getMasMenosExpr(attr newVar, attr left, attr op, attr right)
 	sprintf(asigIntermedia, "%s = %s %s %s;\n\n", newVar.nameTmp, left.nameTmp, operador, right.nameTmp);
 
 	char* res = malloc(300);
-	sprintf(res, "%s%s%s%s", getTabs(), declaration, getTabs(), asigIntermedia);
+	sprintf(res, "%s\t%s%s\t%s", getTabs(), declaration, getTabs(), asigIntermedia);
 
 	return res;
 }
@@ -174,7 +173,7 @@ char* getMasMenosSufExpr(attr newVar, attr op, attr val)
 	sprintf(asigIntermedia, "%s = %s %s;\n\n", newVar.nameTmp, operador, val.nameTmp);
 
 	char* res = malloc(300);
-	sprintf(res, "%s%s%s%s", getTabs(), declaration, getTabs(), asigIntermedia);
+	sprintf(res, "%s\t%s%s\t%s", getTabs(), declaration, getTabs(), asigIntermedia);
 
 	return res;
 }
@@ -190,7 +189,7 @@ char* getNotExpr(attr newVar, attr op, attr val)
 	sprintf(asigIntermedia, "%s = %s %s;\n\n", newVar.nameTmp, "!", val.nameTmp);
 
 	char* res = malloc(300);
-	sprintf(res, "%s%s%s%s", getTabs(), declaration, getTabs(), asigIntermedia);
+	sprintf(res, "%s\t%s%s\t%s", getTabs(), declaration, getTabs(), asigIntermedia);
 
 	return res;
 }
@@ -219,7 +218,7 @@ char* getOpMultExpr(attr newVar, attr left, attr op, attr right)
 		sprintf(asigIntermedia, "%s = pow(%s, %s);\n\n", newVar.nameTmp, left.nameTmp, right.nameTmp);
 
 	char* res = malloc(300);
-	sprintf(res, "%s%s%s%s", getTabs(), declaration, getTabs(), asigIntermedia);
+	sprintf(res, "%s\t%s%s\t%s", getTabs(), declaration, getTabs(), asigIntermedia);
 
 	return res;
 }
@@ -242,7 +241,7 @@ char* getIgualdadExpr(attr newVar, attr left, attr op, attr right)
 	sprintf(asigIntermedia, "%s = %s %s %s;\n\n", newVar.nameTmp, left.nameTmp, operador, right.nameTmp);
 
 	char* res = malloc(300);
-	sprintf(res, "%s%s%s%s", getTabs(), declaration, getTabs(), asigIntermedia);
+	sprintf(res, "%s\t%s%s\t%s", getTabs(), declaration, getTabs(), asigIntermedia);
 
 	return res;
 }
@@ -269,7 +268,7 @@ char* getDesigualExpr(attr newVar, attr left, attr op, attr right)
 	sprintf(asigIntermedia, "%s = %s %s %s;\n\n", newVar.nameTmp, left.nameTmp, operador, right.nameTmp);
 
 	char* res = malloc(300);
-	sprintf(res, "%s%s%s%s", getTabs(), declaration, getTabs(), asigIntermedia);
+	sprintf(res, "%s\t%s%s\t%s", getTabs(), declaration, getTabs(), asigIntermedia);
 
 	return res;
 }
@@ -285,7 +284,7 @@ char* getAndExpr(attr newVar, attr left, attr op, attr right)
 	sprintf(asigIntermedia, "%s = %s %s %s;\n\n", newVar.nameTmp, left.nameTmp, "&&", right.nameTmp);
 
 	char* res = malloc(300);
-	sprintf(res, "%s%s%s%s", getTabs(), declaration, getTabs(), asigIntermedia);
+	sprintf(res, "%s\t%s%s\t%s", getTabs(), declaration, getTabs(), asigIntermedia);
 
 	return res;
 }
@@ -301,7 +300,7 @@ char* getOrExpr(attr newVar, attr left, attr op, attr right)
 	sprintf(asigIntermedia, "%s = %s %s %s;\n\n", newVar.nameTmp, left.nameTmp, "||", right.nameTmp);
 
 	char* res = malloc(300);
-	sprintf(res, "%s%s%s%s", getTabs(), declaration, getTabs(), asigIntermedia);
+	sprintf(res, "%s\t%s%s\t%s", getTabs(), declaration, getTabs(), asigIntermedia);
 
 	return res;
 }
@@ -317,7 +316,7 @@ char* getXorExpr(attr newVar, attr left, attr op, attr right)
 	sprintf(asigIntermedia, "%s = %s %s %s;\n\n", newVar.nameTmp, left.nameTmp, "!=", right.nameTmp);
 
 	char* res = malloc(300);
-	sprintf(res, "%s%s%s%s", getTabs(), declaration, getTabs(), asigIntermedia);
+	sprintf(res, "%s\t%s%s\t%s", getTabs(), declaration, getTabs(), asigIntermedia);
 
 	return res;
 }
@@ -339,57 +338,92 @@ char* equivalentCLexema(attr atributo)
 
 char* concatGen(char* left, char* right)
 {
-	char* res = malloc(2000);
+	char* res = malloc(5000);
 	sprintf(res, "%s%s", left, right);
 	return res;
 }
 
-char* declarateTmpVar(attr exp)
+
+char* getAsig(attr left, attr right)
 {
-	char* var = temporal();
-
-	char* declaration = malloc(150);
-	sprintf(declaration, "%s%s;\n", getCType(exp.type), var);
-	writeWithTabs(declaration);
-	writeStartBlock();
-	normalWrite(exp.gen);
-	char * assign = malloc(150);
-	sprintf(assign, "%s = %s;\n", var, exp.nameTmp);
-	writeWithTabs(assign);
-	writeEndBlock();
-
-	return var;
+	char* res = malloc(300);
+	sprintf(res, "%s%s", getStartBlock(), right.gen);
+	sprintf(res, "%s%s%s = %s;\n", res, getTabs(), left.lexema, right.nameTmp);
+	sprintf(res, "%s%s", res, getEndBlock());
+	return res;
 }
 
-void writePrint(attr exp)
+char* declarateTmpVar(char* var, attr exp)
 {
+	char* res = malloc(300);
+	sprintf(res, "%s%s%s;\n", getTabs(), getCType(exp.type), var);
+	sprintf(res, "%s%s%s", res, getStartBlock(), exp.gen);
+	sprintf(res, "%s%s%s = %s;\n", res, getTabs(), var, exp.nameTmp);
+	sprintf(res, "%s%s", res, getEndBlock());  
+
+	return res;
+}
+
+char* getPrint(attr exp)
+{
+	char* res = malloc(300);
+
 	// Comprobar si hay que generar variable
 	int genVar = strcmp(exp.gen, "") != 0;
 	char* varSalida;
 
 	if(genVar)
-		varSalida = declarateTmpVar(exp);
+		varSalida = temporal();
 	else
 		varSalida = exp.nameTmp;
 
-	char* salida = malloc(150);
+	// Si hay que generar variable, concatenar expresión
+	if(genVar)
+		res = declarateTmpVar(varSalida, exp);
+		
 
-	if(exp.type == ENTERO){
-		sprintf(salida, "printf(\"%sd\\n\", %s);\n", "%", varSalida); 
-		writeWithTabs(salida);
-	}
-	else if(exp.type == REAL){
-		sprintf(salida, "printf(\"%slf\\n\", %s);\n", "%", varSalida); 
-		writeWithTabs(salida);
-	}
-	else if(exp.type == CARACTER){
-		sprintf(salida, "printf(\"%sc\\n\", %s);\n", "%", varSalida); 
-		writeWithTabs(salida);
-	}
-	else if(exp.type == BOOLEANO){
-		sprintf(salida, "printf(\"%sd\\n\", %s);\n", "%", varSalida); 
-		writeWithTabs(salida);
-	}
+	if(exp.type == ENTERO)
+		sprintf(res, "%s%sprintf(\"%sd\\n\", %s);\n", res, getTabs(), "%", varSalida); 
+	else if(exp.type == REAL)
+		sprintf(res, "%s%sprintf(\"%slf\\n\", %s);\n", res, getTabs(), "%", varSalida); 
+	else if(exp.type == CARACTER)
+		sprintf(res, "%s%sprintf(\"%sc\\n\", %s);\n", res, getTabs(), "%", varSalida); 
+	else if(exp.type == BOOLEANO)
+		sprintf(res, "%s%sprintf(\"%sd\\n\", %s);\n", res, getTabs(), "%", varSalida); 
+
+	return res;
+}
+
+char* getIf(attr exp, attr sent)
+{
+	char* etiqSig = etiqueta();
+	
+	char* res = malloc(300);
+
+	// Comprobar si hay que generar variable
+	int genVar = strcmp(exp.gen, "") != 0;
+	char* varSalida;
+
+	if(genVar)
+		varSalida = temporal();
+	else
+		varSalida = exp.nameTmp;
+
+	// Si hay que generar variable, concatenar expresión
+	if(genVar)
+		res = declarateTmpVar(varSalida, exp);
+
+	// Concatenar expresion
+	sprintf(res, "%s%sif(!%s) goto %s;\n", res, getTabs(), varSalida, etiqSig);
+	sprintf(res, "%s%s", res, sent.gen);
+	sprintf(res, "%s%s%s:\n", res, getTabs(), etiqSig);
+
+	return res;
+}
+
+void writeProgram(attr block)
+{
+	fprintf(output, "%s", block.gen);
 }
 
 

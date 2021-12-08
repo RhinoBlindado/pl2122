@@ -123,13 +123,13 @@ uint IN_FUNC;
 
 %%
 
-programa                      : cabeceraPrograma { globalVars = 1; } bloque { closeFile();}
+programa                      : cabeceraPrograma { globalVars = 1; } bloque { $$.gen = concatGen($1.gen, $3.gen); writeProgram($$); closeFile();}
                               ; 
 
-cabeceraPrograma              : INIPROG { openFile(); genHeaders(); };
+cabeceraPrograma              : INIPROG { openFile(); $$.gen = genHeaders(); };
 
 bloque                        : inicioBloque declararVariablesLocalesMulti
-                                declararFuncionMulti sentencias finBloque ; 
+                                declararFuncionMulti sentencias finBloque {$$.gen = concatGen($1.gen, concatGen($2.gen, concatGen($4.gen, $5.gen)));}; 
 
 declararFuncionMulti          : declararFuncionMulti declararFuncion
                               | /* cadena vacía */
@@ -140,8 +140,8 @@ declararFuncion               : cabeceraFuncion {IN_FUNC = 1;}
                                 ;
 
 declararVariablesLocalesMulti : marcaInicioVariable variablesLocalesMulti
-                                marcaFinVar { controlGlobalVars(); }
-                              | /* cadena vacía*/
+                                marcaFinVar { $$.gen = concatGen($2.gen, controlGlobalVars()); }
+                              | {$$.gen = "";} /* cadena vacía*/
                               ;
 
 cabeceraFuncion               : tipoDato identificador {$2.type = $1.type; insertFunction($2);}
@@ -156,17 +156,17 @@ marcaInicioVariable           : INIVAR;
 
 marcaFinVar                   : FINVAR finSentencia;
 
-inicioBloque                  : ABRLLA { blockStart(); writeStartBlock(); }
+inicioBloque                  : ABRLLA { blockStart(); $$.gen = getStartBlock();}
                               ;  
 
-finBloque                     : CERLLA { blockEnd(); writeEndBlock();}
+finBloque                     : CERLLA { blockEnd(); $$.gen = getEndBlock();}
                               ;
 
-variablesLocalesMulti         : variablesLocalesMulti variableLocal
-                              | /* cadena vacía */
+variablesLocalesMulti         : variablesLocalesMulti variableLocal {$$.gen = concatGen($1.gen, $2.gen);}
+                              | {$$.gen = "";} /* cadena vacía */
                               ;
 
-variableLocal                 : tipoDato variableSolitaria identificador finSentencia { pushAttr($3); assignType($1); writeVars($1, $2, $3); } 
+variableLocal                 : tipoDato variableSolitaria identificador finSentencia { pushAttr($3); assignType($1); $$.gen = getVars($1, $2, $3); } 
                               | error;
 
 variableSolitaria             : variableSolitaria identificador coma { pushAttr($2); $$.nameTmp = concatVars($1, $2); }
@@ -183,27 +183,27 @@ tipoDato                      : tipoElemental { $$.type = $1.type; $$.isList = 0
 
 tipoElemental                 : TIPODATO;
 
-sentencias                    : sentencias sentencia
-                              | sentencia
+sentencias                    : sentencias sentencia {$$.gen = concatGen($1.gen, $2.gen);}
+                              | sentencia {$$.gen = $1.gen;}
                               ;
 
-sentencia                     : bloque
-                              | sentenciaAsignacion
-                              | sentenciaIf
+sentencia                     : bloque {$$.gen = $1.gen;}
+                              | sentenciaAsignacion {$$.gen = $1.gen;}
+                              | sentenciaIf {$$.gen = $1.gen;}
                               | sentenciaWhile
                               | sentenciaEntrada
-                              | sentenciaSalida
+                              | sentenciaSalida {$$.gen = $1.gen;}
                               | sentenciaReturn
                               | sentenciaFor
                               | sentenciaLista
                               ;
 
-sentenciaAsignacion           : identificador ASIG expresion finSentencia { $$ = checkAsignacion($1, $3); writeAsig($1, $3); }
+sentenciaAsignacion           : identificador ASIG expresion finSentencia { $$ = checkAsignacion($1, $3); $$.gen = getAsig($1, $3); }
                               | error
                               ;
 
-sentenciaIf                   : IF inicioParametros expresion finParametros 
-                                sentencia {checkBooleans($3.type);}
+sentenciaIf                   : IF inicioParametros expresion finParametros
+                                sentencia {checkBooleans($3.type); $$.gen = getIf($3, $5);}
                               | IF inicioParametros expresion finParametros
                                 sentencia ELSE sentencia {checkBooleans($3.type);}
                               ;
@@ -228,10 +228,11 @@ sentido                       : SENTIDO;
 
 sentenciaSalida               : nombreSalida inicioParametros
                                 listaExpresionesCadena finParametros
-                                finSentencia;
+                                finSentencia {$$.gen = $3.gen;};
+                              ;
 
-listaExpresionesCadena        : expresion {writePrint($1);}  
-                              | listaExpresionesCadena COMA expresion {writePrint($3);}
+listaExpresionesCadena        : expresion {$$.gen = getPrint($1);}  
+                              | listaExpresionesCadena COMA expresion {$$.gen = concatGen($1.gen, getPrint($3));}
                               ;
 
 nombreSalida                  : PRINT;

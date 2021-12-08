@@ -7,8 +7,23 @@ inicio
         booleano vl, vl2, vl3, vl4;
     finvar;
 
-    ve = 3 + 4 * 5 * 7 % 7 ^ 2;
-	ve2 = (3 * 4 + 5) * 20;
+	ve = 4 * 3 ^ 2;
+	vf = 3.5;
 
-	anunciar(ve, ve2, 4*9);
+	si(Verdadero)
+	{
+		ve = 7;
+		si(Verdadero)
+		{
+			ve = 1;
+			vf = 4.33;
+			vf = 7.44;
+			si(Falso)
+			{
+				ve = 4444;
+			}
+		}
+	}
+
+	anunciar(ve, vf);
 }

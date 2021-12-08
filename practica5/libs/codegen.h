@@ -7,33 +7,29 @@
 
     void closeFile();
 
-    void genHeaders();
+    char* genHeaders();
 
-	char * temporal();
+	char* temporal();
 
-    void writeTabs();
+	char* etiqueta();
 
-    void writeInit();
+    char* getInit();
 
-    void writeWithTabs(const char* something);
+    char* getWithTabs(const char* something);
 
 	char* getTabs();
 
-    void normalWrite(const char* something);
+	char* getStartBlock();
 
-	void writeStartBlock();
-
-	void writeEndBlock()
+	char* getEndBlock()
 
     char* getCType(dType t);
 
-	void writeVars(attr type, attr idsMiddle, attr idFinal);
+	char* getVars(attr type, attr idsMiddle, attr idFinal);
 
 	char* concatVars(attr variousIds, attr newId);
 
-	void controlGlobalVars();
-
-	void writeAsig(attr left, attr right);
+	char* controlGlobalVars();
 
 	char* getMasMenosExpr(attr newVar, attr left, attr op, attr right);
 
@@ -57,8 +53,14 @@
 
 	char* concatGen(char* left, char* right);
 
-	char* declarateTmpVar(attr exp);
+	char* declarateTmpVar(char* var);
 
-	void writePrint(attr exp);
+	char* getAsig(attr left, attr right);
+
+	char* getPrint(attr exp, attr sent);
+
+	char* getIf(attr exp);
+
+	void writeProgram(attr block);
 
 #endif
