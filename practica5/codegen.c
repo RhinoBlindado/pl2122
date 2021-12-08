@@ -417,6 +417,8 @@ char* getIf(attr exp, attr sent)
 	sprintf(res, "%s%sif(!%s) goto %s;\n", res, getTabs(), varSalida, etiqSig);
 	sprintf(res, "%s%s", res, sent.gen);
 	sprintf(res, "%s%s%s:\n", res, getTabs(), etiqSig);
+	sprintf(res, "%s%s", res, getStartBlock());
+	sprintf(res, "%s%s", res, getEndBlock());
 
 	return res;
 }
