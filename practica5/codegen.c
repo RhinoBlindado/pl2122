@@ -386,10 +386,12 @@ char* getPrint(attr exp)
 		sprintf(res, "%s%sprintf(\"%sd\\n\", %s);\n", res, getTabs(), "%", varSalida); 
 	else if(exp.type == REAL)
 		sprintf(res, "%s%sprintf(\"%slf\\n\", %s);\n", res, getTabs(), "%", varSalida); 
-	else if(exp.type == CARACTER)
+	else if(exp.type == CARACTER && exp.isList == 0)
 		sprintf(res, "%s%sprintf(\"%sc\\n\", %s);\n", res, getTabs(), "%", varSalida); 
 	else if(exp.type == BOOLEANO)
-		sprintf(res, "%s%sprintf(\"%sd\\n\", %s);\n", res, getTabs(), "%", varSalida); 
+		sprintf(res, "%s%sprintf(\"%sd\\n\", %s);\n", res, getTabs(), "%", varSalida);
+	else if (exp.type == CARACTER && exp.isList == 1)
+		sprintf(res, "%s%sprintf(\"%ss\\n\", %s);\n", res, getTabs(), "%", varSalida);
 
 	return res;
 }

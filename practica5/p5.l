@@ -86,7 +86,8 @@ lista[ \t\n]+de         return(DEFLISTA);
 "$"                     return(INITER);
 \"[^"]*\"               {
                             yylval.lexema = strdup(yytext);
-                            // yylval.type = ENTERO;
+                            yylval.type = CARACTER;
+                            yylval.isList = 1;
                             return(CADENA);
                         }
 "Verdadero"             {
