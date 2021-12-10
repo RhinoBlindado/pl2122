@@ -190,10 +190,10 @@ sentencias                    : sentencias sentencia {$$.gen = concatGen($1.gen,
 sentencia                     : bloque {$$.gen = $1.gen;}
                               | sentenciaAsignacion {$$.gen = $1.gen;}
                               | sentenciaIf {$$.gen = $1.gen;}
-                              | sentenciaWhile
-                              | sentenciaEntrada
+                              | sentenciaWhile {$$.gen = $1.gen;}
+                              | sentenciaEntrada {$$.gen = $1.gen;}
                               | sentenciaSalida {$$.gen = $1.gen;}
-                              | sentenciaReturn
+                              | sentenciaReturn {$$.gen = $1.gen;}
                               | sentenciaFor {$$.gen = $1.gen;}
                               | sentenciaLista
                               ;
@@ -209,15 +209,21 @@ sentenciaIf                   : IF inicioParametros expresion finParametros
                               ;
 
 sentenciaWhile                : WHILE inicioParametros expresion finParametros
-                                sentencia {checkBooleans($3.type);} ; 
+                                sentencia {checkBooleans($3.type); $$.gen = getWhile($3, $5);} ; 
 
-sentenciaEntrada              : nombreEntrada listaVariables finSentencia;
+sentenciaEntrada              : nombreEntrada listaVariablesEntrada finSentencia {$$.gen = $2.gen;};
+
+listaVariablesEntrada         : inicioParametros listaIdentificadores finParametros {$$.gen = $2.gen;};
+
+listaIdentificadores          : identificador {$1 = getTypeVar($1); $$.gen = getScan($1);}
+                              | listaIdentificadores COMA identificador {$3 = getTypeVar($3); $$.gen = concatGen($1.gen, getScan($3));}
+                              | error
+                              | {$$.gen = "";} /* cadena vacía */
+                              ;
 
 nombreEntrada                 : SCAN;
 
-listaVariables                : inicioParametros parametros finParametros;
-
-sentenciaReturn               : RETURN expresion finSentencia{checkReturn($2); };
+sentenciaReturn               : RETURN expresion finSentencia{checkReturn($2); $$.gen = getReturn($2);};
 
 sentenciaFor                  : FOR sentenciaAsignacion TO expresion sentido
                                 sentencia {if ($2.type != getExpType(ENTERO, $4.type)) yyerror("Tipos distintos en bucle for"); $$.gen = getForAsig($2, $4, $5, $6);}
@@ -255,7 +261,7 @@ expresion                     : ABRPAR expresion CERPAR { $$ = $2; $$.nameTmp = 
                               | expresion XOR expresion { $$.type = checkBooleanExp($1.type, $3.type); $$.nameTmp = temporal(); $$.gen = concatGen($1.gen, concatGen($3.gen, getXorExpr($$, $1, $2, $3))); }
                               | identificador { $$ = getTypeVar($1); $$.nameTmp = $1.lexema; $$.gen = ""; }
                               | literal { $$ = $1; $$.nameTmp = equivalentCLexema($1); $$.gen = ""; }
-                              | funcion { $$.type = getTypeFunc($1); }
+                              | funcion { $$.type = getTypeFunc($1); $$.nameTmp = $1.nameTmp; $$.gen = $1.gen;}
                               | HASH expresion { $$ = checkHashExp($2); }
                               | INTERR expresion %prec HASH { $$ = checkInterrExp($2); }
                               | expresion AT expresion { $$ = checkAtExp($1, $3); }
@@ -264,12 +270,12 @@ expresion                     : ABRPAR expresion CERPAR { $$ = $2; $$.nameTmp = 
                               | expresion CONCAT expresion { $$ = checkConcatExp($1, $3); }
                               ;
 
-funcion                       : identificador { findFunctionCall($1); }
-                                ABRPAR argumentos CERPAR { endCallParameters(); }
+funcion                       : identificador { findFunctionCall($1); numTabs += 1;}
+                                ABRPAR argumentos CERPAR { endCallParameters(); $$.nameTmp = getFuncCall($1, $4); $$.gen = $4.gen; numTabs -= 1;}
                               ;
 
-argumentos                    : expresion { checkCallParameters($1);}
-                              | argumentos COMA expresion { checkCallParameters($3); }
+argumentos                    : expresion { checkCallParameters($1); $1 = getParamFunc($1); $$.nameTmp = $1.nameTmp; $$.gen = $1.gen;}
+                              | argumentos COMA expresion { checkCallParameters($3); $3 = getParamFunc($3); $$.nameTmp = paramConcat($1, $3); $$.gen = concatGen($1.gen, $3.gen);}
                               ;
 
 identificador                 : IDENTIF ;

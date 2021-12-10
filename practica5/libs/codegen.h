@@ -67,6 +67,18 @@
 
 	char* getFor(attr exp1, attr exp2, attr sentido, attr sent);
 
+	char* getWhile(attr exp, attr sent);
+
+	char* getReturn(attr exp);
+
+	char* getScan(attr id);
+
+	attr getParamFunc(attr exp);
+
+	char* paramConcat(attr args, attr exp);
+
+	char* getFuncCall(attr id, attr args);
+
 	void writeProgram(attr block);
 
 #endif

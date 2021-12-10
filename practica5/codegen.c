@@ -346,7 +346,7 @@ char* concatGen(char* left, char* right)
 
 char* getAsig(attr left, attr right)
 {
-	char* res = malloc(300);
+	char* res = malloc(1000);
 	sprintf(res, "%s%s", getStartBlock(), right.gen);
 	sprintf(res, "%s%s%s = %s;\n", res, getTabs(), left.lexema, right.nameTmp);
 	sprintf(res, "%s%s", res, getEndBlock());
@@ -355,7 +355,7 @@ char* getAsig(attr left, attr right)
 
 char* declarateTmpVar(char* var, attr exp)
 {
-	char* res = malloc(300);
+	char* res = malloc(1000);
 	sprintf(res, "%s%s%s;\n", getTabs(), getCType(exp.type), var);
 	sprintf(res, "%s%s%s", res, getStartBlock(), exp.gen);
 	sprintf(res, "%s%s%s = %s;\n", res, getTabs(), var, exp.nameTmp);
@@ -579,6 +579,142 @@ char* getFor(attr exp1, attr exp2, attr sentido, attr sent)
 	return res; 
 }
 
+char* getWhile(attr exp, attr sent)
+{
+	char* etiqIni = etiqueta();
+	char* etiqOut = etiqueta();
+
+	char* res = malloc(700);
+
+	// Comprobar si hay que generar variable
+	int genVar = strcmp(exp.gen, "") != 0;
+	char* varSalida;
+
+	if(genVar)
+		varSalida = temporal();
+	else
+		varSalida = exp.nameTmp;
+
+	// Si hay que generar variable, concatenar expresión
+	if(genVar)
+		res = declarateTmpVar(varSalida, exp);
+	
+	// Escribir etiqueta inicial
+	sprintf(res, "%s%s%s:\n", res, getTabs(), etiqIni);
+	
+	// Salto condicional
+	sprintf(res, "%s%sif(!%s) goto %s;\n", res, getTabs(), varSalida, etiqOut);
+
+	// Sentencias del bucle
+	sprintf(res, "%s%s", res, sent.gen);
+
+	// Actualizar variables del bucle
+	if(genVar){
+		sprintf(res, "%s%s", res, getStartBlock());
+		sprintf(res, "%s%s", res, exp.gen);
+		sprintf(res, "%s%s%s = %s;\n", res, getTabs(), varSalida, exp.nameTmp);
+		sprintf(res, "%s%s", res, getEndBlock());
+	}
+
+	// Escribir salto incondicional
+	sprintf(res, "%s%sgoto %s;\n", res, getTabs(), etiqIni);
+
+	// Escribir etiqueta final
+	sprintf(res, "%s%s%s:\n", res, getTabs(), etiqOut);
+	sprintf(res, "%s%s", res, getStartBlock());
+	sprintf(res, "%s%s", res, getEndBlock());
+
+	return res; 
+}
+
+
+char* getReturn(attr exp)
+{
+	char* res = malloc(700);	
+
+	// Comprobar si hay que generar variable
+	int genVar = strcmp(exp.gen, "") != 0;
+	char* varSalida;
+
+	if(genVar)
+		varSalida = temporal();
+	else
+		varSalida = exp.nameTmp;
+
+	// Si hay que generar variable, concatenar expresión
+	if(genVar)
+		res = declarateTmpVar(varSalida, exp);
+
+	// Escribir return
+	sprintf(res, "%s%sreturn %s;\n", res, getTabs(), varSalida);
+	
+	return res;
+}
+
+char* getScan(attr id)
+{
+	char* res = malloc(1000);
+
+	if(id.type == ENTERO)
+		sprintf(res, "%s%sscanf(\"%sd\", &%s);\n", res, getTabs(), "%", id.lexema);
+	else if(id.type == REAL)
+		sprintf(res, "%s%sscanf(\"%slf\", &%s);\n", res, getTabs(), "%", id.lexema);
+	else if(id.type == CARACTER && id.isList == 0)
+		sprintf(res, "%s%sscanf(\"%sc\", &%s);\n", res, getTabs(), "%", id.lexema);
+	else if(id.type == BOOLEANO)
+		sprintf(res, "%s%sscanf(\"%sd\", &%s);\n", res, getTabs(), "%", id.lexema);
+	else if (id.type == CARACTER && id.isList == 1)
+		sprintf(res, "%s%sscanf(\"%ss\", &%s);\n", res, getTabs(), "%", id.lexema);
+
+	return res;
+}
+
+attr getParamFunc(attr exp)
+{
+	// Copiar atributo
+	attr auxAttr;
+	auxAttr.atrib = exp.atrib;
+	auxAttr.lexema = exp.lexema;
+	auxAttr.type = exp.type;
+	auxAttr.isList = exp.isList;
+	auxAttr.nameTmp = exp.nameTmp;
+	auxAttr.gen = exp.gen;
+
+	char* res = malloc(1000);
+	
+	// Comprobar si hay que generar variable
+	int genVar = strcmp(exp.gen, "") != 0;
+	char* varSalida;
+
+	if(genVar)
+		varSalida = temporal();
+	else
+		varSalida = exp.nameTmp;
+
+	// Si hay que generar variable, concatenar expresión
+	if(genVar)
+		res = declarateTmpVar(varSalida, exp);
+
+	// Actualizar atributo
+	auxAttr.nameTmp = varSalida;
+	auxAttr.gen = res;
+
+	return auxAttr;
+}
+
+char* paramConcat(attr args, attr exp)
+{
+	char* res = malloc(200);
+	sprintf(res, "%s, %s", args.nameTmp, exp.nameTmp);
+	return res;
+}
+
+char* getFuncCall(attr id, attr args)
+{
+	char* res = malloc(300);
+	sprintf(res, "%s(%s)", id.lexema, args.nameTmp);
+	return res;
+}
 
 void writeProgram(attr block)
 {
