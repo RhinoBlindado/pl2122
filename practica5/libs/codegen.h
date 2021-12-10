@@ -59,7 +59,13 @@
 
 	char* getPrint(attr exp, attr sent);
 
-	char* getIf(attr exp);
+	char* getIf(attr exp, attr sent);
+	
+	char* getIfElse(attr exp, attr sentIf, attr sentElse);
+        
+	char* getForAsig(attr asig, attr expr, attr sentido, attr sent);
+
+	char* getFor(attr exp1, attr exp2, attr sentido, attr sent);
 
 	void writeProgram(attr block);
 

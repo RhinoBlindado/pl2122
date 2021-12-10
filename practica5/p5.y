@@ -194,18 +194,18 @@ sentencia                     : bloque {$$.gen = $1.gen;}
                               | sentenciaEntrada
                               | sentenciaSalida {$$.gen = $1.gen;}
                               | sentenciaReturn
-                              | sentenciaFor
+                              | sentenciaFor {$$.gen = $1.gen;}
                               | sentenciaLista
                               ;
 
-sentenciaAsignacion           : identificador ASIG expresion finSentencia { $$ = checkAsignacion($1, $3); $$.gen = getAsig($1, $3); }
+sentenciaAsignacion           : identificador ASIG expresion finSentencia { $$ = checkAsignacion($1, $3); $$.gen = getAsig($1, $3); $$.nameTmp = $1.lexema;}
                               | error
                               ;
 
 sentenciaIf                   : IF inicioParametros expresion finParametros
                                 sentencia {checkBooleans($3.type); $$.gen = getIf($3, $5);}
                               | IF inicioParametros expresion finParametros
-                                sentencia ELSE sentencia {checkBooleans($3.type);}
+                                sentencia ELSE sentencia {checkBooleans($3.type); $$.gen = getIfElse($3, $5, $7);}
                               ;
 
 sentenciaWhile                : WHILE inicioParametros expresion finParametros
@@ -220,8 +220,8 @@ listaVariables                : inicioParametros parametros finParametros;
 sentenciaReturn               : RETURN expresion finSentencia{checkReturn($2); };
 
 sentenciaFor                  : FOR sentenciaAsignacion TO expresion sentido
-                                sentencia {if ($2.type != getExpType(ENTERO, $4.type)){ yyerror("Tipos distintos en bucle for"); }}
-                              | FOR expresion TO expresion sentido sentencia {if (ENTERO != getExpType($2.type, $4.type)){ yyerror("Tipos distintos en bucle for"); }}
+                                sentencia {if ($2.type != getExpType(ENTERO, $4.type)) yyerror("Tipos distintos en bucle for"); $$.gen = getForAsig($2, $4, $5, $6);}
+                              | FOR expresion TO expresion sentido sentencia {if (ENTERO != getExpType($2.type, $4.type)) yyerror("Tipos distintos en bucle for"); $$.gen = getFor($2, $4, $5, $6);}
                               ;
 
 sentido                       : SENTIDO;
@@ -240,7 +240,7 @@ nombreSalida                  : PRINT;
 parametros                    : tipoDato identificador {$2.type = $1.type; insertFormalParameter($2);}
                               | parametros COMA tipoDato identificador {$4.type = $3.type; insertFormalParameter($4);}
                               | error
-                              | /* cadena vacía */
+                              | {$$.gen = "";} /* cadena vacía */
                               ;
 
 expresion                     : ABRPAR expresion CERPAR { $$ = $2; $$.nameTmp = $2.nameTmp; $$.gen = $2.gen; }
