@@ -86,17 +86,20 @@ lista[ \t\n]+de         return(DEFLISTA);
 "$"                     return(INITER);
 \"[^"]*\"               {
                             yylval.lexema = strdup(yytext);
-                            // yylval.type = ENTERO;
+                            yylval.type = CARACTER;
+                            yylval.isList = 1;
                             return(CADENA);
                         }
 "Verdadero"             {
                             yylval.lexema = strdup(yytext);
                             yylval.type = BOOLEANO;
+                            yylval.isList = 0;
                             return(LITERAL);
                         }
 "Falso"                 {
                             yylval.lexema = strdup(yytext);
                             yylval.type = BOOLEANO;
+                            yylval.isList = 0;
                             return(LITERAL);
                         }
 [A-Za-z][A-Za-z0-9_]*    {
@@ -107,16 +110,19 @@ lista[ \t\n]+de         return(DEFLISTA);
 [0-9]*\.[0-9]*          {
                             yylval.lexema = strdup(yytext);
                             yylval.type = REAL;
+                            yylval.isList = 0;
                             return(LITERAL);
                         }
 [0-9]+                  {
                             yylval.lexema = strdup(yytext);
                             yylval.type = ENTERO;
+                            yylval.isList = 0;
                             return(LITERAL);
                         }
 '.'                     {
                             yylval.lexema = strdup(yytext);
                             yylval.type = CARACTER;
+                            yylval.isList = 0;
                             return(LITERAL);
                         }
 
