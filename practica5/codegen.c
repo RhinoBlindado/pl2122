@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 FILE *output;
+FILE *func;
 int varTemp = 0;
 int etiquet = 0;
 int numTabs = 0;
@@ -10,12 +11,14 @@ int globalVars = 0;
 
 void openFile()
 {
+	func = fopen("dec_fun.c", "w");
     output = fopen("output.c", "w");
 }
 
 void closeFile()
 {
     fclose(output);
+	fclose(func);
 }
 
 char* genHeaders()
@@ -25,7 +28,8 @@ char* genHeaders()
     sprintf(res, "%s#include <stdio.h>\n", res);
     sprintf(res, "%s#include <stdlib.h>\n", res);
 	sprintf(res, "%s#include <math.h>\n", res);
-    sprintf(res, "%s#include <stdbool.h>\n\n", res);
+    sprintf(res, "%s#include <stdbool.h>\n", res);
+	sprintf(res, "%s#include \"dec_fun.c\"\n\n", res);
 	return res;
 }
 
@@ -118,6 +122,12 @@ char * concatVars(attr variousIds, attr newId)
 {
 	char* res = malloc(150);
 	sprintf(res, "%s%s, ", variousIds.nameTmp, newId.lexema);
+	return res;
+}
+
+char * getLex(attr id){
+	char* res = malloc(150);
+	sprintf(res, "%s, ", id.lexema);
 	return res;
 }
 
@@ -421,6 +431,14 @@ char* getIf(attr exp, attr sent)
 	sprintf(res, "%s%s", res, getEndBlock());
 
 	return res;
+}
+
+char * traducirSubprograma(attr tipoDato, attr id, attr parametros){
+
+}
+
+void writeFunc(char* s){
+	fprintf(func, "%s", s);
 }
 
 void writeProgram(attr block)

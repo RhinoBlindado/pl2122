@@ -129,14 +129,14 @@ programa                      : cabeceraPrograma { globalVars = 1; } bloque { $$
 cabeceraPrograma              : INIPROG { openFile(); $$.gen = genHeaders(); };
 
 bloque                        : inicioBloque declararVariablesLocalesMulti
-                                declararFuncionMulti sentencias finBloque {$$.gen = concatGen($1.gen, concatGen($2.gen, concatGen($4.gen, $5.gen)));}; 
+                                declararFuncionMulti sentencias finBloque {$$.gen = concatGen($1.gen, concatGen($2.gen, concatGen($4.gen, $5.gen)));}
 
 declararFuncionMulti          : declararFuncionMulti declararFuncion
                               | /* cadena vacía */
                               ;
 
 declararFuncion               : cabeceraFuncion {IN_FUNC = 1;}
-                                bloque {IN_FUNC = 0;}
+                                bloque {IN_FUNC = 0; $$.gen = concatGen($1.gen, concatGen($2.gen, ";")); writeProgram($$);}
                                 ;
 
 declararVariablesLocalesMulti : marcaInicioVariable variablesLocalesMulti
@@ -146,7 +146,7 @@ declararVariablesLocalesMulti : marcaInicioVariable variablesLocalesMulti
 
 cabeceraFuncion               : tipoDato identificador {$2.type = $1.type; insertFunction($2);}
                                 inicioParametros
-                                parametros finParametros;
+                                parametros finParametros {$$.gen = concatGen(getCType($1.type), concatGen($2.lexema, concatGen("(", concatGen($4.gen, ")"))));};
 
 inicioParametros              : ABRPAR;
 
@@ -237,8 +237,8 @@ listaExpresionesCadena        : expresion {$$.gen = getPrint($1);}
 
 nombreSalida                  : PRINT;
 
-parametros                    : tipoDato identificador {$2.type = $1.type; insertFormalParameter($2);}
-                              | parametros COMA tipoDato identificador {$4.type = $3.type; insertFormalParameter($4);}
+parametros                    : tipoDato identificador {$2.type = $1.type; insertFormalParameter($2); $$.gen = concatGen(getCType($1.type), getLex($2));}
+                              | parametros COMA tipoDato identificador {$4.type = $3.type; insertFormalParameter($4); $$.gen = concatGen($1.gen, concatGen(",", concatGen(getCType($3.type), getLex($4))));}
                               | error
                               | /* cadena vacía */
                               ;
