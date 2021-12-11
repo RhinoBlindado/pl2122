@@ -1,6 +1,6 @@
 .PHONY : all clean
 
-all: exe
+all: g+o-
 
 clean:
 	@echo "Limpiando proyecto..."
@@ -24,5 +24,5 @@ y.tab.o: y.tab.c
 main.o: main.c
 	gcc -c main.c
 
-exe: main.o y.tab.o
+g+o-: main.o y.tab.o
 	gcc -o g+o- main.o y.tab.o

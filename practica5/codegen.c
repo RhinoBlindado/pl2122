@@ -356,7 +356,7 @@ char* concatGen(char* left, char* right)
 
 char* getAsig(attr left, attr right)
 {
-	char* res = malloc(300);
+	char* res = malloc(1000);
 	sprintf(res, "%s%s", getStartBlock(), right.gen);
 	sprintf(res, "%s%s%s = %s;\n", res, getTabs(), left.lexema, right.nameTmp);
 	sprintf(res, "%s%s", res, getEndBlock());
@@ -365,7 +365,7 @@ char* getAsig(attr left, attr right)
 
 char* declarateTmpVar(char* var, attr exp)
 {
-	char* res = malloc(300);
+	char* res = malloc(1000);
 	sprintf(res, "%s%s%s;\n", getTabs(), getCType(exp.type), var);
 	sprintf(res, "%s%s%s", res, getStartBlock(), exp.gen);
 	sprintf(res, "%s%s%s = %s;\n", res, getTabs(), var, exp.nameTmp);
@@ -376,7 +376,7 @@ char* declarateTmpVar(char* var, attr exp)
 
 char* getPrint(attr exp)
 {
-	char* res = malloc(300);
+	char* res = malloc(1000);
 
 	// Comprobar si hay que generar variable
 	int genVar = strcmp(exp.gen, "") != 0;
@@ -393,13 +393,15 @@ char* getPrint(attr exp)
 		
 
 	if(exp.type == ENTERO)
-		sprintf(res, "%s%sprintf(\"%sd\\n\", %s);\n", res, getTabs(), "%", varSalida); 
+		sprintf(res, "%s%sprintf(\"%sd\", %s);\n", res, getTabs(), "%", varSalida);
 	else if(exp.type == REAL)
-		sprintf(res, "%s%sprintf(\"%slf\\n\", %s);\n", res, getTabs(), "%", varSalida); 
-	else if(exp.type == CARACTER)
-		sprintf(res, "%s%sprintf(\"%sc\\n\", %s);\n", res, getTabs(), "%", varSalida); 
+		sprintf(res, "%s%sprintf(\"%slf\", %s);\n", res, getTabs(), "%", varSalida);
+	else if(exp.type == CARACTER && exp.isList == 0)
+		sprintf(res, "%s%sprintf(\"%sc\", %s);\n", res, getTabs(), "%", varSalida);
 	else if(exp.type == BOOLEANO)
-		sprintf(res, "%s%sprintf(\"%sd\\n\", %s);\n", res, getTabs(), "%", varSalida); 
+		sprintf(res, "%s%sprintf(\"%sd\", %s);\n", res, getTabs(), "%", varSalida);
+	else if (exp.type == CARACTER && exp.isList == 1)
+		sprintf(res, "%s%sprintf(\"%ss\", %s);\n", res, getTabs(), "%", varSalida);
 
 	return res;
 }
@@ -408,7 +410,7 @@ char* getIf(attr exp, attr sent)
 {
 	char* etiqSig = etiqueta();
 	
-	char* res = malloc(300);
+	char* res = malloc(700);
 
 	// Comprobar si hay que generar variable
 	int genVar = strcmp(exp.gen, "") != 0;
@@ -439,6 +441,297 @@ char * traducirSubprograma(attr tipoDato, attr id, attr parametros){
 
 void writeFunc(attr block){
 	fprintf(func, "%s", block.gen);
+}
+
+char* getIfElse(attr exp, attr sentIf, attr sentElse)
+{
+	char* etiqElse = etiqueta();
+	char* etiqSig = etiqueta();
+
+	char* res = malloc(700);
+
+	// Comprobar si hay que generar variable
+	int genVar = strcmp(exp.gen, "") != 0;
+	char* varSalida;
+
+	if(genVar)
+		varSalida = temporal();
+	else
+		varSalida = exp.nameTmp;
+
+	// Si hay que generar variable, concatenar expresión
+	if(genVar)
+		res = declarateTmpVar(varSalida, exp);
+
+	// Concatenar expresion
+	sprintf(res, "%s%sif(!%s) goto %s;\n", res, getTabs(), varSalida, etiqElse);
+	sprintf(res, "%s%s", res, sentIf.gen);
+	sprintf(res, "%s%sgoto %s;\n", res, getTabs(), etiqSig);
+	sprintf(res, "%s%s%s:\n", res, getTabs(), etiqElse);
+	sprintf(res, "%s%s", res, sentElse.gen);
+	sprintf(res, "%s%s%s:\n", res, getTabs(), etiqSig);
+	sprintf(res, "%s%s", res, getStartBlock());
+	sprintf(res, "%s%s", res, getEndBlock());
+
+	return res;
+}
+
+char* getForAsig(attr asig, attr exp, attr sentido, attr sent)
+{
+	char* etiqIni = etiqueta();
+	char* etiqOut = etiqueta();
+
+	char* res = malloc(700);
+
+	// Comprobar si hay que generar variable
+	int genVar = strcmp(exp.gen, "") != 0;
+	char* varSalida;
+
+	if(genVar)
+		varSalida = temporal();
+	else
+		varSalida = exp.nameTmp;
+
+	// Si hay que generar variable, concatenar expresión
+	if(genVar)
+		res = declarateTmpVar(varSalida, exp);
+
+	// Asignación inicial
+	sprintf(res, "%s%s", res, asig.gen);
+	
+	// Escribir etiqueta inicial
+	sprintf(res, "%s%s%s:\n", res, getTabs(), etiqIni);
+	
+	// Concatenar según el sentido
+	if(sentido.atrib == 0)
+		sprintf(res, "%s%sif(%s > %s) goto %s;\n", res, getTabs(), asig.nameTmp, varSalida, etiqOut);
+	else
+		sprintf(res, "%s%sif(%s < %s) goto %s;\n", res, getTabs(), asig.nameTmp, varSalida, etiqOut);
+
+	// Sentencias del bucle
+	sprintf(res, "%s%s", res, sent.gen);
+
+	// Actualizar variables del bucle
+	if(genVar){
+		sprintf(res, "%s%s", res, getStartBlock());
+		sprintf(res, "%s%s", res, exp.gen);
+		sprintf(res, "%s%s%s = %s;\n", res, getTabs(), varSalida, exp.nameTmp);
+		sprintf(res, "%s%s", res, getEndBlock());
+	}
+
+	// Aumentar o decrementar variable control
+	if(sentido.atrib == 0)
+		sprintf(res, "%s%s%s += 1;\n", res, getTabs(), asig.nameTmp);
+	else
+		sprintf(res, "%s%s%s -= 1;\n", res, getTabs(), asig.nameTmp);
+
+	// Escribir salto incondicional
+	sprintf(res, "%s%sgoto %s;\n", res, getTabs(), etiqIni);
+
+	// Escribir etiqueta final
+	sprintf(res, "%s%s%s:\n", res, getTabs(), etiqOut);
+	sprintf(res, "%s%s", res, getStartBlock());
+	sprintf(res, "%s%s", res, getEndBlock());
+
+	return res; 
+}
+
+char* getFor(attr exp1, attr exp2, attr sentido, attr sent)
+{
+	char* etiqIni = etiqueta();
+	char* etiqOut = etiqueta();
+
+	char* res = malloc(700);
+
+	// Comprobar si hay que generar variable para expresión izquierda
+	char* varLeft = temporal();
+	res = declarateTmpVar(varLeft, exp1);
+
+	// Comprobar si hay que generar variable para expresión izquierda
+	int genVarRight = strcmp(exp2.gen, "") != 0;
+	char* varRight;
+
+	if(genVarRight)
+		varRight = temporal();
+	else
+		varRight = exp2.nameTmp;
+
+	// Si hay que generar variable, concatenar expresión
+	if(genVarRight)
+		sprintf(res, "%s%s", res, declarateTmpVar(varRight, exp2));
+	
+	// Escribir etiqueta inicial
+	sprintf(res, "%s%s%s:\n", res, getTabs(), etiqIni);
+	
+	// Concatenar según el sentido
+	if(sentido.atrib == 0)
+		sprintf(res, "%s%sif(%s > %s) goto %s;\n", res, getTabs(), varLeft, varRight, etiqOut);
+	else
+		sprintf(res, "%s%sif(%s < %s) goto %s;\n", res, getTabs(), varLeft, varRight, etiqOut);
+
+	// Sentencias del bucle
+	sprintf(res, "%s%s", res, sent.gen);
+
+	// Actualizar variables del bucle
+	if(genVarRight){
+		sprintf(res, "%s%s", res, getStartBlock());
+		sprintf(res, "%s%s", res, exp2.gen);
+		sprintf(res, "%s%s%s = %s;\n", res, getTabs(), varRight, exp2.nameTmp);
+		sprintf(res, "%s%s", res, getEndBlock());
+	}
+
+	// Aumentar o decrementar variable control
+	if(sentido.atrib == 0)
+		sprintf(res, "%s%s%s += 1;\n", res, getTabs(), varLeft);
+	else
+		sprintf(res, "%s%s%s -= 1;\n", res, getTabs(), varLeft);
+
+	// Escribir salto incondicional
+	sprintf(res, "%s%sgoto %s;\n", res, getTabs(), etiqIni);
+
+	// Escribir etiqueta final
+	sprintf(res, "%s%s%s:\n", res, getTabs(), etiqOut);
+	sprintf(res, "%s%s", res, getStartBlock());
+	sprintf(res, "%s%s", res, getEndBlock());
+
+	return res; 
+}
+
+char* getWhile(attr exp, attr sent)
+{
+	char* etiqIni = etiqueta();
+	char* etiqOut = etiqueta();
+
+	char* res = malloc(700);
+
+	// Comprobar si hay que generar variable
+	int genVar = strcmp(exp.gen, "") != 0;
+	char* varSalida;
+
+	if(genVar)
+		varSalida = temporal();
+	else
+		varSalida = exp.nameTmp;
+
+	// Si hay que generar variable, concatenar expresión
+	if(genVar)
+		res = declarateTmpVar(varSalida, exp);
+	
+	// Escribir etiqueta inicial
+	sprintf(res, "%s%s%s:\n", res, getTabs(), etiqIni);
+	
+	// Salto condicional
+	sprintf(res, "%s%sif(!%s) goto %s;\n", res, getTabs(), varSalida, etiqOut);
+
+	// Sentencias del bucle
+	sprintf(res, "%s%s", res, sent.gen);
+
+	// Actualizar variables del bucle
+	if(genVar){
+		sprintf(res, "%s%s", res, getStartBlock());
+		sprintf(res, "%s%s", res, exp.gen);
+		sprintf(res, "%s%s%s = %s;\n", res, getTabs(), varSalida, exp.nameTmp);
+		sprintf(res, "%s%s", res, getEndBlock());
+	}
+
+	// Escribir salto incondicional
+	sprintf(res, "%s%sgoto %s;\n", res, getTabs(), etiqIni);
+
+	// Escribir etiqueta final
+	sprintf(res, "%s%s%s:\n", res, getTabs(), etiqOut);
+	sprintf(res, "%s%s", res, getStartBlock());
+	sprintf(res, "%s%s", res, getEndBlock());
+
+	return res; 
+}
+
+
+char* getReturn(attr exp)
+{
+	char* res = malloc(700);	
+
+	// Comprobar si hay que generar variable
+	int genVar = strcmp(exp.gen, "") != 0;
+	char* varSalida;
+
+	if(genVar)
+		varSalida = temporal();
+	else
+		varSalida = exp.nameTmp;
+
+	// Si hay que generar variable, concatenar expresión
+	if(genVar)
+		res = declarateTmpVar(varSalida, exp);
+
+	// Escribir return
+	sprintf(res, "%s%sreturn %s;\n", res, getTabs(), varSalida);
+	
+	return res;
+}
+
+char* getScan(attr id)
+{
+	char* res = malloc(1000);
+
+	if(id.type == ENTERO)
+		sprintf(res, "%s%sscanf(\"%sd\", &%s);\n", res, getTabs(), "%", id.lexema);
+	else if(id.type == REAL)
+		sprintf(res, "%s%sscanf(\"%slf\", &%s);\n", res, getTabs(), "%", id.lexema);
+	else if(id.type == CARACTER && id.isList == 0)
+		sprintf(res, "%s%sscanf(\"%sc\", &%s);\n", res, getTabs(), "%", id.lexema);
+	else if(id.type == BOOLEANO)
+		sprintf(res, "%s%sscanf(\"%sd\", &%s);\n", res, getTabs(), "%", id.lexema);
+	else if (id.type == CARACTER && id.isList == 1)
+		sprintf(res, "%s%sscanf(\"%ss\", &%s);\n", res, getTabs(), "%", id.lexema);
+
+	return res;
+}
+
+attr getParamFunc(attr exp)
+{
+	// Copiar atributo
+	attr auxAttr;
+	auxAttr.atrib = exp.atrib;
+	auxAttr.lexema = exp.lexema;
+	auxAttr.type = exp.type;
+	auxAttr.isList = exp.isList;
+	auxAttr.nameTmp = exp.nameTmp;
+	auxAttr.gen = exp.gen;
+
+	char* res = malloc(1000);
+	
+	// Comprobar si hay que generar variable
+	int genVar = strcmp(exp.gen, "") != 0;
+	char* varSalida;
+
+	if(genVar)
+		varSalida = temporal();
+	else
+		varSalida = exp.nameTmp;
+
+	// Si hay que generar variable, concatenar expresión
+	if(genVar)
+		res = declarateTmpVar(varSalida, exp);
+
+	// Actualizar atributo
+	auxAttr.nameTmp = varSalida;
+	auxAttr.gen = res;
+
+	return auxAttr;
+}
+
+char* paramConcat(attr args, attr exp)
+{
+	char* res = malloc(200);
+	sprintf(res, "%s, %s", args.nameTmp, exp.nameTmp);
+	return res;
+}
+
+char* getFuncCall(attr id, attr args)
+{
+	char* res = malloc(300);
+	sprintf(res, "%s(%s)", id.lexema, args.nameTmp);
+	return res;
 }
 
 void writeProgram(attr block)

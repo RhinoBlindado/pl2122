@@ -262,6 +262,7 @@ attr getTypeVar(attr atrib)
   attr auxType;
   auxType.type = SUS;
   auxType.isList = 0;
+	auxType.lexema = atrib.lexema;
 
   int found = 0;
 
