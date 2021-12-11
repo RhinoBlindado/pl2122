@@ -12,12 +12,15 @@ int globalVars = 0;
 void openFile()
 {
 	func = fopen("dec_fun.c", "w");
+	fprintf(func, "#ifndef FUNC_H\n");
+	fprintf(func, "#define FUNC_H\n");
     output = fopen("output.c", "w");
 }
 
 void closeFile()
 {
     fclose(output);
+	fprintf(func, "#endif\n");
 	fclose(func);
 }
 
