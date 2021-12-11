@@ -1,4 +1,4 @@
-int funcionA((null))(null);/* PROGRAMA GENERADO POR YACC/LEX */
+/* PROGRAMA GENERADO POR YACC/LEX */
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>

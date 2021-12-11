@@ -127,7 +127,7 @@ char * concatVars(attr variousIds, attr newId)
 
 char * getLex(attr id){
 	char* res = malloc(150);
-	sprintf(res, "%s, ", id.lexema);
+	sprintf(res, "%s", id.lexema);
 	return res;
 }
 
@@ -437,8 +437,8 @@ char * traducirSubprograma(attr tipoDato, attr id, attr parametros){
 
 }
 
-void writeFunc(char* s){
-	fprintf(func, "%s", s);
+void writeFunc(attr block){
+	fprintf(func, "%s", block.gen);
 }
 
 void writeProgram(attr block)
