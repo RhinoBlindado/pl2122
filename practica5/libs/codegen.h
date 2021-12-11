@@ -79,6 +79,24 @@
 
 	char* getFuncCall(attr id, attr args);
 
+	char* getParamDec(attr type, attr id);
+        
+	char* concatParamDec(attr params, attr type, attr id);
+
+	char* getCabecera(attr type, attr nameFunc, attr params);
+
+	void controlStartBlockFunc();
+
+	void controlEndBlockFunc();
+
+	char* genHeadersFunc();
+
+	char* getExternVars(attr type, attr idsMiddle, attr idFinal);
+
+	void writeFuncsFile(attr block);
+
+	attr getCorrectBlock(attr ini, attr vars, attr funcs, attr sent, attr end);
+
 	void writeProgram(attr block);
 
 #endif

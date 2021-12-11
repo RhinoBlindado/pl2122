@@ -2,26 +2,24 @@
 #include <stdio.h>
 
 FILE *output;
-FILE *func;
+FILE *funcs;
 int varTemp = 0;
 int etiquet = 0;
 int numTabs = 0;
 int globalVars = 0;
+int numTabsAnt = -1;
 
 
 void openFile()
 {
-	func = fopen("dec_fun.c", "w");
-	fprintf(func, "#ifndef FUNC_H\n");
-	fprintf(func, "#define FUNC_H\n");
     output = fopen("output.c", "w");
+	funcs = fopen("dec_func.h", "w");
 }
 
 void closeFile()
 {
     fclose(output);
-	fprintf(func, "#endif\n");
-	fclose(func);
+	fclose(funcs);
 }
 
 char* genHeaders()
@@ -32,7 +30,7 @@ char* genHeaders()
     sprintf(res, "%s#include <stdlib.h>\n", res);
 	sprintf(res, "%s#include <math.h>\n", res);
     sprintf(res, "%s#include <stdbool.h>\n", res);
-	sprintf(res, "%s#include \"dec_fun.c\"\n\n", res);
+	sprintf(res, "%s#include \"dec_func.h\"\n\n", res);
 	return res;
 }
 
@@ -125,12 +123,6 @@ char * concatVars(attr variousIds, attr newId)
 {
 	char* res = malloc(150);
 	sprintf(res, "%s%s, ", variousIds.nameTmp, newId.lexema);
-	return res;
-}
-
-char * getLex(attr id){
-	char* res = malloc(150);
-	sprintf(res, "%s", id.lexema);
 	return res;
 }
 
@@ -438,14 +430,6 @@ char* getIf(attr exp, attr sent)
 	return res;
 }
 
-char * traducirSubprograma(attr tipoDato, attr id, attr parametros){
-
-}
-
-void writeFunc(attr block){
-	fprintf(func, "%s", block.gen);
-}
-
 char* getIfElse(attr exp, attr sentIf, attr sentElse)
 {
 	char* etiqElse = etiqueta();
@@ -737,9 +721,97 @@ char* getFuncCall(attr id, attr args)
 	return res;
 }
 
+char* getParamDec(attr type, attr id)
+{
+	char* res = malloc(100);
+	sprintf(res, "%s %s", getCType(type.type), id.lexema);
+	return res;
+}
+
+char* concatParamDec(attr params, attr type, attr id)
+{
+	char* res = malloc(200);
+	sprintf(res, "%s, %s", params.gen, getParamDec(type, id));
+	return res;
+}
+
+char* getCabecera(attr type, attr nameFunc, attr params)
+{
+	char* res = malloc(300);
+	sprintf(res, "%s%s %s(%s)\n", getTabs(), getCType(type.type), nameFunc.lexema, params.gen);
+	return res;
+}
+
+void controlStartBlockFunc()
+{
+	if(numTabsAnt == -1){
+		numTabsAnt = numTabs;
+		numTabs = 0;
+	}
+}
+
+void controlEndBlockFunc()
+{
+	if(numTabs == 0){
+		numTabs = numTabsAnt;
+		numTabsAnt = -1;
+	}
+}
+
+char* genHeadersFunc()
+{
+	char* res = malloc(300);
+    sprintf(res,"/* PROGRAMA GENERADO POR YACC/LEX */\n");
+	sprintf(res, "%s#ifndef FUNCIONES\n", res);
+	sprintf(res, "%s#define FUNCIONES\n", res);
+    sprintf(res, "%s#include <stdio.h>\n", res);
+    sprintf(res, "%s#include <stdlib.h>\n", res);
+	sprintf(res, "%s#include <math.h>\n", res);
+    sprintf(res, "%s#include <stdbool.h>\n\n", res);
+	return res;
+}
+
+char* getExternVars(attr type, attr idsMiddle, attr idFinal)
+{
+    char* res = malloc(150);
+	if(globalVars)
+		sprintf(res, "%s %s%s%s;\n", "extern", type.nameTmp, idsMiddle.nameTmp, idFinal.lexema);
+	return res;
+}
+
+void writeFuncsFile(attr block)
+{
+	char* res = malloc(3000);
+	sprintf(res, "%s%s%s", genHeadersFunc(), block.funcGen, "#endif");
+	fprintf(funcs, "%s", res);
+}
+
+attr getCorrectBlock(attr ini, attr vars, attr funcs, attr sent, attr end, int IN_FUNC)
+{
+	attr block;
+
+	char* res = malloc(5000);
+	if(IN_FUNC)
+		sprintf(res, "%s%s%s%s%s", ini.gen, vars.gen, funcs.gen, sent.gen, end.gen);
+	else
+		sprintf(res, "%s%s%s%s", ini.gen, vars.gen, sent.gen, end.gen);
+
+	char* res2 = malloc(5000);
+	if(strcmp(vars.gen, "") == 0)
+		sprintf(res2, "%s", funcs.gen);
+	else
+		sprintf(res2, "%s\n%s", vars.funcGen, funcs.gen);
+
+	block.gen = res;
+	block.funcGen = res2;
+
+	return block;
+}
+
 void writeProgram(attr block)
 {
 	fprintf(output, "%s", block.gen);
+	writeFuncsFile(block);
 }
 
 

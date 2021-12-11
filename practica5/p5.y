@@ -123,30 +123,36 @@ uint IN_FUNC;
 
 %%
 
-programa                      : cabeceraPrograma { globalVars = 1; } bloque { $$.gen = concatGen($1.gen, $3.gen); writeProgram($$); closeFile();}
+programa                      : cabeceraPrograma { globalVars = 1; } bloque { $$.gen = concatGen($1.gen, $3.gen); $$.funcGen = $3.funcGen; writeProgram($$); closeFile();}
                               ; 
 
 cabeceraPrograma              : INIPROG { openFile(); $$.gen = genHeaders(); };
 
 bloque                        : inicioBloque declararVariablesLocalesMulti
-                                declararFuncionMulti sentencias finBloque {$$.gen = concatGen($1.gen, concatGen($2.gen, concatGen($4.gen, $5.gen)));}
+                                declararFuncionMulti sentencias finBloque {$$ = getCorrectBlock($1, $2, $3, $4, $5, IN_FUNC);}; 
 
-declararFuncionMulti          : declararFuncionMulti declararFuncion
-                              | /* cadena vacía */
+declararFuncionMulti          : declararFuncionMulti declararFuncion {$$.gen = concatGen($1.gen, $2.gen);}
+                              | {$$.gen = "";}/* cadena vacía */
                               ;
 
-declararFuncion               : cabeceraFuncion {IN_FUNC = 1;}
-                                bloque {IN_FUNC = 0; $$.gen = concatGen($1.gen, $3.gen); writeFunc($$);}
+declararFuncion               : { controlStartBlockFunc();} cabeceraFuncion {IN_FUNC += 1; }
+                                bloque {IN_FUNC -= 1; $$.gen = concatGen($2.gen, $4.gen); controlEndBlockFunc();}
                                 ;
 
 declararVariablesLocalesMulti : marcaInicioVariable variablesLocalesMulti
-                                marcaFinVar { $$.gen = concatGen($2.gen, controlGlobalVars()); }
-                              | {$$.gen = "";} /* cadena vacía*/
+                                marcaFinVar { $$.gen = concatGen($2.gen, controlGlobalVars()); $$.funcGen = $2.funcGen;}
+                              | {$$.gen = concatGen("", controlGlobalVars()); $$.funcGen = "";} /* cadena vacía*/
                               ;
 
 cabeceraFuncion               : tipoDato identificador {$2.type = $1.type; insertFunction($2);}
                                 inicioParametros
-                                parametros finParametros {$$.gen = concatGen(getCType($1.type), concatGen($2.lexema, concatGen("(", concatGen($5.gen, ")")))); /*writeFunc($$);*/};
+                                parametros finParametros {$$.gen = getCabecera($1, $2, $5);};
+
+parametros                    : tipoDato identificador {$2.type = $1.type; insertFormalParameter($2); $$.gen = getParamDec($1, $2);}
+                              | parametros COMA tipoDato identificador {$4.type = $3.type; insertFormalParameter($4); $$.gen = concatParamDec($1, $3, $4);}
+                              | error
+                              | {$$.gen = "";} /* cadena vacía */
+                              ;
 
 inicioParametros              : ABRPAR;
 
@@ -162,11 +168,11 @@ inicioBloque                  : ABRLLA { blockStart(); $$.gen = getStartBlock();
 finBloque                     : CERLLA { blockEnd(); $$.gen = getEndBlock();}
                               ;
 
-variablesLocalesMulti         : variablesLocalesMulti variableLocal {$$.gen = concatGen($1.gen, $2.gen);}
-                              | {$$.gen = "";} /* cadena vacía */
+variablesLocalesMulti         : variablesLocalesMulti variableLocal {$$.gen = concatGen($1.gen, $2.gen); $$.funcGen = concatGen($1.funcGen, $2.funcGen);}
+                              | {$$.gen = ""; $$.funcGen = "";} /* cadena vacía */
                               ;
 
-variableLocal                 : tipoDato variableSolitaria identificador finSentencia { pushAttr($3); assignType($1); $$.gen = getVars($1, $2, $3); } 
+variableLocal                 : tipoDato variableSolitaria identificador finSentencia { pushAttr($3); assignType($1); $$.gen = getVars($1, $2, $3); $$.funcGen = getExternVars($1, $2, $3);} 
                               | error;
 
 variableSolitaria             : variableSolitaria identificador coma { pushAttr($2); $$.nameTmp = concatVars($1, $2); }
@@ -242,13 +248,6 @@ listaExpresionesCadena        : expresion {$$.gen = getPrint($1);}
                               ;
 
 nombreSalida                  : PRINT;
-
-
-parametros                    : tipoDato identificador {$2.type = $1.type; insertFormalParameter($2); $$.gen = concatGen(getCType($1.type), getLex($2));}
-                              | parametros COMA tipoDato identificador {$4.type = $3.type; insertFormalParameter($4); $$.gen = concatGen($1.gen, concatGen(", ", concatGen(getCType($3.type), getLex($4))));}
-                              | error {$$.gen = "";}
-                              | /* cadena vacía */ {$$.gen = "";}
-                              ;
 
 expresion                     : ABRPAR expresion CERPAR { $$ = $2; $$.nameTmp = $2.nameTmp; $$.gen = $2.gen; }
                               | MASMENOS expresion %prec HASH { $$.type = $2.type; $$.nameTmp = temporal(); $$.gen = $2.gen; $$.gen = concatGen($$.gen, getMasMenosSufExpr($$, $1, $2)); }

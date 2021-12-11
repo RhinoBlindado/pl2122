@@ -32,6 +32,7 @@
         int isList;
         char* nameTmp;
         char* gen;
+		char* funcGen;
     } attr;
 
 

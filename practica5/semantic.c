@@ -155,7 +155,7 @@ void assignType(attr p_dataType)
 void checkBlockFunction(){
 
   // Se comprueba el bit de declaración de función
-  if (IN_FUNC == 1){
+  if (IN_FUNC){
 
     // Buscar función justo antes de inicio de bloque
     int posNow = HEADER;
