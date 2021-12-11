@@ -7,6 +7,16 @@ inicio
         booleano vl, vl2, vl3, vl4;
     finvar;
 
+	entero funcionA(entero a1, real a2)
+    {
+        inivar
+            entero x, x2;
+        finvar;        
+        x = x + x2;
+		anunciar(x);
+        repatriar a1;
+    }
+	
 	ve = 4 * 3 ^ 2;
 	vf = 3.5;
 
