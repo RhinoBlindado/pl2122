@@ -5,12 +5,12 @@ CC = gcc
 EJECUTABLE = Prueba
 
 # Programa Principal
-all: Lista.o
-	$(CC) Lista.o Prueba.c -o $(EJECUTABLE) -g
+all: int_list.o
+	$(CC) int_list.o Prueba.c -o $(EJECUTABLE) -g
 # Librerías
 
-Lista.o: Lista.h Lista.c
-	$(CC) -c Lista.c
+int_list.o: int_list.h int_list.c
+	$(CC) -c int_list.c
 
 # Borrar los Archivos Objeto y el Ejecutable
 clean:
