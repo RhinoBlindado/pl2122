@@ -15,65 +15,65 @@
 			int puntero;
 		}int_list;
 		
-		void inicializar(int_list *L);
+		void int_inicializar(int_list *L);
 
-		int esVacia(int_list L);
+		int int_esVacia(int_list L);
 
-		void insertar(int_list *L, int p, int e);
+		void int_insertar(int_list *L, int p, int e);
 
-		void eliminar(int_list *L,int p);
+		void int_eliminar(int_list *L,int p);
 
-		int esta(int_list L, int e);
+		int int_esta(int_list L, int e);
 
-		void limpiar(int_list *L);
+		void int_limpiar(int_list *L);
 
 		// Funciones añadidas
 
 		// Listo - Probado
-		void avanzarPuntero(int_list *L);
+		void int_avanzarPuntero(int_list *L);
 
 		// Listo - Probado
-		void retrocederPuntero(int_list *L);
+		void int_retrocederPuntero(int_list *L);
 
 		// Listo - Probado
-		void punteroAInicio(int_list *L);
+		void int_punteroAInicio(int_list *L);
 
 		// Listo - Probado
-		int longitud(int_list *L);
+		int int_longitud(int_list *L);
 
 		// Listo - Probado
-		int consultarEnPosicion(int_list L, int p);
+		int int_consultarEnPosicion(int_list L, int p);
 
 		// Listo - Probado
-		int consultar(int_list L);
+		int int_consultar(int_list L);
 
 		// Listo - Probado
-		void insertarCopia(int_list *L, int_list *LCopia, int p, int e);
+		void int_insertarCopia(int_list *L, int_list *LCopia, int p, int e);
 
 		// Listo - Probado
-		void eliminarCopia(int_list *L, int_list *LCopia, int p);
+		void int_eliminarCopia(int_list *L, int_list *LCopia, int p);
 
 		// Listo - Probado
-		void eliminarCopiaDesdePosicion(int_list *L, int_list *LCopia, int p);
+		void int_eliminarCopiaDesdePosicion(int_list *L, int_list *LCopia, int p);
 
-		void concatenarCopia(int_list *L1, int_list *L2, int_list *LCopia);
-
-		// Listo - Probado
-		void sumarLista(int_list *L, int valor);
+		void int_concatenarCopia(int_list *L1, int_list *L2, int_list *LCopia);
 
 		// Listo - Probado
-		int sumarValor(int_list *L, int valor);
+		void int_sumarLista(int_list *L, int valor);
 
 		// Listo - Probado
-		void multiplicarLista(int_list *L, int valor);
+		int int_sumarValor(int_list *L, int valor);
 
 		// Listo - Probado
-		int multiplicarValor(int_list *L, int valor);
+		void int_multiplicarLista(int_list *L, int valor);
 
 		// Listo - Probado
-		void restarLista(int_list *L, int valor);
+		int int_multiplicarValor(int_list *L, int valor);
 
 		// Listo - Probado
-		void dividirLista(int_list *L, int valor);
+		void int_restarLista(int_list *L, int valor);
+
+		// Listo - Probado
+		void int_dividirLista(int_list *L, int valor);
 
 #endif

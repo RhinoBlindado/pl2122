@@ -4,7 +4,7 @@
 #include "int_list.h"
 
 
-	void inicializar(int_list *L)
+	void int_inicializar(int_list *L)
 	{
 		L->primero = NULL;
 		L->ultimo = NULL;
@@ -12,7 +12,7 @@
 		L->puntero = 1;
 	}
 	
-	int esVacia(int_list L)
+	int int_esVacia(int_list L)
 	{
 		if (L.primero == NULL)
 			return(1);
@@ -20,11 +20,11 @@
 			return(0);
 	}
 	
-	void insertar(int_list *L, int p,int e)
+	void int_insertar(int_list *L, int p,int e)
 	{
 		int i;
 		Nodo *ant,*sigu,*nuevo;
-		if(p>0 && p<=longitud(L)+1)
+		if(p>0 && p<=int_longitud(L)+1)
 		{
 			nuevo = (Nodo *) malloc(sizeof (Nodo));
 			nuevo->information = e;
@@ -54,7 +54,7 @@
 		}
 	}
 
-	void eliminar(int_list *L, int p)
+	void int_eliminar(int_list *L, int p)
 	{	
 
 		Nodo *ant,*act,*sigu;
@@ -91,7 +91,7 @@
 		}	
 	}
 
-	int consultarEnPosicion(int_list L, int p)
+	int int_consultarEnPosicion(int_list L, int p)
 	{	
 
 		int i;
@@ -115,7 +115,7 @@
 		}
 		
 	}
-	int esta(int_list L, int e)
+	int int_esta(int_list L, int e)
 	{
 		Nodo *finder;
 		int i,flag;
@@ -133,34 +133,34 @@
 		return -1;
 	}
 
-	int longitud(int_list *L)
+	int int_longitud(int_list *L)
 	{
 		return(L->longitud);
 	}
 
-	void avanzarPuntero(int_list *L)
+	void int_avanzarPuntero(int_list *L)
 	{
 		if(L->puntero < L->longitud)
 			L->puntero++;
 	}
 
-	void retrocederPuntero(int_list *L)
+	void int_retrocederPuntero(int_list *L)
 	{
 		if(L->puntero > 1)
 			L->puntero--;
 	}
 
-	void punteroAInicio(int_list *L)
+	void int_punteroAInicio(int_list *L)
 	{
 		L->puntero = 1;
 	}
 
-	int consultar(int_list L)
+	int int_consultar(int_list L)
 	{
-		return consultarEnPosicion(L, L.puntero);
+		return int_consultarEnPosicion(L, L.puntero);
 	}
 
-	void limpiar(int_list *L)
+	void int_limpiar(int_list *L)
 	{
 		if(L->longitud > 0)
 		{
@@ -186,11 +186,11 @@
 	}
 
 
-	void copiar(int_list *origList, int_list *copyList)
+	void int_copiar(int_list *origList, int_list *copyList)
 	{
 		Nodo *ant, *sigu, *cAct, *cSigu;
 
-		limpiar(copyList);
+		int_limpiar(copyList);
 	
 		copyList->longitud = origList->longitud;
 		copyList->puntero = origList->puntero;
@@ -224,19 +224,19 @@
 		copyList->ultimo = cSigu;
 	}
 
-	void insertarCopia(int_list *L, int_list *LCopia, int p, int e)
+	void int_insertarCopia(int_list *L, int_list *LCopia, int p, int e)
 	{
-		copiar(L, LCopia);
-		insertar(LCopia, p, e);
+		int_copiar(L, LCopia);
+		int_insertar(LCopia, p, e);
 	}
 
-	void eliminarCopia(int_list *L, int_list *LCopia, int p)
+	void int_eliminarCopia(int_list *L, int_list *LCopia, int p)
 	{
-		copiar(L, LCopia);
-		eliminar(LCopia, p);
+		int_copiar(L, LCopia);
+		int_eliminar(LCopia, p);
 	}
 
-	void eliminarDesdePosicion(int_list *L, int p)
+	void int_eliminarDesdePosicion(int_list *L, int p)
 	{	
 		Nodo *act,*sigu;
 		int i;
@@ -244,7 +244,7 @@
 		{
 			if(p==1)
 			{
-				limpiar(L);
+				int_limpiar(L);
 				L->longitud = 0;
 			}
 			else
@@ -272,13 +272,13 @@
 		}	
 	}
 
-	void eliminarCopiaDesdePosicion(int_list *L, int_list *LCopia, int p)
+	void int_eliminarCopiaDesdePosicion(int_list *L, int_list *LCopia, int p)
 	{
-		copiar(L, LCopia);
-		eliminarDesdePosicion(LCopia, p);
+		int_copiar(L, LCopia);
+		int_eliminarDesdePosicion(LCopia, p);
 	}
 
-	void sumarLista(int_list *L, int valor)
+	void int_sumarLista(int_list *L, int valor)
 	{
 		if(L->longitud > 0)
 		{
@@ -298,7 +298,7 @@
 		}
 	}
 
-	int sumarValor(int_list *L, int valor)
+	int int_sumarValor(int_list *L, int valor)
 	{
 		int output = 0;
 		if(L->longitud > 0)
@@ -322,7 +322,7 @@
 		return output;
 	}
 
-	void multiplicarLista(int_list *L, int valor)
+	void int_multiplicarLista(int_list *L, int valor)
 	{
 		if(L->longitud > 0)
 		{
@@ -342,7 +342,7 @@
 		}
 	}
 
-	int multiplicarValor(int_list *L, int valor)
+	int int_multiplicarValor(int_list *L, int valor)
 	{
 		int output = 0;
 		if(L->longitud > 0)
@@ -366,12 +366,12 @@
 		return output;
 	}
 
-	void restarLista(int_list *L, int valor)
+	void int_restarLista(int_list *L, int valor)
 	{
-		sumarLista(L, -valor);
+		int_sumarLista(L, -valor);
 	}
 
-	void dividirLista(int_list *L, int valor)
+	void int_dividirLista(int_list *L, int valor)
 	{
 		if(L->longitud > 0)
 		{
@@ -391,7 +391,7 @@
 		}
 	}
 
-	void concatenarCopia(int_list *L1, int_list *L2, int_list *LCopia)
+	void int_concatenarCopia(int_list *L1, int_list *L2, int_list *LCopia)
 	{
 
 	}

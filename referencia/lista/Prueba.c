@@ -4,10 +4,10 @@
 void imprimir(int_list MEME)
 {
 	int i,j;
-	j = longitud(&MEME);
+	j = int_longitud(&MEME);
 	for (i=1;i<=j;i++)
 	{
-		printf("%d ",consultarEnPosicion(MEME,i));
+		printf("%d ",int_consultarEnPosicion(MEME,i));
 	}
 	printf("\n");
 }
@@ -17,20 +17,20 @@ void pruebaPuntero()
 	printf("Prueba puntero\n");
 
 	int_list x;
-	inicializar(&x);
+	int_inicializar(&x);
 
 	for(int i=1;i<=5;i++)
 	{
-		insertar(&x,i,i + (i-1));
+		int_insertar(&x,i,i + (i-1));
 	}	
 
 	imprimir(x);
-	avanzarPuntero(&x);
-	avanzarPuntero(&x);
+	int_avanzarPuntero(&x);
+	int_avanzarPuntero(&x);
 
-	punteroAInicio(&x);
+	int_punteroAInicio(&x);
 
-	printf("Consultado: %d\n", consultar(x));	
+	printf("Consultado: %d\n", int_consultar(x));	
 
 }
 
@@ -39,25 +39,25 @@ void pruebaCopia()
 	printf("Prueba copia\n");
 
 	int_list x, y;
-	inicializar(&x);
-	inicializar(&y);
+	int_inicializar(&x);
+	int_inicializar(&y);
 
 
 	for(int i=0;i<10;i++)
 	{
-		insertar(&x, i + 1, i+2 + (2*i+1));
+		int_insertar(&x, i + 1, i+2 + (2*i+1));
 	}	
 	printf("Original: \n");
 	imprimir(x);
 
 
 	printf("Copia, añadiendo elemento: \n");
-	insertarCopia(&x, &y, 3, 99);
+	int_insertarCopia(&x, &y, 3, 99);
 	imprimir(y);
 
 	printf("Original modificado: \n");
-	limpiar(&x);
-	insertar(&x, 1, 1);
+	int_limpiar(&x);
+	int_insertar(&x, 1, 1);
 	imprimir(x);
 
 	printf("Copia: \n");
@@ -65,10 +65,10 @@ void pruebaCopia()
 	imprimir(y);
 
 	int_list z;
-	inicializar(&z);
+	int_inicializar(&z);
 
-	eliminarCopiaDesdePosicion(&y, &z, 3);
-	printf("Copia: %d\n", sumarValor(&z, 1));
+	int_eliminarCopiaDesdePosicion(&y, &z, 3);
+	printf("Copia: %d\n", int_sumarValor(&z, 1));
 
 	imprimir(z);
 }
