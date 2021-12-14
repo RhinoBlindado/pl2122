@@ -36,6 +36,11 @@
 				return(0);
 		}
 		
+		int int_longitud(l_int *L)
+		{
+			return(L->longitud);
+		}
+
 		void int_insertar(l_int *L, int p,int e)
 		{
 			int i;
@@ -147,11 +152,6 @@
 				finder = finder->sig;	
 			}
 			return -1;
-		}
-
-		int int_longitud(l_int *L)
-		{
-			return(L->longitud);
 		}
 
 		void int_avanzarPuntero(l_int *L)
@@ -518,6 +518,11 @@
 			return(0);
 	}
 	
+	int double_longitud(l_double *L)
+	{
+		return(L->longitud);
+	}
+
 	void double_insertar(l_double *L, int p, double e)
 	{
 		int i;
@@ -631,10 +636,7 @@
 		return -1;
 	}
 
-	int double_longitud(l_double *L)
-	{
-		return(L->longitud);
-	}
+
 
 	void double_avanzarPuntero(l_double *L)
 	{
@@ -1001,6 +1003,11 @@
 			return(0);
 	}
 	
+	int char_longitud(l_char *L)
+	{
+		return(L->longitud);
+	}
+
 	void char_insertar(l_char *L, int p, char e)
 	{
 		int i;
@@ -1114,10 +1121,6 @@
 		return -1;
 	}
 
-	int char_longitud(l_char *L)
-	{
-		return(L->longitud);
-	}
 
 	void char_avanzarPuntero(l_char *L)
 	{
