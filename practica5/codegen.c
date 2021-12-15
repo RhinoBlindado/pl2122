@@ -158,26 +158,28 @@ char* getMasMenosExpr(attr newVar, attr left, attr op, attr right)
 	// Escribir asignación intermedia
 	char* asigIntermedia = malloc(150);
 
-	if(left.isList && !right.isList){
+	if(!left.isList && right.isList){
 		if(op.atrib == 0){
 			if(left.type == ENTERO)
-				sprintf(asigIntermedia, "%s = %s(&%s,%s);\n\n", newVar.nameTmp, "int_sumarValor", left.nameTmp, right.nameTmp);
+				// sprintf(asigIntermedia, "%s(&%s,%s); %s = %s;\n\n", "int_sumarValor", left.nameTmp, right.nameTmp, newVar.nameTmp, left.nameTmp);
+				sprintf(asigIntermedia, "%s = %s(&%s,%s);\n\n", newVar.nameTmp, "int_sumarValor", right.nameTmp, left.nameTmp);
 			else if(left.type == REAL)
-				sprintf(asigIntermedia, "%s = %s(&%s,%s);\n\n", newVar.nameTmp, "double_sumarValor", left.nameTmp, right.nameTmp);
+				// sprintf(asigIntermedia, "%s(&%s,%s); %s = %s;\n\n", "double_sumarValor", left.nameTmp, right.nameTmp, newVar.nameTmp, left.nameTmp);
+				sprintf(asigIntermedia, "%s = %s(&%s,%s);\n\n", newVar.nameTmp, "double_sumarValor", right.nameTmp, left.nameTmp);
 		}
 		else if(op.atrib == 1){
 			if(left.type == ENTERO)
-				sprintf(asigIntermedia, "%s(&%s,%s);int_copiar(&%s,&%s);\n\n", "int_restarLista", left.nameTmp, right.nameTmp, left.nameTmp, newVar.nameTmp);
+				sprintf(asigIntermedia, "%s(&%s,%s);int_copiar(&%s,&%s);\n\n", "int_restarLista", right.nameTmp, left.nameTmp, left.nameTmp, newVar.nameTmp);
 			else if(left.type == REAL)
-				sprintf(asigIntermedia, "%s(&%s,%s);double_copiar(&%s,&%s);\n\n", "double_restarLista", left.nameTmp, right.nameTmp, left.nameTmp, newVar.nameTmp);
+				sprintf(asigIntermedia, "%s(&%s,%s);double_copiar(&%s,&%s);\n\n", "double_restarLista", right.nameTmp, left.nameTmp, left.nameTmp, newVar.nameTmp);
 		}
 	}
-	else if(!left.isList && right.isList){
+	else if(left.isList && !right.isList){
 		if(op.atrib == 0){
 			if(left.type == ENTERO)
-				sprintf(asigIntermedia, "%s(&%s,%s);int_copiar(&%s,&%s);\n\n", "int_sumarLista", right.nameTmp, left.nameTmp, right.nameTmp, newVar.nameTmp);
+				sprintf(asigIntermedia, "%s(&%s,%s);int_copiar(&%s,&%s);\n\n", "int_sumarLista", left.nameTmp, right.nameTmp, right.nameTmp, newVar.nameTmp);
 			else if(left.type == REAL)
-				sprintf(asigIntermedia, "%s(&%s,%s);double_copiar(&%s,&%s);\n\n", "double_sumarLista", right.nameTmp, left.nameTmp, right.nameTmp, newVar.nameTmp);
+				sprintf(asigIntermedia, "%s(&%s,%s);double_copiar(&%s,&%s);\n\n", "double_sumarLista", left.nameTmp, right.nameTmp, right.nameTmp, newVar.nameTmp);
 		}
 	}
 	else
