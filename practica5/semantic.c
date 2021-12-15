@@ -499,15 +499,15 @@ void checkReturn(attr a){
       found = 1;
       entryFunc = i;
     }
-  
-  if(found && (TS[entryFunc].dataType != a.type || (a.isList && TS[entryFunc].dataType == LISTA && a.type == TS[entryFunc].listDataType))){
-    yyerror("Estas intentado devolver una variable de un tipo distinto al esperado");
-  }
-  else if(!found){
-    yyerror("Este repatriar no esta asociado a una funcion");
-  }
 
-  
+  if (found) {
+    if (a.isList == 0 && a.type != TS[entryFunc].dataType ||
+        a.isList == 1 && a.type != TS[entryFunc].listDataType) {
+      yyerror("Estas intentado devolver una variable de un tipo distinto al esperado");
+    }  
+  } else {
+    yyerror("Este repatriar no esta asociado a una funcion");
+  }  
 }
 
 attr checkMasMenosExp(attr a, attr b, attr op)
