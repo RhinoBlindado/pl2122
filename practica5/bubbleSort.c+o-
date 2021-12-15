@@ -1,22 +1,9 @@
 inicio{
     inivar
         lista de entero l1;
-        entero size;
+        entero size, tmp, tmp2, i, j, in1, in2;
     finvar;
 
-    lista de entero swap(lista de entero l1, entero izquierda, entero derecha)
-    {
-        inivar
-            entero tmp, tmp2;
-        finvar;
-
-        tmp = l1@izquierda;
-        tmp2= l1@derecha;
-        l1 = l1--izquierda;
-        l1 = l1++tmp2@(izquierda-1);
-        l1 = l1--derecha;
-        l1 = l1++tmp@(derecha-1);
-    }
 
     l1 = [2,3,5,6,1,4,2,8,9];
     size = #l1;
@@ -25,14 +12,22 @@ inicio{
     {
         para j=0; hasta size-i-1 aumentando
         {
-            si(l1@j > l1@(j+1))
+            in1 = l1@j;
+            in2 = l1@j+1;
+            si(in1 > in2)
             {
-                l1 = swap(l1, j, j+1);
+                tmp = l1@j;
+                tmp2= l1@j+1;
+                l1 = l1--j;
+                l1 = l1++tmp2@(j-1);
+                l1 = l1--j+1;
+                l1 = l1++tmp@(j+1-1);
             }
         }
     }
-    para entero i=0; hasta size aumentando
+    para i=0; hasta size aumentando
     {
         anunciar(l1@i);
+        anunciar(" ");
     }
 }
