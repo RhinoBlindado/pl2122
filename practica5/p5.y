@@ -144,7 +144,7 @@ declararVariablesLocalesMulti : marcaInicioVariable variablesLocalesMulti
                               | {$$.gen = concatGen("", controlGlobalVars()); $$.funcGen = "";} /* cadena vacía*/
                               ;
 
-cabeceraFuncion               : tipoDato identificador {$2.type = $1.type; insertFunction($2);}
+cabeceraFuncion               : tipoDato identificador {$2.type = $1.type; $2.isList = $1.isList; insertFunction($2); }
                                 inicioParametros
                                 parametros finParametros {$$.gen = getCabecera($1, $2, $5);};
 
@@ -261,7 +261,7 @@ expresion                     : ABRPAR expresion CERPAR { $$ = $2; $$.nameTmp = 
                               | expresion XOR expresion { $$.type = checkBooleanExp($1.type, $3.type); $$.nameTmp = temporal(); $$.gen = concatGen($1.gen, concatGen($3.gen, getXorExpr($$, $1, $2, $3))); }
                               | identificador { $$ = getTypeVar($1); $$.nameTmp = $1.lexema; $$.gen = ""; }
                               | literal { $$ = $1; $$.nameTmp = equivalentCLexema($1); $$.gen = ""; }
-                              | funcion { $$.type = getTypeFunc($1); $$.nameTmp = $1.nameTmp; $$.gen = $1.gen;}
+                              | funcion { $$ = getTypeFunc($1); $$.nameTmp = $1.nameTmp; $$.gen = $1.gen; }
                               | HASH expresion { $$ = checkHashExp($2); }
                               | INTERR expresion %prec HASH { $$ = checkInterrExp($2); }
                               | expresion AT expresion { $$ = checkAtExp($1, $3); }

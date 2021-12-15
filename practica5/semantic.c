@@ -215,7 +215,7 @@ void insertFunction(attr atrib){
   if (atrib.isList)
     pushTS(FUNC, atrib.lexema, LISTA, 0, atrib.type);
   else
-    pushTS(FUNC, atrib.lexema, atrib.type, 0, -1);
+    pushTS(FUNC, atrib.lexema, atrib.type, 0, 0);
 }
 
 /**
@@ -325,8 +325,9 @@ attr getTypeVar(attr atrib)
  * @param   atrib Atributo detectado por el analizador sintáctico
  * @return  
  */
-dType getTypeFunc(attr atrib) {
-  dType auxType = SUS;
+attr getTypeFunc(attr atrib) {
+  attr aux;
+  aux.type = SUS;
   int found = 0;
 
   for(int i = HEADER; i > 0; i--)
@@ -334,7 +335,13 @@ dType getTypeFunc(attr atrib) {
   	if(strcmp(atrib.lexema, TS[i].name) == 0 && TS[i].input == FUNC)
   	{
       found = 1;
-      auxType = TS[i].dataType;
+      if (TS[i].listDataType == 0) {
+        aux.type = TS[i].dataType;
+        aux.isList = 0;
+      } else {
+        aux.type = TS[i].listDataType;
+        aux.isList = 1;
+      }
       break;
   	}
   }
@@ -347,9 +354,8 @@ dType getTypeFunc(attr atrib) {
 		strcat(output,"\"no definida previamente.");
 		yyerror(output);
 	}
-  
 
-  return auxType;
+  return aux;
 }
 
 
