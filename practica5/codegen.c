@@ -167,17 +167,17 @@ char* getMasMenosExpr(attr newVar, attr left, attr op, attr right)
 		}
 		else if(op.atrib == 1){
 			if(left.type == ENTERO)
-				sprintf(asigIntermedia, "%s = %s(&%s,%s);\n\n", newVar.nameTmp, "int_restarLista", left.nameTmp, right.nameTmp);
+				sprintf(asigIntermedia, "%s(&%s,%s);int_copiar(&%s,&%s);\n\n", "int_restarLista", left.nameTmp, right.nameTmp, left.nameTmp, newVar.nameTmp);
 			else if(left.type == REAL)
-				sprintf(asigIntermedia, "%s = %s(&%s,%s);\n\n", newVar.nameTmp, "double_restarLista", left.nameTmp, right.nameTmp);
+				sprintf(asigIntermedia, "%s(&%s,%s);double_copiar(&%s,&%s);\n\n", "double_restarLista", left.nameTmp, right.nameTmp, left.nameTmp, newVar.nameTmp);
 		}
 	}
 	else if(!left.isList && right.isList){
 		if(op.atrib == 0){
 			if(left.type == ENTERO)
-				sprintf(asigIntermedia, "%s = %s(&%s,%s);\n\n", newVar.nameTmp, "int_sumarLista", right.nameTmp, left.nameTmp);
+				sprintf(asigIntermedia, "%s(&%s,%s);int_copiar(&%s,&%s);\n\n", "int_sumarLista", right.nameTmp, left.nameTmp, right.nameTmp, newVar.nameTmp);
 			else if(left.type == REAL)
-				sprintf(asigIntermedia, "%s = %s(&%s,%s);\n\n", newVar.nameTmp, "double_sumarLista", right.nameTmp, left.nameTmp);
+				sprintf(asigIntermedia, "%s(&%s,%s);double_copiar(&%s,&%s);\n\n", "double_sumarLista", right.nameTmp, left.nameTmp, right.nameTmp, newVar.nameTmp);
 		}
 	}
 	else
@@ -261,17 +261,18 @@ char* getOpMultExpr(attr newVar, attr left, attr op, attr right)
 		}
 		else if(op.atrib == 0){
 			if(left.type == ENTERO)
-				sprintf(asigIntermedia, "%s = %s(&%s,%s);\n\n", newVar.nameTmp, "int_dividirLista", left.nameTmp, right.nameTmp);
+				sprintf(asigIntermedia, "%s(&%s,%s);int_copiar(&%s,&%s);\n\n", "int_dividirLista", left.nameTmp, right.nameTmp, left.nameTmp, newVar.nameTmp);
 			else if(left.type == REAL)
-				sprintf(asigIntermedia, "%s = %s(&%s,%s);\n\n", newVar.nameTmp, "double_dividirLista", left.nameTmp, right.nameTmp);
+				sprintf(asigIntermedia, "%s(&%s,%s);double_copiar(&%s,&%s);\n\n", "double_dividirLista", left.nameTmp, right.nameTmp, left.nameTmp, newVar.nameTmp);
 		}
 	}
 	else if(!left.isList && right.isList){
-		if(op.atrib == 2)
+		if(op.atrib == 2){
 			if(left.type == ENTERO)
-				sprintf(asigIntermedia, "%s = %s(&%s,%s);\n\n", newVar.nameTmp, "int_multiplicarLista", right.nameTmp, left.nameTmp);
+				sprintf(asigIntermedia, "%s(&%s,%s);\nint_copiar(&%s,&%s);\n\n", "int_multiplicarLista", right.nameTmp, left.nameTmp, right.nameTmp, newVar.nameTmp);
 			else if(left.type == REAL)
-				sprintf(asigIntermedia, "%s = %s(&%s,%s);\n\n", newVar.nameTmp, "double_multiplicarLista", right.nameTmp, left.nameTmp);
+				sprintf(asigIntermedia, "%s(&%s,%s);\ndouble_copiar(&%s,&%s);\n\n", "double_multiplicarLista", right.nameTmp, left.nameTmp, right.nameTmp, newVar.nameTmp);
+		}
 	}
 	else{
 		if(op.atrib == 0 || op.atrib == 2 || op.atrib == 3)
@@ -941,9 +942,9 @@ char* getTernExpr(attr newVar, attr expr1, attr expr2, attr expr3){
 	char* asigIntermedia = malloc(150);
 
 	if(expr1.type == ENTERO)
-		sprintf(asigIntermedia, "%s = int_insertar(&%s, %s, %s);\n\n", newVar.nameTmp, expr1.nameTmp, expr3.nameTmp, expr2.nameTmp);
+		sprintf(asigIntermedia, "int_insertarCopia(&%s, &%s, %s, %s);\n\n", expr1.nameTmp, newVar.nameTmp, expr3.nameTmp, expr2.nameTmp);
 	else if(expr1.type == REAL)
-		sprintf(asigIntermedia, "%s = double_insertar(&%s, %s, %s);\n\n", newVar.nameTmp, expr1.nameTmp, expr3.nameTmp, expr2.nameTmp);
+		sprintf(asigIntermedia, "double_insertarCopia(&%s, &%s, %s, %s);\n\n", expr1.nameTmp, newVar.nameTmp, expr3.nameTmp, expr2.nameTmp);
 
 	char* res = malloc(300);
 	sprintf(res, "%s\t%s%s\t%s", getTabs(), declaration, getTabs(), asigIntermedia);
@@ -960,9 +961,9 @@ char* getMinMinExpr(attr newVar, attr expr1, attr expr2){
 	char* asigIntermedia = malloc(150);
 
 	if(expr1.type == ENTERO)
-		sprintf(asigIntermedia, "%s = int_eliminar(&%s, %s);\n\n", newVar.nameTmp, expr1.nameTmp, expr2.nameTmp);
+		sprintf(asigIntermedia, "int_eliminarCopia(&%s, &%s, %s);\n\n", expr1.nameTmp, newVar.nameTmp, expr2.nameTmp);
 	else if(expr1.type == REAL)
-		sprintf(asigIntermedia, "%s = double_eliminar(&%s, %s);\n\n", newVar.nameTmp, expr1.nameTmp, expr2.nameTmp);
+		sprintf(asigIntermedia, "double_eliminarCopia(&%s, &%s, %s);\n\n", expr1.nameTmp, newVar.nameTmp, expr2.nameTmp);
 
 	char* res = malloc(300);
 	sprintf(res, "%s\t%s%s\t%s", getTabs(), declaration, getTabs(), asigIntermedia);
