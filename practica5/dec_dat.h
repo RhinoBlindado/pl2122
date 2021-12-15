@@ -236,40 +236,45 @@
 			int_isInit(origList);
 			int_isInit(copyList);
 
-			Nodo_int *ant, *sigu, *cAct, *cSigu;
-
-			int_limpiar(copyList);
-		
-			copyList->longitud = origList->longitud;
-			copyList->puntero = origList->puntero;
-
-			cAct = (Nodo_int *) malloc(sizeof (Nodo_int));
-			cSigu = (Nodo_int *) malloc(sizeof (Nodo_int));
-
-			ant = origList->primero;
-			sigu = ant->sig;
-
-			cSigu->data = sigu->data;
-
-			cAct->data = ant->data;
-			cAct->sig = cSigu;
-
-			copyList->primero = cAct;
-
-			for(int i=0; i<copyList->longitud - 2; i++)
+			if(origList->longitud > 0)
 			{
-				cAct = cSigu;
+				Nodo_int *ant, *sigu, *cAct, *cSigu;
+
+				int_limpiar(copyList);
+			
+				copyList->longitud = origList->longitud;
+				copyList->puntero = origList->puntero;
+
+				cAct = (Nodo_int *) malloc(sizeof (Nodo_int));
 				cSigu = (Nodo_int *) malloc(sizeof (Nodo_int));
 
-				ant = sigu;
-				sigu = sigu->sig;
+				ant = origList->primero;
+				sigu = ant->sig;
 
 				cSigu->data = sigu->data;
+
+				cAct->data = ant->data;
 				cAct->sig = cSigu;
+
+				copyList->primero = cAct;
+
+				for(int i=0; i<copyList->longitud - 2; i++)
+				{
+					cAct = cSigu;
+					cSigu = (Nodo_int *) malloc(sizeof (Nodo_int));
+
+					ant = sigu;
+					sigu = sigu->sig;
+
+					cSigu->data = sigu->data;
+					cAct->sig = cSigu;
+				}
+
+				cSigu->sig = NULL;
+				copyList->ultimo = cSigu;
+
 			}
 
-			cSigu->sig = NULL;
-			copyList->ultimo = cSigu;
 		}
 
 		void int_insertarCopia(l_int *L, l_int *LCopia, int p, int e)
