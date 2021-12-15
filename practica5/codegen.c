@@ -9,6 +9,8 @@ int numTabs = 0;
 int globalVars = 0;
 int numTabsAnt = -1;
 
+#define SIZE_MALLOC 1024
+
 
 void openFile()
 {
@@ -24,7 +26,7 @@ void closeFile()
 
 char* genHeaders()
 {
-	char* res = malloc(300);
+	char* res = malloc(SIZE_MALLOC);
     sprintf(res,"/* PROGRAMA GENERADO POR YACC/LEX */\n");
     sprintf(res, "%s#include <stdio.h>\n", res);
     sprintf(res, "%s#include <stdlib.h>\n", res);
@@ -37,7 +39,7 @@ char* genHeaders()
 
 char * temporal()
 {
-    char* res = malloc(50);
+    char* res = malloc(SIZE_MALLOC);
     sprintf(res, "tmp%i", varTemp);
     varTemp += 1;
     return res;
@@ -45,7 +47,7 @@ char * temporal()
 
 char * etiqueta()
 {
-    char* res = malloc(50);
+    char* res = malloc(SIZE_MALLOC);
     sprintf(res, "etiqueta%i", etiquet);
     etiquet += 1;
     return res;
@@ -53,14 +55,14 @@ char * etiqueta()
 
 char* getInit()
 {
-	char* res = malloc(50);
+	char* res = malloc(SIZE_MALLOC);
     sprintf(res, "\nint main()\n");
 	return res;
 }
 
 char* getTabs()
 {
-	char* res = malloc(20);
+	char* res = malloc(SIZE_MALLOC);
 	for(int i = 0; i < numTabs; i++)
 		res[i] = '\t';
 	res[numTabs] = '\0';
@@ -70,14 +72,14 @@ char* getTabs()
 
 char* getWithTabs(const char* something)
 {
-	char* res = malloc(400);
+	char* res = malloc(SIZE_MALLOC);
     sprintf(res, "%s%s", getTabs(), something);
 	return res;
 }
 
 char* getStartBlock()
 {
-	char* res = malloc(30);
+	char* res = malloc(SIZE_MALLOC);
 	res[0] = '\0';
     if(!globalVars){
         sprintf(res, "%s{\n", getTabs());
@@ -88,7 +90,7 @@ char* getStartBlock()
 
 char* getEndBlock()
 {
-	char* res = malloc(30);
+	char* res = malloc(SIZE_MALLOC);
 	res[0] = '\0';
 	numTabs -= 1;
     sprintf(res, "%s}\n", getTabs());
@@ -97,7 +99,7 @@ char* getEndBlock()
 
 char * getCType(attr t)
 {
-    char* res = malloc(50);
+    char* res = malloc(SIZE_MALLOC);
 
     if (t.type == ENTERO)
         sprintf(res, "int ");
@@ -109,7 +111,7 @@ char * getCType(attr t)
         sprintf(res, "bool ");
 
 	if(t.isList){
-		char* res2 = malloc(60);
+		char* res2 = malloc(SIZE_MALLOC);
 		sprintf(res2, "%s%s", "l_", res);
 		return res2;
 	}
@@ -119,21 +121,21 @@ char * getCType(attr t)
 
 char* getVars(attr type, attr idsMiddle, attr idFinal)
 {
-    char* res = malloc(150);
+    char* res = malloc(SIZE_MALLOC);
 	sprintf(res, "%s%s%s%s;\n", getTabs(), type.nameTmp, idsMiddle.nameTmp, idFinal.lexema);
 	return res;
 }
 
 char * concatVars(attr variousIds, attr newId)
 {
-	char* res = malloc(150);
+	char* res = malloc(SIZE_MALLOC);
 	sprintf(res, "%s%s, ", variousIds.nameTmp, newId.lexema);
 	return res;
 }
 
 char* controlGlobalVars()
 {
-	char* res = malloc(500);
+	char* res = malloc(SIZE_MALLOC);
 	res[0] = '\0';
 	if(globalVars){
 		globalVars = 0;
@@ -145,47 +147,45 @@ char* controlGlobalVars()
 char* getMasMenosExpr(attr newVar, attr left, attr op, attr right)
 {
 	// Declarar nueva variables
-	char* declaration = malloc(150);
+	char* declaration = malloc(SIZE_MALLOC);
 	sprintf(declaration, "%s%s;\n", getCType(newVar), newVar.nameTmp);
 
 	// Determinar operador
-	char* operador = malloc(10);
+	char* operador = malloc(SIZE_MALLOC);
 	if(op.atrib == 0)
 		operador = "+";
 	else
 		operador = "-";
 
 	// Escribir asignación intermedia
-	char* asigIntermedia = malloc(150);
+	char* asigIntermedia = malloc(SIZE_MALLOC);
 
-	if(!left.isList && right.isList){
+	if(left.isList && !right.isList){
 		if(op.atrib == 0){
 			if(left.type == ENTERO)
-				// sprintf(asigIntermedia, "%s(&%s,%s); %s = %s;\n\n", "int_sumarValor", left.nameTmp, right.nameTmp, newVar.nameTmp, left.nameTmp);
-				sprintf(asigIntermedia, "%s = %s(&%s,%s);\n\n", newVar.nameTmp, "int_sumarValor", right.nameTmp, left.nameTmp);
+				sprintf(asigIntermedia, "%s = %s(&%s,%s);\n\n", newVar.nameTmp, "int_sumarValor", left.nameTmp, right.nameTmp);
 			else if(left.type == REAL)
-				// sprintf(asigIntermedia, "%s(&%s,%s); %s = %s;\n\n", "double_sumarValor", left.nameTmp, right.nameTmp, newVar.nameTmp, left.nameTmp);
-				sprintf(asigIntermedia, "%s = %s(&%s,%s);\n\n", newVar.nameTmp, "double_sumarValor", right.nameTmp, left.nameTmp);
+				sprintf(asigIntermedia, "%s = %s(&%s,%s);\n\n", newVar.nameTmp, "double_sumarValor", left.nameTmp, right.nameTmp);
 		}
 		else if(op.atrib == 1){
 			if(left.type == ENTERO)
-				sprintf(asigIntermedia, "%s(&%s,%s);int_copiar(&%s,&%s);\n\n", "int_restarLista", right.nameTmp, left.nameTmp, left.nameTmp, newVar.nameTmp);
+				sprintf(asigIntermedia, "%s(&%s,%s);int_copiar(&%s,&%s);\n\n", "int_restarLista", left.nameTmp, right.nameTmp, left.nameTmp, newVar.nameTmp);
 			else if(left.type == REAL)
-				sprintf(asigIntermedia, "%s(&%s,%s);double_copiar(&%s,&%s);\n\n", "double_restarLista", right.nameTmp, left.nameTmp, left.nameTmp, newVar.nameTmp);
+				sprintf(asigIntermedia, "%s(&%s,%s);double_copiar(&%s,&%s);\n\n", "double_restarLista", left.nameTmp, right.nameTmp, left.nameTmp, newVar.nameTmp);
 		}
 	}
-	else if(left.isList && !right.isList){
+	else if(!left.isList && right.isList){
 		if(op.atrib == 0){
 			if(left.type == ENTERO)
-				sprintf(asigIntermedia, "%s(&%s,%s);int_copiar(&%s,&%s);\n\n", "int_sumarLista", left.nameTmp, right.nameTmp, right.nameTmp, newVar.nameTmp);
+				sprintf(asigIntermedia, "%s(&%s,%s);int_copiar(&%s,&%s);\n\n", "int_sumarLista", right.nameTmp, left.nameTmp, right.nameTmp, newVar.nameTmp);
 			else if(left.type == REAL)
-				sprintf(asigIntermedia, "%s(&%s,%s);double_copiar(&%s,&%s);\n\n", "double_sumarLista", left.nameTmp, right.nameTmp, right.nameTmp, newVar.nameTmp);
+				sprintf(asigIntermedia, "%s(&%s,%s);double_copiar(&%s,&%s);\n\n", "double_sumarLista", right.nameTmp, left.nameTmp, right.nameTmp, newVar.nameTmp);
 		}
 	}
 	else
 		sprintf(asigIntermedia, "%s = %s %s %s;\n\n", newVar.nameTmp, left.nameTmp, operador, right.nameTmp);
 
-	char* res = malloc(300);
+	char* res = malloc(SIZE_MALLOC);
 	sprintf(res, "%s\t%s%s\t%s", getTabs(), declaration, getTabs(), asigIntermedia);
 
 	return res;
@@ -194,21 +194,21 @@ char* getMasMenosExpr(attr newVar, attr left, attr op, attr right)
 char* getMasMenosSufExpr(attr newVar, attr op, attr val)
 {
 	// Declarar nueva variables
-	char* declaration = malloc(150);
+	char* declaration = malloc(SIZE_MALLOC);
 	sprintf(declaration, "%s%s;\n", getCType(newVar), newVar.nameTmp);
 
 	// Determinar operador
-	char* operador = malloc(10);
+	char* operador = malloc(SIZE_MALLOC);
 	if(op.atrib == 0)
 		operador = "+";
 	else
 		operador = "-";
 
 	// Escribir asignación intermedia
-	char* asigIntermedia = malloc(150);
+	char* asigIntermedia = malloc(SIZE_MALLOC);
 	sprintf(asigIntermedia, "%s = %s %s;\n\n", newVar.nameTmp, operador, val.nameTmp);
 
-	char* res = malloc(300);
+	char* res = malloc(SIZE_MALLOC);
 	sprintf(res, "%s\t%s%s\t%s", getTabs(), declaration, getTabs(), asigIntermedia);
 
 	return res;
@@ -217,14 +217,14 @@ char* getMasMenosSufExpr(attr newVar, attr op, attr val)
 char* getNotExpr(attr newVar, attr op, attr val)
 {
 	// Declarar nueva variables
-	char* declaration = malloc(150);
+	char* declaration = malloc(SIZE_MALLOC);
 	sprintf(declaration, "%s%s;\n", getCType(newVar), newVar.nameTmp);
 
 	// Escribir asignación intermedia
-	char* asigIntermedia = malloc(150);
+	char* asigIntermedia = malloc(SIZE_MALLOC);
 	sprintf(asigIntermedia, "%s = %s %s;\n\n", newVar.nameTmp, "!", val.nameTmp);
 
-	char* res = malloc(300);
+	char* res = malloc(SIZE_MALLOC);
 	sprintf(res, "%s\t%s%s\t%s", getTabs(), declaration, getTabs(), asigIntermedia);
 
 	return res;
@@ -233,11 +233,11 @@ char* getNotExpr(attr newVar, attr op, attr val)
 char* getOpMultExpr(attr newVar, attr left, attr op, attr right)
 {
 	// Declarar nueva variables
-	char* declaration = malloc(150);
+	char* declaration = malloc(SIZE_MALLOC);
 	sprintf(declaration, "%s%s;\n", getCType(newVar), newVar.nameTmp);
 
 	// Determinar operador
-	char* operador = malloc(10);
+	char* operador = malloc(SIZE_MALLOC);
 	if(op.atrib == 0)
 		operador = "/";
 	else if(op.atrib == 2)
@@ -246,7 +246,7 @@ char* getOpMultExpr(attr newVar, attr left, attr op, attr right)
 		operador = "%";
 
 	// Escribir asignación intermedia
-	char* asigIntermedia = malloc(150);
+	char* asigIntermedia = malloc(SIZE_MALLOC);
 	
 	if(left.isList && !right.isList){
 		if(op.atrib == 3){
@@ -255,11 +255,11 @@ char* getOpMultExpr(attr newVar, attr left, attr op, attr right)
 			else if(left.type == REAL)
 				sprintf(asigIntermedia, "%s(&%s,&%s,%s);\n\n", "double_eliminarCopiaDesdePosicion", left.nameTmp, newVar.nameTmp, right.nameTmp);
 		}
-		if(op.atrib == 2){
+		else if(op.atrib == 2){
 			if(left.type == ENTERO)
-				sprintf(asigIntermedia, "%s(&%s,%s);\nint_copiar(&%s,&%s);\n\n", "int_multiplicarLista", left.nameTmp, right.nameTmp, right.nameTmp, newVar.nameTmp);
+				sprintf(asigIntermedia, "%s = %s(&%s,%s);\n\n", newVar.nameTmp, "int_multiplicarValor", left.nameTmp, right.nameTmp);
 			else if(left.type == REAL)
-				sprintf(asigIntermedia, "%s(&%s,%s);\ndouble_copiar(&%s,&%s);\n\n", "double_multiplicarLista", left.nameTmp, right.nameTmp, right.nameTmp, newVar.nameTmp);
+				sprintf(asigIntermedia, "%s = %s(&%s,%s);\n\n", newVar.nameTmp, "double_multiplicarValor", left.nameTmp, right.nameTmp);
 		}
 		else if(op.atrib == 0){
 			if(left.type == ENTERO)
@@ -271,9 +271,9 @@ char* getOpMultExpr(attr newVar, attr left, attr op, attr right)
 	else if(!left.isList && right.isList){
 		if(op.atrib == 2){
 			if(left.type == ENTERO)
-				sprintf(asigIntermedia, "%s = %s(&%s,%s);\n\n", newVar.nameTmp, "int_multiplicarValor", right.nameTmp, left.nameTmp);
+				sprintf(asigIntermedia, "%s(&%s,%s);\nint_copiar(&%s,&%s);\n\n", "int_multiplicarLista", right.nameTmp, left.nameTmp, right.nameTmp, newVar.nameTmp);
 			else if(left.type == REAL)
-				sprintf(asigIntermedia, "%s = %s(&%s,%s);\n\n", newVar.nameTmp, "double_multiplicarValor", right.nameTmp, left.nameTmp);
+				sprintf(asigIntermedia, "%s(&%s,%s);\ndouble_copiar(&%s,&%s);\n\n", "double_multiplicarLista", right.nameTmp, left.nameTmp, right.nameTmp, newVar.nameTmp);
 		}
 	}
 	else{
@@ -283,7 +283,7 @@ char* getOpMultExpr(attr newVar, attr left, attr op, attr right)
 			sprintf(asigIntermedia, "%s = pow(%s, %s);\n\n", newVar.nameTmp, left.nameTmp, right.nameTmp);
 	}
 
-	char* res = malloc(300);
+	char* res = malloc(SIZE_MALLOC);
 	sprintf(res, "%s\t%s%s\t%s", getTabs(), declaration, getTabs(), asigIntermedia);
 
 	return res;
@@ -292,21 +292,21 @@ char* getOpMultExpr(attr newVar, attr left, attr op, attr right)
 char* getIgualdadExpr(attr newVar, attr left, attr op, attr right)
 {
 	// Declarar nueva variables
-	char* declaration = malloc(150);
+	char* declaration = malloc(SIZE_MALLOC);
 	sprintf(declaration, "%s%s;\n", getCType(newVar), newVar.nameTmp);
 
 	// Determinar operador
-	char* operador = malloc(10);
+	char* operador = malloc(SIZE_MALLOC);
 	if(op.atrib == 0)
 		operador = "==";
 	else
 		operador = "!=";
 
 	// Escribir asignación intermedia
-	char* asigIntermedia = malloc(150);
+	char* asigIntermedia = malloc(SIZE_MALLOC);
 	sprintf(asigIntermedia, "%s = %s %s %s;\n\n", newVar.nameTmp, left.nameTmp, operador, right.nameTmp);
 
-	char* res = malloc(300);
+	char* res = malloc(SIZE_MALLOC);
 	sprintf(res, "%s\t%s%s\t%s", getTabs(), declaration, getTabs(), asigIntermedia);
 
 	return res;
@@ -315,11 +315,11 @@ char* getIgualdadExpr(attr newVar, attr left, attr op, attr right)
 char* getDesigualExpr(attr newVar, attr left, attr op, attr right)
 {
 	// Declarar nueva variables
-	char* declaration = malloc(150);
+	char* declaration = malloc(SIZE_MALLOC);
 	sprintf(declaration, "%s%s;\n", getCType(newVar), newVar.nameTmp);
 
 	// Determinar operador
-	char* operador = malloc(10);
+	char* operador = malloc(SIZE_MALLOC);
 	if(op.atrib == 0)
 		operador = "<";
 	else if(op.atrib == 1)
@@ -330,10 +330,10 @@ char* getDesigualExpr(attr newVar, attr left, attr op, attr right)
 		operador = ">=";
 
 	// Escribir asignación intermedia
-	char* asigIntermedia = malloc(150);
+	char* asigIntermedia = malloc(SIZE_MALLOC);
 	sprintf(asigIntermedia, "%s = %s %s %s;\n\n", newVar.nameTmp, left.nameTmp, operador, right.nameTmp);
 
-	char* res = malloc(300);
+	char* res = malloc(SIZE_MALLOC);
 	sprintf(res, "%s\t%s%s\t%s", getTabs(), declaration, getTabs(), asigIntermedia);
 
 	return res;
@@ -342,14 +342,14 @@ char* getDesigualExpr(attr newVar, attr left, attr op, attr right)
 char* getAndExpr(attr newVar, attr left, attr op, attr right)
 {
 	// Declarar nueva variables
-	char* declaration = malloc(150);
+	char* declaration = malloc(SIZE_MALLOC);
 	sprintf(declaration, "%s%s;\n", getCType(newVar), newVar.nameTmp);
 
 	// Escribir asignación intermedia
-	char* asigIntermedia = malloc(150);
+	char* asigIntermedia = malloc(SIZE_MALLOC);
 	sprintf(asigIntermedia, "%s = %s %s %s;\n\n", newVar.nameTmp, left.nameTmp, "&&", right.nameTmp);
 
-	char* res = malloc(300);
+	char* res = malloc(SIZE_MALLOC);
 	sprintf(res, "%s\t%s%s\t%s", getTabs(), declaration, getTabs(), asigIntermedia);
 
 	return res;
@@ -358,14 +358,14 @@ char* getAndExpr(attr newVar, attr left, attr op, attr right)
 char* getOrExpr(attr newVar, attr left, attr op, attr right)
 {
 	// Declarar nueva variables
-	char* declaration = malloc(150);
+	char* declaration = malloc(SIZE_MALLOC);
 	sprintf(declaration, "%s%s;\n", getCType(newVar), newVar.nameTmp);
 
 	// Escribir asignación intermedia
-	char* asigIntermedia = malloc(150);
+	char* asigIntermedia = malloc(SIZE_MALLOC);
 	sprintf(asigIntermedia, "%s = %s %s %s;\n\n", newVar.nameTmp, left.nameTmp, "||", right.nameTmp);
 
-	char* res = malloc(300);
+	char* res = malloc(SIZE_MALLOC);
 	sprintf(res, "%s\t%s%s\t%s", getTabs(), declaration, getTabs(), asigIntermedia);
 
 	return res;
@@ -374,14 +374,14 @@ char* getOrExpr(attr newVar, attr left, attr op, attr right)
 char* getXorExpr(attr newVar, attr left, attr op, attr right)
 {
 	// Declarar nueva variable
-	char* declaration = malloc(150);
+	char* declaration = malloc(SIZE_MALLOC);
 	sprintf(declaration, "%s%s;\n", getCType(newVar), newVar.nameTmp);
 
 	// Escribir asignación intermedia
-	char* asigIntermedia = malloc(150);
+	char* asigIntermedia = malloc(SIZE_MALLOC);
 	sprintf(asigIntermedia, "%s = %s %s %s;\n\n", newVar.nameTmp, left.nameTmp, "!=", right.nameTmp);
 
-	char* res = malloc(300);
+	char* res = malloc(SIZE_MALLOC);
 	sprintf(res, "%s\t%s%s\t%s", getTabs(), declaration, getTabs(), asigIntermedia);
 
 	return res;
@@ -389,7 +389,7 @@ char* getXorExpr(attr newVar, attr left, attr op, attr right)
 
 char* equivalentCLexema(attr atributo)
 {
-	char* lex = malloc(150);
+	char* lex = malloc(SIZE_MALLOC);
 	
 	if(atributo.type == BOOLEANO)
 		if(strcmp(atributo.lexema, "Verdadero") == 0)
@@ -404,7 +404,7 @@ char* equivalentCLexema(attr atributo)
 
 char* concatGen(char* left, char* right)
 {
-	char* res = malloc(5000);
+	char* res = malloc(10000);
 	sprintf(res, "%s%s", left, right);
 	return res;
 }
@@ -412,7 +412,7 @@ char* concatGen(char* left, char* right)
 
 char* getAsig(attr left, attr right)
 {
-	char* res = malloc(1000);
+	char* res = malloc(SIZE_MALLOC);
 	sprintf(res, "%s%s", getStartBlock(), right.gen);
 	sprintf(res, "%s%s%s = %s;\n", res, getTabs(), left.lexema, right.nameTmp);
 	sprintf(res, "%s%s", res, getEndBlock());
@@ -421,7 +421,7 @@ char* getAsig(attr left, attr right)
 
 char* declarateTmpVar(char* var, attr exp)
 {
-	char* res = malloc(1000);
+	char* res = malloc(SIZE_MALLOC);
 	sprintf(res, "%s%s%s;\n", getTabs(), getCType(exp), var);
 	sprintf(res, "%s%s%s", res, getStartBlock(), exp.gen);
 	sprintf(res, "%s%s%s = %s;\n", res, getTabs(), var, exp.nameTmp);
@@ -432,7 +432,7 @@ char* declarateTmpVar(char* var, attr exp)
 
 char* getPrint(attr exp)
 {
-	char* res = malloc(1000);
+	char* res = malloc(SIZE_MALLOC);
 
 	// Comprobar si hay que generar variable
 	int genVar = strcmp(exp.gen, "") != 0;
@@ -466,7 +466,7 @@ char* getIf(attr exp, attr sent)
 {
 	char* etiqSig = etiqueta();
 	
-	char* res = malloc(700);
+	char* res = malloc(SIZE_MALLOC);
 
 	// Comprobar si hay que generar variable
 	int genVar = strcmp(exp.gen, "") != 0;
@@ -496,7 +496,7 @@ char* getIfElse(attr exp, attr sentIf, attr sentElse)
 	char* etiqElse = etiqueta();
 	char* etiqSig = etiqueta();
 
-	char* res = malloc(700);
+	char* res = malloc(SIZE_MALLOC);
 
 	// Comprobar si hay que generar variable
 	int genVar = strcmp(exp.gen, "") != 0;
@@ -529,7 +529,7 @@ char* getForAsig(attr asig, attr exp, attr sentido, attr sent)
 	char* etiqIni = etiqueta();
 	char* etiqOut = etiqueta();
 
-	char* res = malloc(700);
+	char* res = malloc(SIZE_MALLOC);
 
 	// Comprobar si hay que generar variable
 	int genVar = strcmp(exp.gen, "") != 0;
@@ -589,7 +589,7 @@ char* getFor(attr exp1, attr exp2, attr sentido, attr sent)
 	char* etiqIni = etiqueta();
 	char* etiqOut = etiqueta();
 
-	char* res = malloc(700);
+	char* res = malloc(SIZE_MALLOC);
 
 	// Comprobar si hay que generar variable para expresión izquierda
 	char* varLeft = temporal();
@@ -650,7 +650,7 @@ char* getWhile(attr exp, attr sent)
 	char* etiqIni = etiqueta();
 	char* etiqOut = etiqueta();
 
-	char* res = malloc(700);
+	char* res = malloc(SIZE_MALLOC);
 
 	// Comprobar si hay que generar variable
 	int genVar = strcmp(exp.gen, "") != 0;
@@ -696,7 +696,7 @@ char* getWhile(attr exp, attr sent)
 
 char* getReturn(attr exp)
 {
-	char* res = malloc(700);	
+	char* res = malloc(SIZE_MALLOC);	
 
 	// Comprobar si hay que generar variable
 	int genVar = strcmp(exp.gen, "") != 0;
@@ -719,7 +719,7 @@ char* getReturn(attr exp)
 
 char* getScan(attr id)
 {
-	char* res = malloc(1000);
+	char* res = malloc(SIZE_MALLOC);
 
 	if(id.type == ENTERO)
 		sprintf(res, "%s%sscanf(\"%sd\", &%s);\n", res, getTabs(), "%", id.lexema);
@@ -746,7 +746,7 @@ attr getParamFunc(attr exp)
 	auxAttr.nameTmp = exp.nameTmp;
 	auxAttr.gen = exp.gen;
 
-	char* res = malloc(1000);
+	char* res = malloc(SIZE_MALLOC);
 	
 	// Comprobar si hay que generar variable
 	int genVar = strcmp(exp.gen, "") != 0;
@@ -770,35 +770,35 @@ attr getParamFunc(attr exp)
 
 char* paramConcat(attr args, attr exp)
 {
-	char* res = malloc(200);
+	char* res = malloc(SIZE_MALLOC);
 	sprintf(res, "%s, %s", args.nameTmp, exp.nameTmp);
 	return res;
 }
 
 char* getFuncCall(attr id, attr args)
 {
-	char* res = malloc(300);
+	char* res = malloc(SIZE_MALLOC);
 	sprintf(res, "%s(%s)", id.lexema, args.nameTmp);
 	return res;
 }
 
 char* getParamDec(attr type, attr id)
 {
-	char* res = malloc(100);
+	char* res = malloc(SIZE_MALLOC);
 	sprintf(res, "%s %s", getCType(type), id.lexema);
 	return res;
 }
 
 char* concatParamDec(attr params, attr type, attr id)
 {
-	char* res = malloc(200);
+	char* res = malloc(SIZE_MALLOC);
 	sprintf(res, "%s, %s", params.gen, getParamDec(type, id));
 	return res;
 }
 
 char* getCabecera(attr type, attr nameFunc, attr params)
 {
-	char* res = malloc(300);
+	char* res = malloc(SIZE_MALLOC);
 	sprintf(res, "%s%s %s(%s)\n", getTabs(), getCType(type), nameFunc.lexema, params.gen);
 	return res;
 }
@@ -821,7 +821,7 @@ void controlEndBlockFunc()
 
 char* genHeadersFunc()
 {
-	char* res = malloc(300);
+	char* res = malloc(SIZE_MALLOC);
     sprintf(res,"/* PROGRAMA GENERADO POR YACC/LEX */\n");
 	sprintf(res, "%s#ifndef FUNCIONES\n", res);
 	sprintf(res, "%s#define FUNCIONES\n", res);
@@ -835,7 +835,7 @@ char* genHeadersFunc()
 
 char* getExternVars(attr type, attr idsMiddle, attr idFinal)
 {
-    char* res = malloc(150);
+    char* res = malloc(SIZE_MALLOC);
 	if(globalVars)
 		sprintf(res, "%s %s%s%s;\n", "extern", type.nameTmp, idsMiddle.nameTmp, idFinal.lexema);
 	return res;
@@ -843,7 +843,7 @@ char* getExternVars(attr type, attr idsMiddle, attr idFinal)
 
 void writeFuncsFile(attr block)
 {
-	char* res = malloc(3000);
+	char* res = malloc(10000);
 	sprintf(res, "%s%s%s", genHeadersFunc(), block.funcGen, "#endif");
 	fprintf(funcs, "%s", res);
 }
@@ -852,13 +852,13 @@ attr getCorrectBlock(attr ini, attr vars, attr funcs, attr sent, attr end, int I
 {
 	attr block;
 
-	char* res = malloc(5000);
+	char* res = malloc(10000);
 	if(IN_FUNC)
 		sprintf(res, "%s%s%s%s%s", ini.gen, vars.gen, funcs.gen, sent.gen, end.gen);
 	else
 		sprintf(res, "%s%s%s%s", ini.gen, vars.gen, sent.gen, end.gen);
 
-	char* res2 = malloc(5000);
+	char* res2 = malloc(10000);
 	if(strcmp(vars.gen, "") == 0)
 		sprintf(res2, "%s", funcs.gen);
 	else
@@ -879,18 +879,18 @@ void writeProgram(attr block)
 char* getHashExpr(attr newVar, attr op, attr val){
 
 	// Declarar nueva variables
-	char* declaration = malloc(150);
+	char* declaration = malloc(SIZE_MALLOC);
 	sprintf(declaration, "%s%s;\n", getCType(newVar), newVar.nameTmp);
 
 	// Escribir asignación intermedia
-	char* asigIntermedia = malloc(150);
+	char* asigIntermedia = malloc(SIZE_MALLOC);
 
 	if(val.type == ENTERO)
 		sprintf(asigIntermedia, "%s = int_longitud(&%s);\n\n", newVar.nameTmp, val.nameTmp);
 	else if(val.type == REAL)
 		sprintf(asigIntermedia, "%s = double_longitud(&%s);\n\n", newVar.nameTmp, val.nameTmp);
 
-	char* res = malloc(300);
+	char* res = malloc(SIZE_MALLOC);
 	sprintf(res, "%s\t%s%s\t%s", getTabs(), declaration, getTabs(), asigIntermedia);
 
 	return res;
@@ -899,18 +899,18 @@ char* getHashExpr(attr newVar, attr op, attr val){
 char* getInterrExpr(attr newVar, attr op, attr val){
 
 	// Declarar nueva variables
-	char* declaration = malloc(150);
+	char* declaration = malloc(SIZE_MALLOC);
 	sprintf(declaration, "%s%s;\n", getCType(newVar), newVar.nameTmp);
 
 	// Escribir asignación intermedia
-	char* asigIntermedia = malloc(150);
+	char* asigIntermedia = malloc(SIZE_MALLOC);
 
 	if(val.type == ENTERO)
 		sprintf(asigIntermedia, "%s = int_consultar(%s);\n\n", newVar.nameTmp, val.nameTmp);
 	else if(val.type == REAL)
 		sprintf(asigIntermedia, "%s = double_consultar(%s);\n\n", newVar.nameTmp, val.nameTmp);
 
-	char* res = malloc(300);
+	char* res = malloc(SIZE_MALLOC);
 	sprintf(res, "%s\t%s%s\t%s", getTabs(), declaration, getTabs(), asigIntermedia);
 
 	return res;
@@ -918,18 +918,18 @@ char* getInterrExpr(attr newVar, attr op, attr val){
 
 char* getAtExpr(attr newVar, attr left, attr op, attr right){
 	// Declarar nueva variables
-	char* declaration = malloc(150);
+	char* declaration = malloc(SIZE_MALLOC);
 	sprintf(declaration, "%s%s;\n", getCType(newVar), newVar.nameTmp);
 
 	// Escribir asignación intermedia
-	char* asigIntermedia = malloc(150);
+	char* asigIntermedia = malloc(SIZE_MALLOC);
 
 	if(left.type == ENTERO)
 		sprintf(asigIntermedia, "%s = int_consultarEnPosicion(%s, %s);\n\n", newVar.nameTmp, left.nameTmp, right.nameTmp);
 	else if(left.type == REAL)
 		sprintf(asigIntermedia, "%s = double_consultarEnPosicion(%s, %s);\n\n", newVar.nameTmp, left.nameTmp, right.nameTmp);
 
-	char* res = malloc(300);
+	char* res = malloc(SIZE_MALLOC);
 	sprintf(res, "%s\t%s%s\t%s", getTabs(), declaration, getTabs(), asigIntermedia);
 
 	return res;
@@ -937,18 +937,18 @@ char* getAtExpr(attr newVar, attr left, attr op, attr right){
 
 char* getTernExpr(attr newVar, attr expr1, attr expr2, attr expr3){
 	// Declarar nueva variables
-	char* declaration = malloc(150);
+	char* declaration = malloc(SIZE_MALLOC);
 	sprintf(declaration, "%s%s;\n", getCType(newVar), newVar.nameTmp);
 
 	// Escribir asignación intermedia
-	char* asigIntermedia = malloc(150);
+	char* asigIntermedia = malloc(SIZE_MALLOC);
 
 	if(expr1.type == ENTERO)
 		sprintf(asigIntermedia, "int_insertarCopia(&%s, &%s, %s, %s);\n\n", expr1.nameTmp, newVar.nameTmp, expr3.nameTmp, expr2.nameTmp);
 	else if(expr1.type == REAL)
 		sprintf(asigIntermedia, "double_insertarCopia(&%s, &%s, %s, %s);\n\n", expr1.nameTmp, newVar.nameTmp, expr3.nameTmp, expr2.nameTmp);
 
-	char* res = malloc(300);
+	char* res = malloc(SIZE_MALLOC);
 	sprintf(res, "%s\t%s%s\t%s", getTabs(), declaration, getTabs(), asigIntermedia);
 
 	return res;
@@ -956,18 +956,18 @@ char* getTernExpr(attr newVar, attr expr1, attr expr2, attr expr3){
 
 char* getMinMinExpr(attr newVar, attr expr1, attr expr2){
 	// Declarar nueva variables
-	char* declaration = malloc(150);
+	char* declaration = malloc(SIZE_MALLOC);
 	sprintf(declaration, "%s%s;\n", getCType(newVar), newVar.nameTmp);
 
 	// Escribir asignación intermedia
-	char* asigIntermedia = malloc(150);
+	char* asigIntermedia = malloc(SIZE_MALLOC);
 
 	if(expr1.type == ENTERO)
 		sprintf(asigIntermedia, "int_eliminarCopia(&%s, &%s, %s);\n\n", expr1.nameTmp, newVar.nameTmp, expr2.nameTmp);
 	else if(expr1.type == REAL)
 		sprintf(asigIntermedia, "double_eliminarCopia(&%s, &%s, %s);\n\n", expr1.nameTmp, newVar.nameTmp, expr2.nameTmp);
 
-	char* res = malloc(300);
+	char* res = malloc(SIZE_MALLOC);
 	sprintf(res, "%s\t%s%s\t%s", getTabs(), declaration, getTabs(), asigIntermedia);
 
 	return res;
@@ -975,18 +975,18 @@ char* getMinMinExpr(attr newVar, attr expr1, attr expr2){
 
 char* getConcatExpr(attr newVar, attr expr1, attr expr2){
 	// Declarar nueva variables
-	char* declaration = malloc(150);
+	char* declaration = malloc(SIZE_MALLOC);
 	sprintf(declaration, "%s%s;\n", getCType(newVar), newVar.nameTmp);
 
 	// Escribir asignación intermedia
-	char* asigIntermedia = malloc(150);
+	char* asigIntermedia = malloc(SIZE_MALLOC);
 
 	if(expr1.type == ENTERO)
 		sprintf(asigIntermedia, "int_concatenarCopia(&%s, &%s, &%s);\n\n", expr1.nameTmp, expr2.nameTmp, newVar.nameTmp);
 	else if(expr1.type == REAL)
 		sprintf(asigIntermedia, "double_concatenarCopia(&%s, &%s, &%s);\n\n", expr1.nameTmp, expr2.nameTmp, newVar.nameTmp);
 
-	char* res = malloc(300);
+	char* res = malloc(SIZE_MALLOC);
 	sprintf(res, "%s\t%s%s\t%s", getTabs(), declaration, getTabs(), asigIntermedia);
 
 	return res;
@@ -994,7 +994,7 @@ char* getConcatExpr(attr newVar, attr expr1, attr expr2){
 
 
 char* getSentIter(attr id, attr op){
-	char* res = malloc(700);
+	char* res = malloc(SIZE_MALLOC);
 
 	// Escribir sentencia
 	if(op.atrib == 0){
@@ -1016,7 +1016,7 @@ char* getSentIter(attr id, attr op){
 
 char* getIniIter(attr id){
 
-	char* res = malloc(700);	
+	char* res = malloc(SIZE_MALLOC);	
 
 	if(id.type == ENTERO)
 		sprintf(res, "%sint_punteroAInicio(&%s);\n", getTabs(), id.lexema);
