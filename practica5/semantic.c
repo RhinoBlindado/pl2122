@@ -708,7 +708,7 @@ attr checkDesigualdadExp(attr a, attr b)
   attr retVal;
   retVal.type = SUS;
   retVal.isList = 0;
-  if (a.isList != 1)
+  if (a.isList == 0)
   {
     if (a.type == b.type) {
       retVal.type = BOOLEANO;
@@ -778,6 +778,12 @@ attr checkPlusPlusAtExp(attr a, attr b, attr c)
   }
 
   return retVal;
+}
+
+void checkPrint(attr a) {
+  if (a.isList == 1) {
+    yyerror("[ERROR SEMÁNTICO] No se esperaba una variable de tipo LISTA");
+  }
 }
 
 attr checkMinMinExp(attr a, attr b)

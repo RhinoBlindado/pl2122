@@ -453,7 +453,7 @@ char* getPrint(attr exp)
 		sprintf(res, "%s%sprintf(\"%sc\", %s);\n", res, getTabs(), "%", varSalida);
 	else if(exp.type == BOOLEANO)
 		sprintf(res, "%s%sprintf(\"%sd\", %s);\n", res, getTabs(), "%", varSalida);
-	else if (exp.type == CARACTER && exp.isList == 1)
+	else if (exp.type == CARACTER && exp.isList == 2)
 		sprintf(res, "%s%sprintf(\"%ss\", %s);\n", res, getTabs(), "%", varSalida);
 
 	return res;
@@ -726,7 +726,7 @@ char* getScan(attr id)
 		sprintf(res, "%s%sscanf(\"%sc\", &%s);\n", res, getTabs(), "%", id.lexema);
 	else if(id.type == BOOLEANO)
 		sprintf(res, "%s%sscanf(\"%sd\", &%s);\n", res, getTabs(), "%", id.lexema);
-	else if (id.type == CARACTER && id.isList == 1)
+	else if (id.type == CARACTER && id.isList == 2)
 		sprintf(res, "%s%sscanf(\"%ss\", &%s);\n", res, getTabs(), "%", id.lexema);
 
 	return res;

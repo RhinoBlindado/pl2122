@@ -243,8 +243,8 @@ sentenciaSalida               : nombreSalida inicioParametros
                                 finSentencia {$$.gen = $3.gen;};
                               ;
 
-listaExpresionesCadena        : expresion {$$.gen = getPrint($1);}  
-                              | listaExpresionesCadena COMA expresion {$$.gen = concatGen($1.gen, getPrint($3));}
+listaExpresionesCadena        : expresion {checkPrint($1); $$.gen = getPrint($1);}  
+                              | listaExpresionesCadena COMA expresion {checkPrint($3); $$.gen = concatGen($1.gen, getPrint($3));}
                               ;
 
 nombreSalida                  : PRINT;
@@ -290,13 +290,13 @@ contenidoLista                : expresion { $$ = $1; }
                               | contenidoLista COMA expresion { $$ = checkLista($1, $3); }
                               ;
 
-sentenciaLista                : identificador ITER finSentencia { if (getTypeVar($1).isList == 0) yyerror("[ERROR SEMÁNTICO]: Solo se puede iterar una lista."); $1 = getTypeVar($1); $$.gen = getSentIter($1, $2);}
-                              | INITER identificador finSentencia { if (getTypeVar($2).isList == 0) yyerror("[ERROR SEMÁNTICO]: Solo se puede iterar una lista."); $2 = getTypeVar($2); $$.gen = getIniIter($2);}
+sentenciaLista                : identificador ITER finSentencia { if (getTypeVar($1).isList != 0) yyerror("[ERROR SEMÁNTICO]: Solo se puede iterar una lista."); $1 = getTypeVar($1); $$.gen = getSentIter($1, $2);}
+                              | INITER identificador finSentencia { if (getTypeVar($2).isList != 0) yyerror("[ERROR SEMÁNTICO]: Solo se puede iterar una lista."); $2 = getTypeVar($2); $$.gen = getIniIter($2);}
                               ;
 
 literal                       : LITERAL { $$ = $1; }
                               | lista { $$ = $1; }
-                              | cadena { $$.type = CARACTER; $$.isList = 1; }
+                              | cadena { $$.type = CARACTER; $$.isList = 2; }
                               ;
 
 cadena                        : CADENA
