@@ -119,7 +119,7 @@ lista[ \t\n]+de         return(DEFLISTA);
                             yylval.isList = 0;
                             return(LITERAL);
                         }
-'.'                     {
+'\\?.'                     {
                             yylval.lexema = strdup(yytext);
                             yylval.type = CARACTER;
                             yylval.isList = 0;
