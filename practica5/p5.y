@@ -276,7 +276,7 @@ funcion                       : identificador { findFunctionCall($1); numTabs +=
 
 argumentos                    : expresion { checkCallParameters($1); $1 = getParamFunc($1); $$.nameTmp = $1.nameTmp; $$.gen = $1.gen;}
                               | argumentos COMA expresion { checkCallParameters($3); $3 = getParamFunc($3); $$.nameTmp = paramConcat($1, $3); $$.gen = concatGen($1.gen, $3.gen);}
-                              |
+                              | { $$.gen = ""; $$.nameTmp = ""; }
                               ;
 
 identificador                 : IDENTIF ;
