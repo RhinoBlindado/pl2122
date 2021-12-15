@@ -255,11 +255,11 @@ char* getOpMultExpr(attr newVar, attr left, attr op, attr right)
 			else if(left.type == REAL)
 				sprintf(asigIntermedia, "%s(&%s,&%s,%s);\n\n", "double_eliminarCopiaDesdePosicion", left.nameTmp, newVar.nameTmp, right.nameTmp);
 		}
-		else if(op.atrib == 2){
+		if(op.atrib == 2){
 			if(left.type == ENTERO)
-				sprintf(asigIntermedia, "%s = %s(&%s,%s);\n\n", newVar.nameTmp, "int_multiplicarValor", left.nameTmp, right.nameTmp);
+				sprintf(asigIntermedia, "%s(&%s,%s);\nint_copiar(&%s,&%s);\n\n", "int_multiplicarLista", left.nameTmp, right.nameTmp, right.nameTmp, newVar.nameTmp);
 			else if(left.type == REAL)
-				sprintf(asigIntermedia, "%s = %s(&%s,%s);\n\n", newVar.nameTmp, "double_multiplicarValor", left.nameTmp, right.nameTmp);
+				sprintf(asigIntermedia, "%s(&%s,%s);\ndouble_copiar(&%s,&%s);\n\n", "double_multiplicarLista", left.nameTmp, right.nameTmp, right.nameTmp, newVar.nameTmp);
 		}
 		else if(op.atrib == 0){
 			if(left.type == ENTERO)
@@ -271,9 +271,9 @@ char* getOpMultExpr(attr newVar, attr left, attr op, attr right)
 	else if(!left.isList && right.isList){
 		if(op.atrib == 2){
 			if(left.type == ENTERO)
-				sprintf(asigIntermedia, "%s(&%s,%s);\nint_copiar(&%s,&%s);\n\n", "int_multiplicarLista", right.nameTmp, left.nameTmp, right.nameTmp, newVar.nameTmp);
+				sprintf(asigIntermedia, "%s = %s(&%s,%s);\n\n", newVar.nameTmp, "int_multiplicarValor", right.nameTmp, left.nameTmp);
 			else if(left.type == REAL)
-				sprintf(asigIntermedia, "%s(&%s,%s);\ndouble_copiar(&%s,&%s);\n\n", "double_multiplicarLista", right.nameTmp, left.nameTmp, right.nameTmp, newVar.nameTmp);
+				sprintf(asigIntermedia, "%s = %s(&%s,%s);\n\n", newVar.nameTmp, "double_multiplicarValor", right.nameTmp, left.nameTmp);
 		}
 	}
 	else{
