@@ -96,6 +96,7 @@
 			int_isInit(L);
 			Nodo_int *ant,*act,*sigu;
 			int i;
+
 			if(p>0 && p <= L->longitud)
 			{
 				if(p==1)
@@ -111,7 +112,7 @@
 					ant = L->primero;
 					act = ant->sig;
 					sigu = act->sig;
-					for(i=1;i<p;i++)
+					for(i=1;i<p-1;i++)
 					{
 						ant = act;
 						act = sigu;
@@ -661,7 +662,7 @@
 				ant = L->primero;
 				act = ant->sig;
 				sigu = act->sig;
-				for(i=1;i<p;i++)
+				for(i=1;i<p - 1;i++)
 				{
 					ant = act;
 					act = sigu;
@@ -1212,7 +1213,7 @@
 				ant = L->primero;
 				act = ant->sig;
 				sigu = act->sig;
-				for(i=1;i<p;i++)
+				for(i=1;i<p - 1;i++)
 				{
 					ant = act;
 					act = sigu;
