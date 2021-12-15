@@ -9,7 +9,7 @@ int numTabs = 0;
 int globalVars = 0;
 int numTabsAnt = -1;
 
-#define SIZE_MALLOC 1024
+#define SIZE_MALLOC 2048
 
 
 void openFile()
