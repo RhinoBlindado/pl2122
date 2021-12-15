@@ -775,7 +775,10 @@ char* paramConcat(attr args, attr exp)
 char* getFuncCall(attr id, attr args)
 {
 	char* res = malloc(300);
-	sprintf(res, "%s(%s)", id.lexema, args.nameTmp);
+	if (args.nameTmp == NULL)
+		sprintf(res, "%s()", id.lexema);
+	else
+		sprintf(res, "%s(%s)", id.lexema, args.nameTmp);
 	return res;
 }
 
