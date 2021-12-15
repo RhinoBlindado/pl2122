@@ -81,8 +81,8 @@ lista[ \t\n]+de         return(DEFLISTA);
 "#"                     return(HASH);
 "?"                     return(INTERR);
 "@"                     return(AT);
-">>"                    return(ITER);
-"<<"                    return(ITER);
+">>"                    yylval.atrib = 0; return(ITER);
+"<<"                    yylval.atrib = 1; return(ITER);
 "$"                     return(INITER);
 \"[^"]*\"               {
                             yylval.lexema = strdup(yytext);

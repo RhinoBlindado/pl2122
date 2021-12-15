@@ -144,7 +144,7 @@ declararVariablesLocalesMulti : marcaInicioVariable variablesLocalesMulti
                               | {$$.gen = concatGen("", controlGlobalVars()); $$.funcGen = "";} /* cadena vacía*/
                               ;
 
-cabeceraFuncion               : tipoDato identificador {$2.type = $1.type; insertFunction($2);}
+cabeceraFuncion               : tipoDato identificador {$2.type = $1.type; $2.isList = $1.isList; insertFunction($2);}
                                 inicioParametros
                                 parametros finParametros {$$.gen = getCabecera($1, $2, $5);};
 
@@ -183,8 +183,8 @@ coma                          : COMA
                               | error
                               ;
 
-tipoDato                      : tipoElemental { $$.type = $1.type; $$.isList = 0; $$.nameTmp = getCType($1.type); }
-                              | DEFLISTA tipoElemental { $$.type = $2.type; $$.isList = 1; }
+tipoDato                      : tipoElemental { $$.type = $1.type; $$.isList = 0; $$.nameTmp = getCType($1); }
+                              | DEFLISTA tipoElemental { $$.type = $2.type; $$.isList = 1; $$.nameTmp = getCType($$);}
                               ;
 
 tipoElemental                 : TIPODATO;
@@ -201,7 +201,7 @@ sentencia                     : bloque {$$.gen = $1.gen;}
                               | sentenciaSalida {$$.gen = $1.gen;}
                               | sentenciaReturn {$$.gen = $1.gen;}
                               | sentenciaFor {$$.gen = $1.gen;}
-                              | sentenciaLista
+                              | sentenciaLista {$$.gen = $1.gen;}
                               ;
 
 sentenciaAsignacion           : identificador ASIG expresion finSentencia { $$ = checkAsignacion($1, $3); $$.gen = getAsig($1, $3); $$.nameTmp = $1.lexema;}
@@ -262,12 +262,12 @@ expresion                     : ABRPAR expresion CERPAR { $$ = $2; $$.nameTmp = 
                               | identificador { $$ = getTypeVar($1); $$.nameTmp = $1.lexema; $$.gen = ""; }
                               | literal { $$ = $1; $$.nameTmp = equivalentCLexema($1); $$.gen = ""; }
                               | funcion { $$.type = getTypeFunc($1); $$.nameTmp = $1.nameTmp; $$.gen = $1.gen;}
-                              | HASH expresion { $$ = checkHashExp($2); }
-                              | INTERR expresion %prec HASH { $$ = checkInterrExp($2); }
-                              | expresion AT expresion { $$ = checkAtExp($1, $3); }
-                              | expresion PLUSPLUS expresion AT expresion { $$= checkPlusPlusAtExp($1, $3, $5); }
-                              | expresion MINMIN expresion { $$ = checkMinMinExp($1, $3); }
-                              | expresion CONCAT expresion { $$ = checkConcatExp($1, $3); }
+                              | HASH expresion { $$ = checkHashExp($2); $$.nameTmp = temporal(); $$.gen = concatGen($2.gen, getHashExpr($$, $1, $2));}
+                              | INTERR expresion %prec HASH { $$ = checkInterrExp($2); $$.nameTmp = temporal(); $$.gen = concatGen($2.gen, getInterrExpr($$, $1, $2));}
+                              | expresion AT expresion { $$ = checkAtExp($1, $3);$$.nameTmp = temporal(); $$.gen = concatGen($1.gen, concatGen($3.gen, getAtExpr($$, $1, $2, $3))); }
+                              | expresion PLUSPLUS expresion AT expresion { $$= checkPlusPlusAtExp($1, $3, $5); $$.nameTmp = temporal(); $$.gen = concatGen($1.gen, concatGen($3.gen, concatGen($5.gen, getTernExpr($$, $1, $3, $5))));}
+                              | expresion MINMIN expresion { $$ = checkMinMinExp($1, $3); $$.nameTmp = temporal(); $$.gen = concatGen($1.gen, concatGen($3.gen, getMinMinExpr($$, $1, $3)));}
+                              | expresion CONCAT expresion { $$ = checkConcatExp($1, $3); $$.nameTmp = temporal(); $$.gen = concatGen($1.gen, concatGen($3.gen, getConcatExpr($$, $1, $3)));}
                               ;
 
 funcion                       : identificador { findFunctionCall($1); numTabs += 1;}
@@ -290,8 +290,8 @@ contenidoLista                : expresion { $$ = $1; }
                               | contenidoLista COMA expresion { $$ = checkLista($1, $3); }
                               ;
 
-sentenciaLista                : identificador ITER finSentencia { if (getTypeVar($1).isList == 0) yyerror("[ERROR SEMÁNTICO]: Solo se puede iterar una lista."); }
-                              | INITER identificador finSentencia { if (getTypeVar($1).isList == 0) yyerror("[ERROR SEMÁNTICO]: Solo se puede iterar una lista."); }
+sentenciaLista                : identificador ITER finSentencia { if (getTypeVar($1).isList == 0) yyerror("[ERROR SEMÁNTICO]: Solo se puede iterar una lista."); $1 = getTypeVar($1); $$.gen = getSentIter($1, $2);}
+                              | INITER identificador finSentencia { if (getTypeVar($2).isList == 0) yyerror("[ERROR SEMÁNTICO]: Solo se puede iterar una lista."); $2 = getTypeVar($2); $$.gen = getIniIter($2);}
                               ;
 
 literal                       : LITERAL { $$ = $1; }

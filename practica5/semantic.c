@@ -193,9 +193,9 @@ void blockStart()
 
 void blockEnd()
 {
- // printf("Fin bloque detectado\n");
- // printf("HEADER = %d\nTABLA SIMBOLOS HASTA AHORA:\n", HEADER);
- // printTS_ALL();
+ //printf("Fin bloque detectado\n");
+ //printf("HEADER = %d\nTABLA SIMBOLOS HASTA AHORA:\n", HEADER);
+ //printTS_ALL();
   while(TS[HEADER].input != BLOCK_START)
   {
     popTS();
@@ -215,7 +215,7 @@ void insertFunction(attr atrib){
   if (atrib.isList)
     pushTS(FUNC, atrib.lexema, LISTA, 0, atrib.type);
   else
-    pushTS(FUNC, atrib.lexema, atrib.type, 0, -1);
+    pushTS(FUNC, atrib.lexema, atrib.type, 0, 0);
 }
 
 /**
@@ -225,9 +225,9 @@ void insertFunction(attr atrib){
  */
 void insertFormalParameter(attr atrib){
   if (atrib.isList)
-    pushTS(PARAMETER, atrib.lexema, LISTA, -1, atrib.type);
+    pushTS(PARAMETER, atrib.lexema, LISTA, 0, atrib.type);
   else
-    pushTS(PARAMETER, atrib.lexema, atrib.type, -1, -1);
+    pushTS(PARAMETER, atrib.lexema, atrib.type, 0, 0);
 
   // Buscar función a la que hacen referencia los parámetros
   int posFunction = -1;

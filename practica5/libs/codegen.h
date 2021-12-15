@@ -99,4 +99,19 @@
 
 	void writeProgram(attr block);
 
+	char* getHashExpr(attr newVar, attr op, attr val);
+
+	char* getInterrExpr(attr newVar, attr op, attr val);
+
+	char* getAtExpr(attr newVar, attr left, attr op, attr right);
+	
+	char* getTernExpr(attr newVar, attr expr1, attr expr2, attr expr3);
+
+	char* getMinMinExpr(attr newVar, attr expr1, attr expr2);
+
+	char* getConcatExpr(attr newVar, attr expr1, attr expr2);
+
+	char* getSentIter(attr id, attr op);
+
+	char* getIniIter(attr id);
 #endif
