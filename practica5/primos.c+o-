@@ -1,0 +1,70 @@
+inicio
+{
+    inivar
+        entero n, curr, d, ultim, cuenta, primero;
+    finvar;
+
+    curr = 2;
+    ultim = 0;
+    cuenta = 0;
+    primero = 1;
+
+    anunciar("Introduce el numero n\n");
+    escanear(n);
+
+    anunciar(n);
+    anunciar("  = ");
+
+    mientras(curr <= n)
+    {
+        d = n/curr;
+        si(curr*d == n)
+        {
+            si(curr != ultim)
+            {
+                ultim = curr;
+                cuenta = 1;
+            }
+            sino
+            {
+                cuenta = cuenta + 1;
+            }
+            n = n / curr;
+        }
+        sino
+        {
+            si(cuenta > 0){
+                si(primero == 0)
+                {
+                    anunciar(" ");
+                }
+                primero = 0;
+                anunciar(curr);
+                si(cuenta > 1)
+                {
+                    anunciar("^");
+                    anunciar(cuenta);
+                }
+            }
+            curr = curr + 1;
+            cuenta = 0;
+        }
+    }
+    si(cuenta > 0)
+    {
+        si(primero == 0)
+        {
+            anunciar(" *");
+            primero = 0;
+            anunciar(" ");
+            anunciar(curr);
+            si(cuenta > 1)
+            {
+                anunciar("^");
+                anunciar(cuenta);
+            }
+        }
+    }
+    anunciar("\n");
+    
+}
