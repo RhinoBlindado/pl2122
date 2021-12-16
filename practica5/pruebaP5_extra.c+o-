@@ -1,0 +1,115 @@
+inicio
+{
+    inivar
+        entero a, b, c, cont;
+        lista de entero lista1, lista2, lista3, listaAux1, listaAux2;
+    finvar;
+    
+
+
+    entero pares(entero input)
+    {
+        inivar
+            entero retVal, i, aux1, aux2;
+        finvar;        
+
+        entero meter_lista_par(entero num)
+        {
+            inivar
+                lista de entero aux;
+            finvar;
+
+            lista1 = lista1 ++ num @ 1;
+
+            repatriar 0;
+        }
+
+        para i=0; hasta input aumentando
+        {
+            aux1 = 2 * i;
+            aux2 = meter_lista_par(aux1);
+        }
+  
+        repatriar 0;
+    }
+
+    entero impares(entero input2)
+    {
+        inivar
+            entero retVal, i, aux1, aux2;
+        finvar;        
+
+        entero meter_lista_impar(entero num)
+        {
+            inivar
+                lista de entero aux;
+            finvar;
+
+            lista2 = lista2 ++ num @ 1;
+
+            repatriar 0;
+        }
+
+        para i=0; hasta input2 aumentando
+        {
+            aux1 = (2 * i) + 1 ;
+            aux2 = meter_lista_impar(aux1);
+        }
+  
+        repatriar 0;
+    }
+
+    entero imprimir_lista(entero x)
+    {
+        inivar
+            entero i, n;
+        finvar;
+
+        n = #lista1 ;
+
+        anunciar("pares: ");
+
+        para i = 1; hasta n aumentando
+        {
+            anunciar(lista1@i);
+            anunciar(", "); 
+        }
+        anunciar("\n");
+
+        anunciar("impares: ");
+
+        para i = 1; hasta n aumentando
+        {
+            anunciar(lista2@i);
+            anunciar(", "); 
+        }
+        anunciar("\n");
+
+
+        repatriar 0;
+    }
+
+
+    anunciar("Ingresa un numero:\n>");
+    escanear (a);
+
+    b = pares(a);
+    b = impares(a);
+    b = imprimir_lista(b);
+
+    lista3 = lista1 + 3;
+
+    anunciar("sumando tres a pares: \n");
+
+    cont = #lista3;
+
+    para c = 1; hasta cont aumentando
+    {
+        anunciar(lista3@c);
+        anunciar(", "); 
+    }
+    anunciar("\n");
+
+}
+
+ 
