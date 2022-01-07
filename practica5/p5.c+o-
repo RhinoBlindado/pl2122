@@ -17,9 +17,31 @@ inicio
         {
             inivar
                 lista de entero aux;
+                entero h;
             finvar;
 
+            entero imprimir_pares()
+            {
+                inivar
+                entero i, n;
+                finvar;
+
+                n = #lista1 ;
+
+                anunciar("pares: ");
+
+                para i = 1; hasta n aumentando
+                {
+                    anunciar(lista1@i);
+                    anunciar(", "); 
+                }
+                anunciar("\n");
+
+                repatriar n;
+            }
+
             lista1 = lista1 ++ num @ 1;
+            h = imprimir_pares();
 
             repatriar 0;
         }
@@ -39,13 +61,34 @@ inicio
             entero retVal, i, aux1, aux2;
         finvar;        
 
-        entero meter_lista_impar(entero num)
+        entero meter_lista_impar(entero num, entero n)
         {
             inivar
                 lista de entero aux;
+                entero h;
             finvar;
 
+            entero imprimir_impares(entero n)
+            {
+                inivar
+                entero i;
+                finvar;
+
+                anunciar("impares: ");
+
+                para i = 1; hasta n aumentando
+                {
+                    anunciar(lista2@i);
+                    anunciar(", "); 
+                }
+                anunciar("\n");
+
+                repatriar n;
+            }
+
             lista2 = lista2 ++ num @ 1;
+
+            h = imprimir_impares(n);
 
             repatriar 0;
         }
@@ -53,13 +96,13 @@ inicio
         para i=0; hasta input2-1 aumentando
         {
             aux1 = (2 * i) + 1 ;
-            aux2 = meter_lista_impar(aux1);
+            aux2 = meter_lista_impar(aux1, i+1);
         }
   
         repatriar 0;
     }
 
-    entero imprimir_lista(entero x)
+    entero imprimir_lista()
     {
         inivar
             entero i, n;
@@ -95,7 +138,7 @@ inicio
 
     b = pares(a);
     b = impares(a);
-    b = imprimir_lista(b);
+    b = imprimir_lista();
 
     lista3 = lista1 + 3;
 
